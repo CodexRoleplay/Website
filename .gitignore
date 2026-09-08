@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+.env*
+!.env.example
+firebase-service-account.json
+secrets/
+npm-debug.log*
+*.tsbuildinfo
+dbg-*.png
+*-check.png

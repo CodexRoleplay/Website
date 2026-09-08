@@ -1,0 +1,16 @@
+/* Palette et unités viewport Codex RP */
+:root {
+  --vw: 1vw;
+  --dvh: 1dvh;
+  --svh: 1svh;
+  --lvh: 1lvh;
+
+  --primary-rgb: 49, 246, 255;
+  --primary: rgb(var(--primary-rgb));
+  --secondary-rgb: 254, 20, 190;
+  --secondary: rgb(var(--secondary-rgb));
+  --success-primary-rgb: 36, 182, 189;
+  --success-primary: rgb(var(--success-primary-rgb));
+  --success-secondary-rgb: 142, 229, 234;
+  --success-secondary: rgb(var(--success-secondary-rgb));
+}

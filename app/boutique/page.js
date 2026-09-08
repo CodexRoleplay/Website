@@ -1,0 +1,66 @@
+import Image from "next/image";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import { getTebexCategories } from "@/lib/tebex";
+import ShopClient from "./ShopClient";
+import ShopCodyxRain from "./ShopCodyxRain";
+import styles from "./shop.module.css";
+
+export const dynamic = "force-dynamic";
+
+export const metadata = {
+  alternates: {
+    canonical: "/boutique",
+  },
+  title: "Boutique — Codex RP",
+  description: "Boutique Tebex Codex RP : catalogue, panier et connexion FiveM.",
+};
+
+export default async function ShopPage() {
+  let categories = [];
+  let catalogError = "";
+
+  try {
+    categories = await getTebexCategories();
+  } catch (error) {
+    catalogError = error instanceof Error ? error.message : "Le catalogue est indisponible.";
+  }
+
+  return (
+    <>
+      <Header />
+      <div className={styles.page}>
+        <main className={styles.main}>
+          <div className={styles.background} aria-hidden="true">
+            <div />
+          </div>
+          <ShopCodyxRain />
+
+          <section className={styles.hero}>
+            <span className={styles.eyebrow}>Catalogue officiel</span>
+            <h1>
+              Boutique <strong>Codex RP</strong>
+            </h1>
+            <div className={styles.shopCharacter} aria-hidden="true">
+              <Image
+                alt=""
+                className={styles.shopCharacterImage}
+                height={1406}
+                priority
+                sizes="(max-width: 620px) 580px, (max-width: 960px) 900px, 1250px"
+                src="/img/raul-bautista.webp"
+                width={1920}
+              />
+            </div>
+            <p>
+              Connecte ton compte FiveM, choisis tes produits puis finalise ton achat sur le
+              paiement sécurisé Tebex.
+            </p>
+          </section>
+          <ShopClient catalogError={catalogError} initialCategories={categories} />
+        </main>
+        <Footer />
+      </div>
+    </>
+  );
+}

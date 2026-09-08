@@ -1,0 +1,24 @@
+{
+  "name": "codex-rp-next",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "seed:reglement": "node scripts/seed-reglement.mjs",
+    "setup:firebase": "node scripts/setup-firebase.mjs"
+  },
+  "dependencies": {
+    "firebase": "^12.16.0",
+    "google-auth-library": "^10.9.0",
+    "lenis": "^1.3.25",
+    "lucide-react": "^1.24.0",
+    "next": "16.2.9",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "overrides": {
+    "postcss": "8.5.16"
+  }
+}

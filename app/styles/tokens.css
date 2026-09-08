@@ -1,0 +1,470 @@
+/* Tokens, reset, fonts — base migrée (sans nav/header/button legacy) */
+.wrapper_main__v_pMu {
+    min-height: var(--real-height);
+    display: flex;
+    flex-direction: column
+}
+
+.wrapper_main__v_pMu.wrapper_home__GdrY6 {
+    overflow: hidden
+}
+
+.wrapper_main__v_pMu main {
+    flex: 1 1
+}
+
+@font-face {
+    font-family: __secondary_991125;
+    src: url(/fonts/secondary.woff2) format("woff2");
+    font-display: swap;
+    font-weight: 400;
+    font-style: normal
+}
+
+@font-face {
+    font-family: __secondary_Fallback_991125;
+    src: local("Arial");
+    ascent-override: 77.46%;
+    descent-override: 25.11%;
+    line-gap-override: 0.00%;
+    size-adjust: 93.36%
+}
+
+.__className_991125 {
+    font-family: __secondary_991125, __secondary_Fallback_991125;
+    font-weight: 400;
+    font-style: normal
+}
+
+.__variable_991125 {
+    --font-secondary: "__secondary_991125", "__secondary_Fallback_991125"
+}
+
+:root {
+    --bg-opacity-1: rgba(var(--grey-primary-rgb), 0.1);
+    --bg-opacity-2: rgba(var(--grey-secondary-rgb), 0.15);
+    --bg-opacity-3: rgba(var(--grey-secondary-rgb), 0.05);
+    --bg-opacity-4: rgba(var(--grey-primary-rgb), 0.065);
+    --bg-danger-1: rgba(var(--danger-primary-rgb), 0.1);
+    --bg-success-1: rgba(var(--success-primary-rgb), 0.1);
+    --body-rgb: 1, 8, 26;
+    --body: rgb(var(--body-rgb));
+    --primary-rgb: 8, 254, 162;
+    --primary: rgb(var(--primary-rgb));
+    --secondary-rgb: 255, 0, 255;
+    --secondary: rgb(var(--secondary-rgb));
+    --tertiary-rgb: 134, 54, 255;
+    --tertiary: rgb(var(--tertiary-rgb));
+    --quaternary-rgb: 9, 165, 255;
+    --quaternary: rgb(var(--quaternary-rgb));
+    --vip-rgb: 255, 185, 33;
+    --vip: rgb(var(--vip-rgb));
+    --text-primary-rgb: 255, 255, 255;
+    --text-primary: rgb(var(--text-primary-rgb));
+    --text-secondary-rgb: 183, 194, 221;
+    --text-secondary: rgb(var(--text-secondary-rgb));
+    --grey-primary-rgb: 51, 60, 102;
+    --grey-primary: rgb(var(--grey-primary-rgb));
+    --grey-secondary-rgb: 115, 136, 236;
+    --grey-secondary: rgb(var(--grey-secondary-rgb));
+    --danger-primary-rgb: 255, 73, 73;
+    --danger-primary: rgb(var(--danger-primary-rgb));
+    --danger-secondary-rgb: 243, 152, 153;
+    --danger-secondary: rgb(var(--danger-secondary-rgb));
+    --success-primary-rgb: 8, 254, 162;
+    --success-primary: rgb(var(--success-primary-rgb));
+    --success-secondary-rgb: 126, 255, 207;
+    --success-secondary: rgb(var(--success-secondary-rgb));
+    --ease-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+    --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    --ease-in-quart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
+    --ease-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    --ease-in-expo: cubic-bezier(0.95, 0.05, 0.795, 0.035);
+    --ease-in-circ: cubic-bezier(0.6, 0.04, 0.98, 0.335);
+    --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+    --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+    --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+    --ease-out-circ: cubic-bezier(0.075, 0.82, 0.165, 1);
+    --ease-in-out-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+    --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+    --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-in-out-quint: cubic-bezier(0.86, 0, 0.07, 1);
+    --ease-in-out-expo: cubic-bezier(1, 0, 0, 1);
+    --ease-in-out-circ: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+    --gleasing: cubic-bezier(0.4, 0, 0, 1);
+    --cubic: cubic-bezier(0.305, 0.045, 0.355, 1);
+    --transition-link: 0.25s var(--cubic);
+    --transition-scale: 0.1s;
+    --transition-nav: 0.4s var(--cubic);
+    --real-height: calc(var(--dvh, 1vh) * 100);
+    --real-width: calc(var(--vw, 1vw) * 100);
+    --full-size: calc(var(--real-width, 100vw) + var(--real-height, 100vh));
+    --size-1: calc(4px + 1 * (100vw - 320px) / 1080);
+    --size-2: calc(8px + 1 * (100vw - 320px) / 1080);
+    --size-3: calc(16px + 1 * (100vw - 320px) / 1080);
+    --size-4: calc(24px + 2 * (100vw - 320px) / 1080);
+    --size-5: calc(32px + 3 * (100vw - 320px) / 1080);
+    --size-6: calc(40px + 4 * (100vw - 320px) / 1080);
+    --size-7: calc(48px + 5 * (100vw - 320px) / 1080);
+    --wrapper-header: calc(700px + 500 * (100vw - 320px) / 1080);
+    --wrapper-width: calc(600px + 350 * (100vw - 320px) / 1080);
+    --wrapper-middle: calc(var(--wrapper-width) / 2.5);
+    --wrapper-max: 85vw;
+    --main-padding: calc(32px + 24 * (100vw - 320px) / 1080);
+    --main-top: calc(100px + 80 * (100vw - 320px) / 1080);
+    --angle: 40deg;
+    --angle-reverse: -40deg;
+    --angle-radius: 3px;
+    --shadow-1: 0 0 0 1px var(--bg-opacity-3) inset;
+    --shadow-2: 0 24px 40px rgba(0, 0, 0, .25)
+}
+
+@media screen and (max-width:768px) {
+    :root {
+        --wrapper-max: 88vw
+    }
+}
+
+*,
+:after,
+:before {
+    position: relative;
+    box-sizing: border-box
+}
+
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -ms-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0)
+}
+
+a,
+article,
+aside,
+audio,
+body,
+button,
+details,
+div,
+figcaption,
+figure,
+footer,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+header,
+hgroup,
+hr,
+html,
+img,
+input,
+li,
+menu,
+nav,
+ol,
+output,
+p,
+section,
+span,
+table,
+tbody,
+td,
+textarea,
+tfoot,
+th,
+thead,
+tr,
+ul,
+video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    vertical-align: baseline
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+    display: block
+}
+
+a,
+button {
+    cursor: pointer;
+    color: inherit
+}
+
+button {
+    border: 0;
+    padding: 0;
+    background: none;
+    display: inline-block
+}
+
+:active,
+:focus,
+a,
+a:hover,
+button,
+button:hover {
+    text-decoration: none;
+    outline: none
+}
+
+ol,
+ul {
+    list-style: none
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0
+}
+
+strong {
+    font-weight: 700
+}
+
+img,
+svg {
+    vertical-align: bottom;
+    height: auto
+}
+
+input,
+textarea {
+    all: unset
+}
+
+textarea {
+    resize: none;
+    width: 100%;
+    background-color: transparent;
+    color: inherit
+}
+
+picture {
+    display: block
+}
+
+picture img {
+    max-width: 100%;
+    width: 100%;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none
+}
+
+small {
+    font-size: .95em
+}
+
+address {
+    font: inherit
+}
+
+input {
+    color: inherit
+}
+
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0
+}
+
+input[type=search]::-ms-clear,
+input[type=search]::-ms-reveal {
+    display: none;
+    width: 0;
+    height: 0
+}
+
+input[type=search]::-webkit-search-cancel-button,
+input[type=search]::-webkit-search-decoration,
+input[type=search]::-webkit-search-results-button,
+input[type=search]::-webkit-search-results-decoration {
+    display: none
+}
+
+input[type=number] {
+    -webkit-appearance: textfield;
+    appearance: textfield;
+    -moz-appearance: textfield
+}
+
+html.lenis {
+    height: auto
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain
+}
+
+.lenis.lenis-stopped {
+    overflow: hidden
+}
+
+.lenis.lenis-scrolling iframe {
+    pointer-events: none
+}
+
+html {
+    background-color: var(--body);
+    color: var(--text-primary);
+    font-size: calc(15px + 1*(100vw - 320px)/1080);
+    font-weight: 300;
+    font-synthesis: none !important;
+    line-height: 1.15;
+    -webkit-text-size-adjust: 100%;
+    -moz-tab-size: 4;
+    tab-size: 4;
+    -ms-overflow-style: none;
+    scrollbar-width: none
+}
+
+html::-webkit-scrollbar {
+    display: none
+}
+
+html ::selection {
+    background-color: rgba(var(--primary-rgb), .5);
+    color: var(--text-primary);
+    -webkit-text-fill-color: var(--text-primary)
+}
+
+html ::-moz-selection {
+    background-color: rgba(var(--primary-rgb), .5);
+    color: var(--text-primary);
+    -webkit-text-fill-color: var(--text-primary)
+}
+
+body,
+html {
+    scroll-behavior: smooth;
+    overscroll-behavior: none
+}
+
+body {
+    font-family: var(--font-tertiary);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    letter-spacing: -.005em;
+    margin: 0 auto;
+    width: 100vw
+}
+
+@media screen and (min-width:601px) {
+    body:before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        height: 100vh;
+        background: url(/img/noise.webp) repeat 50%;
+        background-size: 30%;
+        pointer-events: none;
+        z-index: 9999
+    }
+}
+
+svg {
+    stroke-linecap: round;
+    stroke-linejoin: round
+}
+
+[data-reveal] {
+    --translate: var(--main-padding);
+    opacity: 0;
+    visibility: hidden;
+    will-change: transform, opacity;
+    transform: translate3d(var(--x, 0), var(--y, 0), 0)
+}
+
+[data-reveal][data-reveal=bottom] {
+    --y: var(--translate)
+}
+
+[data-reveal][data-reveal=top] {
+    --y: calc(var(--translate) * -1)
+}
+
+[data-reveal][data-reveal=right] {
+    --x: var(--translate)
+}
+
+[data-reveal][data-reveal=left] {
+    --x: calc(var(--translate) * -1)
+}
+
+[data-reveal][data-reveal=opacity] {
+    transform: none !important
+}
+
+@font-face {
+    font-family: __primary_675c71;
+    src: url(/fonts/primary.woff2) format("woff2");
+    font-display: swap;
+    font-style: normal
+}
+
+@font-face {
+    font-family: __primary_Fallback_675c71;
+    src: local("Arial");
+    ascent-override: 104.26%;
+    descent-override: 28.96%;
+    line-gap-override: 0.00%;
+    size-adjust: 69.06%
+}
+
+.__className_675c71 {
+    font-family: __primary_675c71, __primary_Fallback_675c71;
+    font-style: normal
+}
+
+.__variable_675c71 {
+    --font-primary: "__primary_675c71", "__primary_Fallback_675c71"
+}
+
+@font-face {
+    font-family: __tertiary_c1dfd3;
+    src: url(/fonts/tertiary.woff2) format("woff2");
+    font-display: swap;
+    font-style: normal
+}
+
+@font-face {
+    font-family: __tertiary_Fallback_c1dfd3;
+    src: local("Arial");
+    ascent-override: 90.00%;
+    descent-override: 22.43%;
+    line-gap-override: 0.00%;
+    size-adjust: 107.64%
+}
+
+.__className_c1dfd3 {
+    font-family: __tertiary_c1dfd3, __tertiary_Fallback_c1dfd3;
+    font-style: normal
+}
+
+.__variable_c1dfd3 {
+    --font-tertiary: "__tertiary_c1dfd3", "__tertiary_Fallback_c1dfd3"
+}

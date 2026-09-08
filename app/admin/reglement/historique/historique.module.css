@@ -1,0 +1,174 @@
+.page {
+  display: grid;
+  gap: 16px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.hint {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.9rem;
+}
+
+.secondaryButton {
+  padding: 10px 14px;
+  border: 1px solid rgba(49, 246, 255, 0.45);
+  border-radius: 10px;
+  background: transparent;
+  color: #8ef8ff;
+  cursor: pointer;
+}
+
+.secondaryButton:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.error {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 80, 120, 0.12);
+  color: #ffb3c7;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  min-height: 520px;
+}
+
+.listPanel,
+.detailPanel {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.listPanel {
+  max-height: calc(100vh - 240px);
+  overflow-y: auto;
+}
+
+.detailPanel {
+  max-height: calc(100vh - 240px);
+  overflow-y: auto;
+}
+
+.status {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.logList {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.logItem {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.logButton {
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.logButton:hover,
+.logButtonActive {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.logButtonActive {
+  box-shadow: inset 2px 0 0 rgba(49, 246, 255, 0.85);
+}
+
+.logButton strong {
+  display: block;
+  font-size: 0.86rem;
+}
+
+.logButton span {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 0.8rem;
+}
+
+.logButton p {
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.detailHeader h2 {
+  margin: 0 0 4px;
+}
+
+.detailHeader p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.summary {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  line-height: 1.5;
+}
+
+.changes {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.changes li + li {
+  margin-top: 8px;
+}
+
+.emptyState h2 {
+  margin: 0 0 8px;
+}
+
+.emptyState p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .listPanel {
+    max-height: 320px;
+  }
+}

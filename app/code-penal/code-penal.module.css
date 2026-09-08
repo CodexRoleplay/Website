@@ -1,0 +1,839 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  background: var(--body);
+  color: #fff;
+  overflow: hidden;
+}
+
+.pageFooter {
+  position: relative;
+  z-index: 2;
+  background: var(--body);
+  overflow: hidden;
+}
+
+.shell {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  width: min(100% - 48px, 1510px);
+  margin: 0 auto;
+  padding: 150px 0 84px;
+}
+
+.background {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 0;
+  width: 100vw;
+  height: min(980px, 112vh);
+  overflow: hidden;
+  background: var(--body);
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.background::before,
+.background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.background::before {
+  background: linear-gradient(to bottom, rgba(var(--body-rgb), 0.95) 10%, rgba(var(--body-rgb), 0));
+}
+
+.background::after {
+  top: auto;
+  bottom: 0;
+  height: 58%;
+  background: linear-gradient(
+    to top,
+    var(--body) 0%,
+    rgba(var(--body-rgb), 0.9) 34%,
+    rgba(var(--body-rgb), 0)
+  );
+}
+
+.background > div {
+  position: absolute;
+  inset: -10px;
+  background: url("/img/home_codepenal.webp") center top / cover no-repeat;
+
+  opacity: 0.96;
+  transform: scale(1.012);
+}
+
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 630px;
+  overflow: hidden;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 22px;
+  color: #24e3ec;
+  font-family: var(--font-secondary);
+  font-size: 0.76rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  text-shadow: 0 0 16px rgba(36, 227, 236, 0.36);
+}
+
+.eyebrow span {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  background: #24e3ec;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  box-shadow: 0 0 10px rgba(36, 227, 236, 0.8);
+}
+
+.heroGrid {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(480px, 0.8fr);
+  gap: 0;
+  align-items: stretch;
+  min-height: 500px;
+}
+
+.heroCopy {
+  position: relative;
+  z-index: 4;
+  align-self: center;
+  padding: 52px 0 68px clamp(8px, 3.5vw, 58px);
+}
+
+.heroTitle {
+  margin: 0;
+  font-family: var(--font-primary);
+  font-size: clamp(112px, 11.5vw, 178px);
+  font-weight: 800;
+  line-height: 0.72;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.titleCode,
+.titlePenal {
+  position: relative;
+  display: block;
+  width: max-content;
+}
+
+.titleCode {
+  margin-bottom: 0.2em;
+  margin-left: -0.4em;
+  color: #24e3ec;
+  font-size: 0.36em;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.titlePenal {
+  z-index: 1;
+  color: #fff;
+  text-shadow: none;
+}
+
+.heroDescription {
+  max-width: 610px;
+  margin: 14px 0 0;
+  padding-left: 3px;
+  color: rgba(235, 241, 255, 0.72);
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.heroVisual {
+  position: relative;
+  z-index: 2;
+  align-self: stretch;
+  min-height: 500px;
+  pointer-events: none;
+}
+
+.heroCharacter {
+  position: absolute;
+  right: clamp(-145px, -7vw, -72px);
+  bottom: -180px;
+  width: min(1040px, 69vw);
+  height: auto;
+  max-width: none;
+  opacity: 0.96;
+  filter: drop-shadow(-22px 24px 38px rgba(0, 0, 0, 0.52));
+  transform: translateZ(0);
+}
+
+.controlDeck {
+  position: relative;
+  z-index: 8;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(520px, 1.1fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: end;
+  min-height: 170px;
+  padding: 22px clamp(18px, 2.4vw, 36px);
+  border: 0;
+  background: rgba(3, 8, 22, 0.74);
+  box-shadow: inset 0 0 0 1px rgba(36, 227, 236, 0.42);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+
+.controlDeck::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, transparent 47%, rgba(36, 227, 236, 0.42) 48%, rgba(36, 227, 236, 0.42) 52%, transparent 53%) top left / 14px 14px no-repeat,
+    linear-gradient(135deg, transparent 47%, rgba(36, 227, 236, 0.42) 48%, rgba(36, 227, 236, 0.42) 52%, transparent 53%) bottom right / 14px 14px no-repeat;
+}
+
+.jurisdictionSwitch {
+  position: relative;
+  z-index: 2;
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.jurisdictionTab {
+  display: grid;
+  gap: 2px;
+  min-width: 168px;
+  padding: 12px 16px;
+  border: 0;
+  background: rgba(4, 9, 24, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(36, 227, 236, 0.32);
+  color: rgba(235, 241, 255, 0.78);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+.jurisdictionTab span {
+  color: #fff;
+  font-family: var(--font-primary);
+  font-size: 1.02rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.jurisdictionTab small {
+  color: rgba(220, 232, 249, 0.55);
+  font-family: var(--font-secondary);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.jurisdictionTabActive {
+  background: rgba(36, 227, 236, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(36, 227, 236, 0.86);
+  color: #24e3ec;
+}
+
+.jurisdictionSummary {
+  position: relative;
+  z-index: 2;
+  grid-column: 1 / -1;
+  margin: 0;
+  color: rgba(235, 241, 255, 0.7);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.search {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+}
+
+.search > span {
+  color: rgba(220, 232, 249, 0.6);
+  font-family: var(--font-secondary);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.searchField {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  height: 54px;
+  padding: 0 18px;
+  border: 0;
+  background: rgba(4, 9, 24, 0.78);
+  box-shadow: inset 0 0 0 1px rgba(36, 227, 236, 0.58);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: #24e3ec;
+  clip-path: polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 13px 100%, 0 calc(100% - 13px));
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.searchField::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(45deg, transparent 47%, rgba(36, 227, 236, 0.58) 48%, rgba(36, 227, 236, 0.58) 52%, transparent 53%) top right / 13px 13px no-repeat,
+    linear-gradient(45deg, transparent 47%, rgba(36, 227, 236, 0.58) 48%, rgba(36, 227, 236, 0.58) 52%, transparent 53%) bottom left / 13px 13px no-repeat;
+}
+
+.searchField:focus-within {
+  box-shadow:
+    inset 0 0 0 1px rgba(36, 227, 236, 0.92),
+    inset 0 0 24px rgba(36, 227, 236, 0.09);
+}
+
+.searchField:focus-within::before {
+  background:
+    linear-gradient(45deg, transparent 47%, rgba(36, 227, 236, 0.92) 48%, rgba(36, 227, 236, 0.92) 52%, transparent 53%) top right / 13px 13px no-repeat,
+    linear-gradient(45deg, transparent 47%, rgba(36, 227, 236, 0.92) 48%, rgba(36, 227, 236, 0.92) 52%, transparent 53%) bottom left / 13px 13px no-repeat;
+}
+
+.searchField svg,
+.searchField input {
+  position: relative;
+  z-index: 1;
+}
+
+.search input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  outline: 0;
+}
+
+.statsBar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: center;
+}
+
+.statsBar > span {
+  display: grid;
+  gap: 2px;
+  color: rgba(222, 231, 247, 0.58);
+  font-family: var(--font-secondary);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.statsBar > span strong {
+  color: #fff;
+  font-family: var(--font-primary);
+  font-size: 1.12rem;
+  letter-spacing: 0;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.toolbar button {
+  position: relative;
+  min-width: 112px;
+  min-height: 44px;
+  padding: 9px 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #fff;
+  font-family: var(--font-secondary);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.toolbar button::before,
+.toolbar button::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  clip-path: inherit;
+}
+
+.toolbar button::before {
+  inset: 0;
+  background: rgba(36, 227, 236, 0.34);
+}
+
+.toolbar button::after {
+  inset: 1px;
+  background: rgba(12, 21, 48, 0.78);
+}
+
+.toolbar button {
+  isolation: isolate;
+}
+
+.toolbar button::before,
+.toolbar button::after {
+  z-index: -1;
+}
+
+.toolbar button:hover {
+  color: #8ef8ff;
+}
+
+.toolbar button:hover::before {
+  background: rgba(36, 227, 236, 0.72);
+}
+
+.toolbar button:hover::after {
+  background: rgba(13, 31, 62, 0.86);
+}
+
+.sectionList {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.sectionCard {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  background: rgba(4, 9, 24, 0.58);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  /* box-shadow: 0 22px 70px rgba(0, 0, 0, 0.22); */
+  overflow: hidden;
+}
+
+.sectionCardOpen {
+  border-color: rgba(36, 227, 236, 0.32);
+  box-shadow: inset 3px 0 0 #24e3ec, 0 22px 70px rgba(0, 0, 0, 0.22);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  width: 100%;
+  min-height: 86px;
+  padding: 18px 24px 18px 28px;
+  border: 0;
+  background: rgba(7, 13, 32, 0.64);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  color: #fff;
+  font-family: var(--font-secondary);
+  font-size: clamp(1.02rem, 1.18vw, 1.22rem);
+  font-weight: 800;
+  letter-spacing: 0.015em;
+  line-height: 1.42;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.sectionHeader:hover {
+  background: rgba(10, 19, 44, 0.78);
+}
+
+.sectionHeading {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.sectionHeading > span {
+  display: block;
+  max-width: 980px;
+  color: rgba(255, 255, 255, 0.94);
+  letter-spacing: 0.018em;
+  line-height: 1.42;
+  text-wrap: balance;
+}
+
+.sectionHeading small {
+  color: #24e3ec;
+  font-family: var(--font-secondary);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  line-height: 1;
+}
+
+.sectionMeta {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex: none;
+}
+
+.sectionMeta em {
+  color: rgba(255, 255, 255, 0.66);
+  font-family: var(--font-secondary);
+  font-size: 0.72rem;
+  font-style: normal;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.sectionChevron {
+  color: #24e3ec;
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.sectionCardOpen .sectionChevron {
+  color: #fe14be;
+  transform: rotate(180deg);
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.lawTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lawTable th {
+  padding: 16px 20px;
+  color: rgba(142, 248, 255, 0.78);
+  font-family: var(--font-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.lawTable td {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  color: rgba(245, 248, 255, 0.86);
+  line-height: 1.68;
+  vertical-align: top;
+}
+
+.lawTable td:first-child {
+  width: 118px;
+  border-left: 4px solid rgba(49, 246, 255, 0.42);
+}
+
+.lawTable td:nth-child(2) {
+  width: 230px;
+  color: #fff;
+  font-weight: 800;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.lawTable td:nth-child(4),
+.lawTable td:nth-child(5) {
+  width: 150px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.lawTable strong,
+.lawTable span {
+  display: block;
+}
+
+.lawTable strong {
+  font-family: var(--font-primary);
+  font-size: 1.05rem;
+}
+
+.lawTable span {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 0.74rem;
+}
+
+.level_contravention td:first-child {
+  border-left-color: #31f6ff;
+}
+
+.level_delit td:first-child {
+  border-left-color: #ffc247;
+}
+
+.level_crime td:first-child {
+  border-left-color: #ff4d6d;
+}
+
+.level_aggravante td:first-child {
+  border-left-color: #fe14be;
+}
+
+.level_info td:first-child {
+  border-left-color: rgba(255, 255, 255, 0.4);
+}
+
+.notes {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.notes p {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.045);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: rgba(245, 248, 255, 0.82);
+  line-height: 1.65;
+  white-space: pre-line;
+}
+
+.emptyState {
+  margin: 0;
+  padding: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(245, 248, 255, 0.66);
+}
+
+@media (max-width: 900px) {
+  .shell {
+    width: min(100% - 28px, 860px);
+    padding-top: 126px;
+  }
+
+  .hero {
+    min-height: 650px;
+  }
+
+  .heroGrid {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    min-height: 500px;
+  }
+
+  .heroCopy {
+    padding: 42px 0 62px 12px;
+  }
+
+  .heroTitle {
+    font-size: clamp(92px, 14vw, 124px);
+  }
+
+  .heroDescription {
+    max-width: 520px;
+    margin-top: 14px;
+  }
+
+  .heroCharacter {
+    right: -180px;
+    bottom: -142px;
+    width: 820px;
+  }
+
+  .controlDeck {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding-block: 20px;
+  }
+
+  .jurisdictionTab {
+    min-width: 0;
+    flex: 1 1 140px;
+  }
+
+  .toolbar {
+    margin-left: 0;
+  }
+
+  .lawTable,
+  .lawTable thead,
+  .lawTable tbody,
+  .lawTable tr,
+  .lawTable th,
+  .lawTable td {
+    display: block;
+  }
+
+  .lawTable thead {
+    display: none;
+  }
+
+  .lawTable tr {
+    padding: 12px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .lawTable td {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 12px;
+    width: auto !important;
+    padding: 8px 16px;
+    border: 0;
+  }
+
+  .lawTable td:first-child {
+    border-left-width: 3px;
+  }
+
+  .lawTable td::before {
+    content: attr(data-label);
+    color: rgba(142, 248, 255, 0.62);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+  }
+}
+
+@media (max-width: 560px) {
+  .background {
+    height: 950px;
+  }
+
+  .shell {
+    width: min(100% - 20px, 520px);
+    padding-top: 104px;
+  }
+
+  .hero {
+    min-height: 800px;
+  }
+
+  .heroGrid {
+    grid-template-columns: 1fr;
+    min-height: 570px;
+  }
+
+  .heroCopy {
+    align-self: start;
+    padding: 42px 4px 0;
+    text-align: center;
+  }
+
+  .eyebrow {
+    justify-content: center;
+    gap: 9px;
+    margin-bottom: 22px;
+    font-size: 0.61rem;
+    letter-spacing: 0.16em;
+  }
+
+  .heroTitle {
+    margin-inline: auto;
+    font-size: clamp(78px, 25vw, 104px);
+  }
+
+  .titleCode {
+    margin-left: 0;
+    margin-inline: auto;
+  }
+
+  .titlePenal {
+    margin-inline: auto;
+  }
+
+  .heroDescription {
+    max-width: 370px;
+    margin: 14px auto 0;
+    padding: 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .heroVisual {
+    position: absolute;
+    inset: 0;
+    bottom: 0;
+    min-height: 570px;
+  }
+
+  .heroCharacter {
+    right: -154px;
+    bottom: -104px;
+    width: 650px;
+    opacity: 0.78;
+    filter: drop-shadow(-12px 18px 24px rgba(0, 0, 0, 0.5));
+  }
+
+  .controlDeck {
+    min-height: 0;
+    gap: 20px;
+    padding: 20px 14px;
+  }
+
+  .searchField {
+    height: 52px;
+  }
+
+  .statsBar {
+    justify-content: center;
+    gap: 14px 20px;
+  }
+
+  .statsBar > span {
+    text-align: center;
+  }
+
+  .toolbar {
+    width: 100%;
+  }
+
+  .toolbar button {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sectionHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sectionHeading > span {
+    font-size: clamp(1rem, 5.5vw, 1.22rem);
+    letter-spacing: 0.035em;
+  }
+
+  .lawTable td {
+    grid-template-columns: 1fr;
+  }
+}

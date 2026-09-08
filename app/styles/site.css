@@ -1,0 +1,229 @@
+/* Overrides site : scrollbar, rubans, gallery, footer */
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+html {
+  overflow-x: clip;
+  scrollbar-color: #24b6bd #02091a !important;
+  scrollbar-width: thin !important;
+}
+
+html::-webkit-scrollbar {
+  display: block !important;
+  width: 10px;
+}
+
+html::-webkit-scrollbar-track {
+  background: #02091a;
+  border-left: 1px solid rgba(112, 137, 220, 0.12);
+}
+
+html::-webkit-scrollbar-thumb {
+  min-height: 64px;
+  border: 2px solid #02091a;
+  border-radius: 0;
+  background: linear-gradient(180deg, #24b6bd, #2d8ed8 58%, #fe14be);
+  box-shadow: 0 0 16px rgba(36, 182, 189, 0.48);
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #54d7dd, #49a4ea 58%, #ff4dd0);
+}
+
+.scroll-to-top {
+  position: fixed;
+  z-index: 4900;
+  right: 24px;
+  bottom: 24px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #24b6bd;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(18px) scale(0.86);
+  transition: opacity 220ms ease, transform 300ms var(--cubic), color 220ms ease;
+  filter: drop-shadow(0 0 8px rgba(36, 182, 189, 0.55));
+}
+
+.scroll-to-top--visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.scroll-to-top:hover {
+  color: #fff;
+  transform: translateY(-4px) scale(1.04);
+}
+
+.scroll-to-top span {
+  width: 14px;
+  height: 14px;
+  margin-top: 8px;
+  border-top: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+@media (max-width: 700px) {
+  .scroll-to-top {
+    right: 14px;
+    bottom: 92px;
+    width: 36px;
+    height: 36px;
+  }
+}
+
+.about_about__M5FYO {
+  margin-top: calc(-120px - 60 * (100vw - 320px) / 1080);
+}
+
+.about_about__M5FYO .about_wrapper__AX_j_ {
+  padding-top: calc(110px + 120 * (100vw - 320px) / 1080);
+}
+
+.about_about__M5FYO .about_bg__eD5MP {
+  top: calc(-60px - 40 * (100vw - 320px) / 1080);
+}
+
+.about_about__M5FYO .about_bg__eD5MP > div {
+  inset: 0;
+  background-position: center 35%;
+  background-size: cover;
+}
+
+.about_about__M5FYO .about_logo__swZaR {
+  width: 37%;
+  min-width: 270px;
+}
+
+.about_about__M5FYO .about_logo__motion {
+  transform-origin: bottom center;
+  will-change: transform;
+}
+
+.about_about__M5FYO .about_logo__motion img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: none !important;
+  scale: none !important;
+  rotate: none !important;
+  translate: none !important;
+}
+
+.gallery-girl-image {
+  transform: translate3d(0, 5%, 0);
+}
+
+.wrapper_home__GdrY6 .gallery_gallery__x_FaV.cxgal {
+  overflow: visible;
+}
+
+.gallery_gallery__x_FaV .gallery_heading__vxuyL {
+  z-index: 250;
+  pointer-events: none;
+}
+
+.wrapper_home__GdrY6 .footer_palmier__V7OiI {
+  z-index: 300;
+}
+
+.footer_footer__pTLpy .footer_bg__Qx50L > div {
+  inset: -22% 0;
+}
+
+@media (max-width: 1084px) {
+  .gallery-girl-image {
+    transform: translate3d(0, 21.4548%, 0);
+  }
+}
+
+/* Banderoles hero — inclinaison + typo (non détectées par la purge) */
+.words_line__jgq9y {
+  text-transform: uppercase;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  color: #01081a;
+}
+
+.words_line__jgq9y > * {
+  line-height: 1;
+  top: 0.1em;
+  will-change: transform;
+}
+
+.words_left__tOxob {
+  transform: rotate(6deg);
+}
+
+.words_right__34B_u {
+  transform: translateY(-100%) rotate(-8deg);
+}
+
+.words-ribbon {
+  color: #01081a;
+}
+
+.words-ribbon--pink {
+  background-color: #fe14be;
+}
+
+.words-ribbon--green {
+  background-color: #24b6bd;
+}
+
+.words-ribbon__track {
+  flex: none;
+  width: max-content;
+  animation-duration: 32s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.words-ribbon__track span {
+  flex: none;
+  white-space: nowrap;
+}
+
+.words-ribbon__track--left {
+  animation-name: words-ribbon-scroll-left;
+}
+
+.words-ribbon__track--right {
+  animation-name: words-ribbon-scroll-right;
+}
+
+@keyframes words-ribbon-scroll-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes words-ribbon-scroll-right {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .words-ribbon__track {
+    animation-play-state: paused;
+  }
+}
+

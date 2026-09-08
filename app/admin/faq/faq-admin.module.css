@@ -1,0 +1,93 @@
+.editor { display: grid; gap: 20px; min-width: 0; }
+
+.toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.toolbarActions { display: flex; flex-wrap: wrap; gap: 10px; }
+.toolbarActions button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(300px, 0.85fr) minmax(0, 1.15fr);
+  gap: 16px;
+  align-items: start;
+  min-width: 0;
+}
+
+.panel {
+  min-width: 0;
+  padding: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.panel:first-child { max-height: calc(100vh - 230px); overflow-y: auto; }
+
+.panelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.panelHeader h2, .statusBox h2 { margin: 0; font-size: 1rem; }
+
+.field { display: grid; gap: 6px; margin-bottom: 16px; }
+.field span { color: rgba(255, 255, 255, 0.72); font-size: 0.9rem; }
+
+.field input, .field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  outline: 0;
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+  font: inherit;
+}
+
+.field input:focus, .field textarea:focus { border-color: rgba(49, 246, 255, 0.55); }
+.field textarea { min-height: 280px; resize: vertical; line-height: 1.6; }
+
+.secondaryButton, .saveButton, .dangerButton {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.secondaryButton { border: 1px solid rgba(49, 246, 255, 0.35); background: rgba(49, 246, 255, 0.08); color: #8ef8ff; }
+.saveButton { border: 1px solid rgba(125, 255, 176, 0.58); background: rgba(55, 206, 118, 0.18); box-shadow: 0 0 22px rgba(55, 206, 118, 0.16); color: #bfffd4; font-weight: 700; }
+.dangerButton { display: grid; width: 40px; padding: 0; place-items: center; border: 1px solid rgba(255, 72, 72, 0.35); background: rgba(255, 72, 72, 0.08); color: #ff9d9d; }
+.secondaryButton:disabled, .saveButton:disabled, .dangerButton:disabled { cursor: not-allowed; opacity: 0.5; }
+
+.metaLine, .status, .statusBox p { color: rgba(255, 255, 255, 0.62); }
+.metaLine { margin: 8px 0 0; font-size: 0.84rem; }
+.statusBox p { margin-bottom: 0; }
+.success { margin: 8px 0 0; color: #7dffb0; }
+.error { margin: 8px 0 0; color: #ff9d9d; }
+
+@media (max-width: 1420px) {
+  .layout { grid-template-columns: minmax(220px, 280px) minmax(0, 1fr); }
+  .layout .panel:last-child { grid-column: 1 / -1; }
+}
+
+@media (max-width: 980px) {
+  .toolbar { flex-direction: column; }
+  .layout { grid-template-columns: 1fr; }
+  .layout .panel:last-child { grid-column: auto; }
+}
