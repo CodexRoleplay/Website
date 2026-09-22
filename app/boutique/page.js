@@ -1,7 +1,9 @@
 import Image from "next/image";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { getBoutiqueSettings } from "@/lib/boutique/admin-persistence";
 import { getTebexCategories } from "@/lib/tebex";
+import BoutiqueClosed from "./BoutiqueClosed";
 import ShopClient from "./ShopClient";
 import ShopCodyxRain from "./ShopCodyxRain";
 import styles from "./shop.module.css";
@@ -17,6 +19,18 @@ export const metadata = {
 };
 
 export default async function ShopPage() {
+  let boutiqueEnabled = false;
+
+  try {
+    boutiqueEnabled = (await getBoutiqueSettings()).enabled;
+  } catch (error) {
+    console.error("[boutique] Impossible de lire le statut.", error);
+  }
+
+  if (!boutiqueEnabled) {
+    return <BoutiqueClosed />;
+  }
+
   let categories = [];
   let catalogError = "";
 

@@ -1,4 +1,5 @@
 import { SocialIcon } from "@/components/Header";
+import ShopLink from "@/components/ShopLink";
 import { footerGroups, socialLinks } from "@/data/site";
 
 export default function Footer() {
@@ -53,14 +54,14 @@ export default function Footer() {
                   <ul>
                     {group.links.map((link) => (
                       <li key={link.label}>
-                        <a
+                        <ShopLink
                           className={link.disabled ? "footer_disabled__KBqk1" : ""}
                           href={link.href}
-                          target={link.external ? "_blank" : undefined}
                           rel={link.external ? "noopener noreferrer" : undefined}
+                          target={link.external ? "_blank" : undefined}
                         >
                           {link.label}
-                        </a>
+                        </ShopLink>
                       </li>
                     ))}
                   </ul>

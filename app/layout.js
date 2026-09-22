@@ -1,5 +1,6 @@
 import "lenis/dist/lenis.css";
 import "./globals.css";
+import { BoutiqueProvider } from "@/components/BoutiqueProvider";
 import ScrollToTop from "@/components/ScrollToTop";
 import SitePreloader from "@/components/SitePreloader";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -147,10 +148,13 @@ export default function RootLayout({ children }) {
         className="__variable_675c71 __variable_991125 __variable_c1dfd3"
         suppressHydrationWarning
       >
-        <SitePreloader />
-        <SmoothScroll />
-        {children}
-        <ScrollToTop />
+        <div id="modal-root" />
+        <BoutiqueProvider>
+          <SitePreloader />
+          <SmoothScroll />
+          {children}
+          <ScrollToTop />
+        </BoutiqueProvider>
       </body>
     </html>
   );

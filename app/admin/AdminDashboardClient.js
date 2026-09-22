@@ -98,6 +98,8 @@ export default function AdminDashboardClient({ initialReglement, initialCodePena
   const [reglementLog, setReglementLog] = useState(null);
   const [codePenalLog, setCodePenalLog] = useState(null);
   const [faqLog, setFaqLog] = useState(null);
+  const [boutiqueEnabled, setBoutiqueEnabled] = useState(false);
+  const [boutiqueSaving, setBoutiqueSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -116,13 +118,14 @@ export default function AdminDashboardClient({ initialReglement, initialCodePena
         throw new Error("Session expirée. Reconnecte-toi.");
       }
 
-      const [reglementResult, penalResult, faqResult, reglementLogsResult, penalLogsResult, faqLogsResult] = await Promise.allSettled([
+      const [reglementResult, penalResult, faqResult, reglementLogsResult, penalLogsResult, faqLogsResult, boutiqueResult] = await Promise.allSettled([
         fetchAdminData("/api/admin/reglement", token),
         fetchAdminData("/api/admin/code-penal", token),
         fetchAdminData("/api/admin/faq", token),
         fetchAdminData("/api/admin/reglement/logs", token),
         fetchAdminData("/api/admin/code-penal/logs", token),
         fetchAdminData("/api/admin/faq/logs", token),
+        fetchAdminData("/api/admin/boutique", token),
       ]);
 
       if (reglementResult.status === "fulfilled") {
@@ -137,6 +140,10 @@ export default function AdminDashboardClient({ initialReglement, initialCodePena
         setFaq(countFaq(faqResult.value));
       }
 
+      if (boutiqueResult.status === "fulfilled") {
+        setBoutiqueEnabled(boutiqueResult.value.enabled === true);
+      }
+
       if (reglementLogsResult.status === "fulfilled") {
         setReglementLog(reglementLogsResult.value.logs?.[0] ?? null);
       }
@@ -149,7 +156,7 @@ export default function AdminDashboardClient({ initialReglement, initialCodePena
         setFaqLog(faqLogsResult.value.logs?.[0] ?? null);
       }
 
-      const rejected = [reglementResult, penalResult, faqResult, reglementLogsResult, penalLogsResult, faqLogsResult].find(
+      const rejected = [reglementResult, penalResult, faqResult, reglementLogsResult, penalLogsResult, faqLogsResult, boutiqueResult].find(
         (result) => result.status === "rejected",
       );
 
@@ -166,6 +173,39 @@ export default function AdminDashboardClient({ initialReglement, initialCodePena
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
+
+  async function updateBoutique(nextEnabled) {
+    setBoutiqueSaving(true);
+    setError("");
+
+    try {
+      const token = await getIdToken();
+
+      if (!token) {
+        throw new Error("Session expirée. Reconnecte-toi.");
+      }
+
+      const response = await fetch("/api/admin/boutique", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ enabled: nextEnabled }),
+      });
+      const payload = await readApiJson(response);
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Impossible de modifier la boutique.");
+      }
+
+      setBoutiqueEnabled(payload.enabled === true);
+    } catch (updateError) {
+      setError(updateError.message ?? "Impossible de modifier la boutique.");
+    } finally {
+      setBoutiqueSaving(false);
+    }
+  }
 
   const statItems = [
     { label: "Rubriques", value: reglement.categories, icon: BookOpen, tone: "cyan" },
@@ -189,6 +229,37 @@ export default function AdminDashboardClient({ initialReglement, initialCodePena
       </header>
 
       {error ? <p className={styles.errorLine}>{error}</p> : null}
+
+      <section className={styles.shopSwitch} aria-label="Boutique publique">
+        <div>
+          <span className={styles.eyebrow}>Visibilité</span>
+          <h2>Boutique {boutiqueEnabled ? "ouverte" : "fermée"}</h2>
+          <p>
+            {boutiqueEnabled
+              ? "Les joueurs accèdent au catalogue."
+              : "Un clic sur Boutique affiche seulement l’annonce « bientôt disponible »."}
+          </p>
+        </div>
+        <div className={styles.shopSwitchControl} role="group" aria-label="Activer la boutique">
+          <button
+            aria-pressed={!boutiqueEnabled}
+            disabled={boutiqueSaving}
+            onClick={() => updateBoutique(false)}
+            type="button"
+          >
+            Off
+          </button>
+          <button
+            aria-pressed={boutiqueEnabled}
+            data-on={boutiqueEnabled ? "true" : "false"}
+            disabled={boutiqueSaving}
+            onClick={() => updateBoutique(true)}
+            type="button"
+          >
+            On
+          </button>
+        </div>
+      </section>
 
       <section className={styles.stats} aria-label="Statistiques du contenu">
         {statItems.map((item) => {

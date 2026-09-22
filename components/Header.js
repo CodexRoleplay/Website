@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import ShopLink from "@/components/ShopLink";
 import { socialLinks } from "@/data/site";
 
 const serverLinks = [
@@ -170,10 +171,10 @@ function NavDropdown({ index, label, links, active, featured, href }) {
   return (
     <li className={`cxnav__cell cxnav__cell--sub${featured ? " cxnav__cell--featured" : ""}`}>
       {href ? (
-        <a className={`cxnav__link${active ? " is-active" : ""}`} href={href}>
+        <ShopLink className={`cxnav__link${active ? " is-active" : ""}`} href={href}>
           <NavLabel index={index} label={label} />
           <Caret />
-        </a>
+        </ShopLink>
       ) : (
         <button className={`cxnav__link${active ? " is-active" : ""}`} type="button">
           <NavLabel index={index} label={label} />
@@ -187,18 +188,18 @@ function NavDropdown({ index, label, links, active, featured, href }) {
         <ul>
           {links.map((link, i) => (
             <li key={link.label} style={{ "--i": i }}>
-              <a
+              <ShopLink
                 className="cxnav__panel-link"
                 href={link.href}
-                target={link.icon ? "_blank" : undefined}
                 rel={link.icon ? "noopener noreferrer" : undefined}
+                target={link.icon ? "_blank" : undefined}
               >
                 {link.icon ? <SocialIcon name={link.icon} /> : <span className="cxnav__panel-dot" aria-hidden="true" />}
                 <span>{link.label}</span>
                 <svg className="cxnav__panel-arrow" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">
                   <path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
                 </svg>
-              </a>
+              </ShopLink>
             </li>
           ))}
         </ul>
@@ -352,19 +353,19 @@ export default function Header() {
               </ul>
             </li>
             <li style={{ "--i": 3 }}>
-              <a
+              <ShopLink
                 className={`cxnav__drawer-group${pathname.startsWith("/boutique") ? " is-active" : ""}`}
                 href="/boutique"
                 onClick={() => setIsOpen(false)}
               >
                 <em>04</em>Boutique
-              </a>
+              </ShopLink>
               <ul>
                 {shopLinks.map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} onClick={() => setIsOpen(false)}>
+                    <ShopLink href={link.href} onClick={() => setIsOpen(false)}>
                       {link.label}
-                    </a>
+                    </ShopLink>
                   </li>
                 ))}
               </ul>

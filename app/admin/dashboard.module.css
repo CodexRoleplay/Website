@@ -68,6 +68,66 @@
   to { transform: rotate(360deg); }
 }
 
+.shopSwitch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+  padding: 18px 20px;
+  border: 1px solid rgba(254, 20, 190, 0.28);
+  border-radius: 8px;
+  background: rgba(254, 20, 190, 0.06);
+}
+
+.shopSwitch h2 {
+  margin: 0 0 6px;
+  font-size: 1.35rem;
+  font-weight: 500;
+}
+
+.shopSwitch p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.shopSwitchControl {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.shopSwitchControl button {
+  min-width: 72px;
+  min-height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  font: inherit;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.shopSwitchControl button[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+.shopSwitchControl button[data-on="true"][aria-pressed="true"] {
+  background: #fe14be;
+  color: white;
+}
+
+.shopSwitchControl button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
 .errorLine {
   margin: 0 0 18px;
   padding: 11px 14px;
@@ -347,6 +407,7 @@
 @media (max-width: 760px) {
   .header { align-items: stretch; flex-direction: column; gap: 18px; }
   .refreshButton { align-self: flex-start; }
+  .shopSwitch { align-items: stretch; flex-direction: column; }
   .utilityGrid { grid-template-columns: 1fr; }
 }
 
