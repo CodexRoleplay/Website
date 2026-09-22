@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { verifyAdminRequest } from "@/lib/firebase/admin";
-import { getFallbackReglement } from "@/lib/reglement/fallback";
 import { getReglementDocument, saveReglementWithAudit } from "@/lib/reglement/admin-persistence";
 
 export const runtime = "nodejs";
@@ -15,11 +14,7 @@ export async function GET(request) {
     }
 
     const stored = await getReglementDocument();
-    const payload = stored.updatedAt || stored.categories.length
-      ? { ...stored, source: "firestore" }
-      : getFallbackReglement();
-
-    return NextResponse.json(payload);
+    return NextResponse.json({ ...stored, source: "firestore" });
   } catch (error) {
     console.error("[admin/reglement GET]", error);
     return NextResponse.json({ error: error?.message ?? "Erreur serveur admin." }, { status: 500 });

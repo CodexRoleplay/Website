@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { verifyAdminRequest } from "@/lib/firebase/admin";
-import { getFallbackFaq } from "@/lib/faq/fallback";
 import { getFaqDocument, saveFaqWithAudit } from "@/lib/faq/admin-persistence";
 
 export const runtime = "nodejs";
@@ -15,8 +14,7 @@ export async function GET(request) {
     }
 
     const stored = await getFaqDocument();
-    const payload = stored.updatedAt || stored.categories.length ? { ...stored, source: "firestore" } : getFallbackFaq();
-    return NextResponse.json(payload);
+    return NextResponse.json({ ...stored, source: "firestore" });
   } catch (error) {
     console.error("[admin/faq GET]", error);
     return NextResponse.json({ error: error?.message ?? "Erreur serveur admin." }, { status: 500 });
