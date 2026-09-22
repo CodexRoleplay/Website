@@ -2211,6 +2211,135 @@ body.cx-modal-open {
   }
 }
 
+/* Annonce boutique fermée */
+.bxsoon {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.bxsoon__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(36, 227, 236, 0.1), transparent 46%),
+    rgba(1, 8, 26, 0.88);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+}
+
+.bxsoon__panel {
+  position: relative;
+  z-index: 1;
+  width: min(440px, 100%);
+  padding: 42px 32px 36px;
+  text-align: center;
+  background:
+    linear-gradient(165deg, rgba(1, 8, 26, 0.98), rgba(1, 8, 26, 0.92)),
+    radial-gradient(circle at 50% 0%, rgba(254, 20, 190, 0.16), transparent 55%);
+  border: 1px solid rgba(36, 227, 236, 0.28);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(254, 20, 190, 0.08);
+}
+
+.bxsoon__corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #24e3ec;
+}
+
+.bxsoon__corner--tl {
+  top: 8px;
+  left: 8px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.bxsoon__corner--tr {
+  top: 8px;
+  right: 8px;
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.bxsoon__corner--bl {
+  bottom: 8px;
+  left: 8px;
+  border-right: 0;
+  border-top: 0;
+  border-color: #fe14be;
+}
+
+.bxsoon__corner--br {
+  bottom: 8px;
+  right: 8px;
+  border-left: 0;
+  border-top: 0;
+  border-color: #fe14be;
+}
+
+.bxsoon__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(36, 227, 236, 0.35);
+  background: rgba(1, 8, 26, 0.65);
+  color: #24e3ec;
+  cursor: pointer;
+}
+
+.bxsoon__close svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.bxsoon__close:hover,
+.bxsoon__close:focus-visible {
+  border-color: rgba(254, 20, 190, 0.55);
+  color: #fe14be;
+}
+
+.bxsoon__eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-secondary);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(var(--text-secondary-rgb), 0.85);
+}
+
+.bxsoon__panel h2 {
+  margin: 0 0 14px;
+  font-family: var(--font-primary);
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.bxsoon__text {
+  max-width: 34ch;
+  margin: 0 auto;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
 /* Modal vidéo */
 .cxvmodal {
   position: fixed;

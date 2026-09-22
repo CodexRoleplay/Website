@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import CxModal from "@/components/CxModal";
+import BoutiqueSoonModal from "@/components/BoutiqueSoonModal";
 import { subscribeBoutique } from "@/lib/boutique/service";
 
 const BoutiqueContext = createContext(null);
@@ -37,18 +37,7 @@ export function BoutiqueProvider({ children }) {
   return (
     <BoutiqueContext.Provider value={value}>
       {children}
-      <CxModal
-        closeLabel="Fermer"
-        eyebrow="Boutique"
-        onClose={() => setSoonOpen(false)}
-        open={soonOpen}
-        title="Bientôt disponible"
-      >
-        <p>
-          La boutique n&apos;est pas encore ouverte. Le catalogue sera prêt très prochainement :
-          abonnements, packs Codyx et paiement sécurisé.
-        </p>
-      </CxModal>
+      <BoutiqueSoonModal open={soonOpen} onClose={() => setSoonOpen(false)} />
     </BoutiqueContext.Provider>
   );
 }
