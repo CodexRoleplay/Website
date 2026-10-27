@@ -29,7 +29,22 @@ export default function ReglementClient({ initialCategories = [] }) {
     const nextCategory = categories.find((category) => category.id === categoryId);
 
     setActiveCategoryId(categoryId);
-    setOpenSections(nextCategory?.sections[0] ? { [nextCategory.sections[0].id]: true } : {});
+    setOpenSections((current) => {
+      const sections = nextCategory?.sections ?? [];
+
+      if (sections.length === 0) {
+        return current;
+      }
+
+      const next = { ...current };
+
+      for (const section of sections) {
+        next[section.id] = true;
+      }
+
+      return next;
+    });
+    scrollToHero();
   }
 
   function scrollToHero() {
