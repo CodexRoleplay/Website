@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ContentBlocks from "@/components/reglement/ContentBlocks";
 import RuleIcon from "@/components/reglement/RuleIcon";
 import { normalizeSectionContent } from "@/lib/reglement/content";
@@ -40,13 +40,38 @@ function SearchHighlight({ text, query }) {
   return nodes;
 }
 
+function sectionDomId(categoryId, sectionId) {
+  return `reglement-section-${categoryId}-${sectionId}`;
+}
+
+function scrollToReglementTarget(targetId) {
+  const node = document.getElementById(targetId);
+
+  if (!node) {
+    return false;
+  }
+
+  window.dispatchEvent(
+    new CustomEvent("codex:scroll-to", {
+      detail: {
+        target: `#${CSS.escape(targetId)}`,
+        offset: window.innerWidth <= 820 ? -112 : -150,
+      },
+    }),
+  );
+
+  return true;
+}
+
 export default function ReglementClient({ initialCategories = [] }) {
   const [categories, setCategories] = useState(initialCategories);
   const [activeCategoryId, setActiveCategoryId] = useState(null);
+  const [activeSectionId, setActiveSectionId] = useState(null);
   const [openSections, setOpenSections] = useState({});
   const [query, setQuery] = useState("");
   const [collapsedWhileSearching, setCollapsedWhileSearching] = useState({});
   const heroRef = useRef(null);
+  const pendingScrollId = useRef(null);
   const normalizedQuery = query.trim();
   const isSearching = normalizedQuery.length > 0;
 
@@ -59,6 +84,27 @@ export default function ReglementClient({ initialCategories = [] }) {
   useEffect(() => {
     setCollapsedWhileSearching({});
   }, [normalizedQuery]);
+
+  useLayoutEffect(() => {
+    const targetId = pendingScrollId.current;
+
+    if (!targetId) {
+      return undefined;
+    }
+
+    if (scrollToReglementTarget(targetId)) {
+      pendingScrollId.current = null;
+      return undefined;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      if (pendingScrollId.current === targetId && scrollToReglementTarget(targetId)) {
+        pendingScrollId.current = null;
+      }
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [activeSectionId, activeCategoryId, openSections, collapsedWhileSearching]);
 
   const activeCategory = useMemo(
     () => categories.find((category) => category.id === activeCategoryId) ?? null,
@@ -87,7 +133,9 @@ export default function ReglementClient({ initialCategories = [] }) {
   function selectCategory(categoryId) {
     const nextCategory = categories.find((category) => category.id === categoryId);
 
+    pendingScrollId.current = null;
     setActiveCategoryId(categoryId);
+    setActiveSectionId(null);
     setOpenSections((current) => {
       const sections = nextCategory?.sections ?? [];
 
@@ -108,6 +156,10 @@ export default function ReglementClient({ initialCategories = [] }) {
 
   function scrollToHero() {
     requestAnimationFrame(() => {
+      if (pendingScrollId.current) {
+        return;
+      }
+
       const rect = heroRef.current?.getBoundingClientRect();
 
       if (!rect) {
@@ -122,9 +174,41 @@ export default function ReglementClient({ initialCategories = [] }) {
   }
 
   function resetToIndex() {
+    pendingScrollId.current = null;
     setActiveCategoryId(null);
+    setActiveSectionId(null);
     setOpenSections({});
     scrollToHero();
+  }
+
+  function selectSection(categoryId, sectionId) {
+    pendingScrollId.current = sectionDomId(categoryId, sectionId);
+    setActiveSectionId(sectionId);
+
+    if (categoryId !== activeCategoryId) {
+      const nextCategory = categories.find((category) => category.id === categoryId);
+      setActiveCategoryId(categoryId);
+      setOpenSections((current) => {
+        const next = { ...current };
+
+        for (const section of nextCategory?.sections ?? []) {
+          next[section.id] = true;
+        }
+
+        next[sectionId] = true;
+        return next;
+      });
+    } else if (isSearching) {
+      setCollapsedWhileSearching((current) => ({
+        ...current,
+        [sectionId]: false,
+      }));
+    } else {
+      setOpenSections((current) => ({
+        ...current,
+        [sectionId]: true,
+      }));
+    }
   }
 
   function toggleSection(sectionId) {
@@ -142,12 +226,17 @@ export default function ReglementClient({ initialCategories = [] }) {
     }));
   }
 
-  function renderSection(section, expanded) {
+  function renderSection(section, expanded, categoryId) {
     const isOpen = expanded ? !collapsedWhileSearching[section.id] : Boolean(openSections[section.id]);
     const sectionContent = normalizeSectionContent(section);
+    const isCurrent = section.id === activeSectionId;
 
     return (
-      <article className={`${styles.sectionPanel} ${isOpen ? styles.sectionPanelOpen : ""}`} key={section.id}>
+      <article
+        className={`${styles.sectionPanel} ${isOpen ? styles.sectionPanelOpen : ""} ${isCurrent ? styles.sectionPanelCurrent : ""}`}
+        id={sectionDomId(categoryId, section.id)}
+        key={section.id}
+      >
         <button
           aria-expanded={isOpen}
           className={styles.sectionButton}
@@ -189,17 +278,56 @@ export default function ReglementClient({ initialCategories = [] }) {
       </div>
 
       <div className={styles.layout}>
-        <aside className={styles.sidebar} aria-label="Catégories du règlement">
-          {sidebarCategories.map((category) => (
-            <button
-              className={`${styles.sideLink} ${category.id === activeCategoryId ? styles.sideLinkActive : ""}`}
-              key={category.id}
-              onClick={() => selectCategory(category.id)}
-              type="button"
-            >
-              {isSearching ? <SearchHighlight text={category.title} query={normalizedQuery} /> : category.title}
-            </button>
-          ))}
+        <aside className={styles.sidebar} aria-label="Catégories du règlement" data-lenis-prevent="true">
+          <ul className={styles.sideNav}>
+            {sidebarCategories.map((category) => {
+              const isActive = category.id === activeCategoryId;
+              const sections = category.sections ?? [];
+              const showSections = isActive && sections.length > 0;
+
+              return (
+                <li className={styles.sideGroup} key={category.id}>
+                  <button
+                    aria-controls={showSections ? `reglement-sub-${category.id}` : undefined}
+                    aria-expanded={sections.length > 0 ? isActive : undefined}
+                    className={`${styles.sideLink} ${isActive ? styles.sideLinkActive : ""}`}
+                    onClick={() => selectCategory(category.id)}
+                    type="button"
+                  >
+                    {isSearching ? <SearchHighlight text={category.title} query={normalizedQuery} /> : category.title}
+                  </button>
+                  {showSections ? (
+                    <ul
+                      aria-label={`Chapitres de ${category.title}`}
+                      className={styles.sideSubList}
+                      id={`reglement-sub-${category.id}`}
+                    >
+                      {sections.map((section) => {
+                        const isSectionActive = section.id === activeSectionId;
+
+                        return (
+                          <li key={section.id}>
+                            <button
+                              aria-current={isSectionActive ? "true" : undefined}
+                              className={`${styles.sideSubLink} ${isSectionActive ? styles.sideSubLinkActive : ""}`}
+                              onClick={() => selectSection(category.id, section.id)}
+                              type="button"
+                            >
+                              {isSearching ? (
+                                <SearchHighlight text={section.title} query={normalizedQuery} />
+                              ) : (
+                                section.title
+                              )}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
         </aside>
 
         <main className={styles.content}>
@@ -250,7 +378,7 @@ export default function ReglementClient({ initialCategories = [] }) {
                   </h2>
                   {category.sections.length ? (
                     <div className={styles.accordionList}>
-                      {category.sections.map((section) => renderSection(section, true))}
+                      {category.sections.map((section) => renderSection(section, true, category.id))}
                     </div>
                   ) : (
                     <p className={styles.emptySection}>Aucun contenu pour cette section.</p>
@@ -276,7 +404,9 @@ export default function ReglementClient({ initialCategories = [] }) {
             </div>
           ) : (
             <div className={styles.accordionList}>
-              {(displayedCategory ?? activeCategory).sections.map((section) => renderSection(section, isSearching))}
+              {(displayedCategory ?? activeCategory).sections.map((section) =>
+                renderSection(section, isSearching, (displayedCategory ?? activeCategory).id),
+              )}
             </div>
           )}
         </main>

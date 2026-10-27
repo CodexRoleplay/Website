@@ -40,7 +40,7 @@ export default function SmoothScroll() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const scrollToSelector = (target) => {
+    const scrollToSelector = (target, { offset = 0, duration = 1.15 } = {}) => {
       const element = typeof target === "string" ? document.querySelector(target) : null;
 
       if (!element) {
@@ -48,16 +48,24 @@ export default function SmoothScroll() {
       }
 
       if (lenis) {
-        lenis.scrollTo(element, { duration: 1.15 });
+        lenis.scrollTo(element, { offset, duration });
         return true;
       }
 
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      window.scrollTo({
+        top: window.scrollY + element.getBoundingClientRect().top + offset,
+        behavior: reduceMotion ? "auto" : "smooth",
+      });
       return true;
     };
 
     const scrollToTarget = (event) => {
-      scrollToSelector(event.detail?.target);
+      const offset = Number(event.detail?.offset);
+      scrollToSelector(event.detail?.target, {
+        offset: Number.isFinite(offset) ? offset : 0,
+      });
     };
 
     const handleAnchorClick = (event) => {
