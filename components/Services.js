@@ -79,9 +79,9 @@ function ServiceCard({ card, index }) {
         className="cxsvc__icon"
         src={card.image}
         alt=""
-        width={500}
-        height={484}
-        sizes="(max-width: 500px) 350px, (max-width: 768px) 450px"
+        width={448}
+        height={434}
+        sizes="170px"
         draggable={false}
         unoptimized
         aria-hidden="true"
@@ -189,9 +189,9 @@ export default function Services() {
         className="services_characters__S_FE_"
         src="/img/home_services_char.webp"
         alt="Codex RP"
-        width={980}
-        height={1308}
-        sizes="(max-width: 500px) 350px, (max-width: 768px) 450px, (max-width: 900px) 550px, 667px"
+        width={1179}
+        height={1213}
+        sizes="(max-width: 889px) 400px, 45vw"
         draggable={false}
         unoptimized
         style={{ color: "transparent" }}

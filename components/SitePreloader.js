@@ -115,6 +115,8 @@ export default function SitePreloader() {
           className="site-preloader__logo"
           src="/img/logo_other.webp"
           alt=""
+          width={464}
+          height={367}
           aria-hidden="true"
           decoding="async"
         />

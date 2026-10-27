@@ -114,9 +114,9 @@ export default function About() {
           <Image
             src="/img/home-about-car.webp"
             alt="Codex RP"
-            width={1371}
-            height={1097}
-            sizes="(max-width: 500px) 350px, (max-width: 768px) 450px, (max-width: 900px) 550px, 667px"
+            width={1024}
+            height={1024}
+            sizes="(max-width: 600px) 270px, 37vw"
             draggable={false}
             unoptimized
             style={{ color: "transparent" }}
@@ -143,7 +143,7 @@ export default function About() {
             alt="Palmier"
             width={1124}
             height={1851}
-            sizes="(max-width: 500px) 350px, (max-width: 768px) 450px, (max-width: 900px) 550px, 667px"
+            sizes="(max-width: 900px) 62vw, 55vw"
             draggable={false}
             unoptimized
             style={{ color: "transparent" }}

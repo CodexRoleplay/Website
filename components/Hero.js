@@ -116,8 +116,8 @@ export default function Hero() {
             src="/img/drequan-priest-1600.webp"
             alt="Codex RP"
             width={1725}
-            height={1100}
-            sizes="(max-width: 600px) 600px, (max-width: 1200px) 1200px, 1725px"
+            height={1119}
+            sizes="(max-width: 600px) 100vw, (max-width: 860px) 92vw, 1542px"
             priority
             unoptimized
             draggable={false}

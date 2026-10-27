@@ -23,6 +23,8 @@ export default function Footer() {
               className="footer_logo__mzArI"
               src="/img/logo_other.webp"
               alt="Codex RP"
+              width={464}
+              height={367}
               loading="lazy"
               decoding="async"
             />

@@ -295,9 +295,9 @@ export default function Gallery() {
               className="gallery-girl-image cxgal__girl"
               src="/img/home_portfolio.webp"
               alt="Codex RP"
-              width={1200}
-              height={1746}
-              sizes="(max-width: 500px) 350px, (max-width: 768px) 450px, (max-width: 900px) 550px, 667px"
+              width={1024}
+              height={1536}
+              sizes="(max-width: 1084px) 58vw, 50vw"
               draggable={false}
               unoptimized
               style={{

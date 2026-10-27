@@ -98,15 +98,15 @@ export function galleryAlt(tag) {
 }
 
 export const galleryPhotos = [
-  { src: "/img/portfolio/1.jpg", tag: "OFFROAD" },
-  { src: "/img/portfolio/2.jpg", tag: "SKYLINE" },
-  { src: "/img/portfolio/3.jpg", tag: "SERVEUR" },
-  { src: "/img/portfolio/4.jpg", tag: "CINÉ" },
-  { src: "/img/portfolio/5.jpg", tag: "SCÈNE" },
-  { src: "/img/portfolio/6.jpg", tag: "COMMU" },
-  { src: "/img/portfolio/7.jpg", tag: "NEON" },
-  { src: "/img/portfolio/8.jpg", tag: "STREET" },
-  { src: "/img/portfolio/9.jpg", tag: "EVENT" },
+  { src: "/img/portfolio/1.webp", tag: "OFFROAD" },
+  { src: "/img/portfolio/2.webp", tag: "SKYLINE" },
+  { src: "/img/portfolio/3.webp", tag: "SERVEUR" },
+  { src: "/img/portfolio/4.webp", tag: "CINÉ" },
+  { src: "/img/portfolio/5.webp", tag: "SCÈNE" },
+  { src: "/img/portfolio/6.webp", tag: "COMMU" },
+  { src: "/img/portfolio/7.webp", tag: "NEON" },
+  { src: "/img/portfolio/8.webp", tag: "STREET" },
+  { src: "/img/portfolio/9.webp", tag: "EVENT" },
 ];
 
 export const presentationVideo = {

@@ -235,12 +235,16 @@ export default function Header() {
             className="cxnav__brand-logo cxnav__brand-logo--full"
             src="/img/logo_other.webp"
             alt=""
+            width={464}
+            height={367}
             aria-hidden="true"
           />
           <img
             className="cxnav__brand-logo cxnav__brand-logo--small"
             src="/img/codex_small.webp"
             alt=""
+            width={432}
+            height={126}
             aria-hidden="true"
           />
         </a>
@@ -278,8 +282,8 @@ export default function Header() {
 
           <div className="cxnav__core">
             <a className="cxnav__pod" href="/" aria-label="Codex RP - Accueil">
-              <img className="cxnav__logo cxnav__logo--full" src="/img/logo_other.webp" alt="Codex RP" />
-              <img className="cxnav__logo cxnav__logo--small" src="/img/codex_small.webp" alt="Codex RP" />
+              <img className="cxnav__logo cxnav__logo--full" src="/img/logo_other.webp" alt="Codex RP" width={464} height={367} />
+              <img className="cxnav__logo cxnav__logo--small" src="/img/codex_small.webp" alt="Codex RP" width={432} height={126} />
             </a>
           </div>
 

@@ -75,7 +75,7 @@ export default function AdminLoginPage() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.brand}>
-          <img className={styles.logo} src="/img/logo_other.webp" alt="Codex RP" />
+          <img className={styles.logo} src="/img/logo_other.webp" alt="Codex RP" width={464} height={367} />
           <span>Panel admin</span>
         </div>
 

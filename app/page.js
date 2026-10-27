@@ -21,6 +21,7 @@ export const metadata = pageMetadata({
 export default function HomePage() {
   return (
     <>
+      <link rel="preload" as="image" href="/img/home_hero_bg.webp" fetchPriority="high" />
       <Header />
       <div className="wrapper_main__v_pMu wrapper_home__GdrY6">
         <main>

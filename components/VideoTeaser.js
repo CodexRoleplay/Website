@@ -200,9 +200,9 @@ export default function VideoTeaser() {
             className="module_video__visual"
             src="/img/codex_video.webp"
             alt="Vidéo sur Codex RP"
-            width={980}
+            width={1182}
             height={1308}
-            sizes="(max-width: 500px) 430px, (max-width: 768px) 520px, (max-width: 900px) 550px, 667px"
+            sizes="(max-width: 600px) 100vw, 45vw"
             draggable={false}
             unoptimized
             style={{ color: "transparent" }}

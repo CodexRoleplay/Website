@@ -16,7 +16,7 @@ export default function HeroPalmier() {
           alt="Palmier"
           width={1124}
           height={1851}
-          sizes="(max-width: 500px) 350px, (max-width: 768px) 450px, (max-width: 900px) 550px, 667px"
+          sizes="(max-width: 900px) 62vw, 55vw"
           draggable={false}
           unoptimized
           style={{ color: "transparent" }}
