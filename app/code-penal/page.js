@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata = pageMetadata({
   path: "/code-penal",
-  title: "Code pénal — Codex RP",
+  title: "Code pénal - Codex RP",
   description:
     "Code pénal de Codex RP : infractions, amendes, peines et procédures judiciaires en jeu.",
 });

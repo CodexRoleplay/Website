@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata = pageMetadata({
   path: "/reglement",
-  title: "Règlement — Codex RP",
+  title: "Règlement - Codex RP",
   description:
     "Règlement officiel de Codex RP : bases du roleplay, règles légales, illégales et sanctions.",
 });

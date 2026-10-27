@@ -1,7 +1,9 @@
-const words =
-  "IMMERSION RÉALISME CARRIÈRE ENTREPRISE JUSTICE ÉCONOMIE COMMUNAUTÉ LOS ANGELES AMBITION HISTOIRE";
+const ribbons = [
+  { direction: "left", text: "La réalité comme seule limite, Codex RP ·" },
+  { direction: "right", text: "Ton histoire commence ici ·" },
+];
 
-function MarqueeLine({ direction }) {
+function MarqueeLine({ direction, text }) {
   const isLeft = direction === "left";
   const className = [
     "marquee_marquee__lngSP",
@@ -19,8 +21,8 @@ function MarqueeLine({ direction }) {
           isLeft ? "words-ribbon__track--left" : "words-ribbon__track--right"
         }`}
       >
-        <span>{words}&nbsp;</span>
-        <span aria-hidden="true">{words}&nbsp;</span>
+        <span>{text}&nbsp;</span>
+        <span aria-hidden="true">{text}&nbsp;</span>
       </div>
     </div>
   );
@@ -30,8 +32,9 @@ export default function WordsTicker() {
   return (
     <div className="words_wrapper__y1PQG">
       <div className="words_words__lqh1s">
-        <MarqueeLine direction="left" />
-        <MarqueeLine direction="right" />
+        {ribbons.map((ribbon) => (
+          <MarqueeLine direction={ribbon.direction} key={ribbon.direction} text={ribbon.text} />
+        ))}
       </div>
     </div>
   );

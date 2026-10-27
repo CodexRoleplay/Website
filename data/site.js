@@ -23,8 +23,8 @@ export const serviceCards = [
   },
   {
     eyebrow: "Idées",
-    titleLead: "Votre serveur",
-    titleStrong: "vos idées",
+    titleLead: "Ton serveur,",
+    titleStrong: "tes idées",
     description:
       "Chez Codex RP, ta voix compte. Nous encourageons activement la communauté à partager ses idées et suggestions pour faire évoluer le serveur. Ta créativité façonne notre univers.",
     image: "/img/home-services-card-secondary.webp",

@@ -18,6 +18,16 @@ function validatePackageId(packageId) {
   return parsedId;
 }
 
+function validatePackageRef(body) {
+  const ident = typeof body?.packageIdent === "string" ? body.packageIdent.trim() : "";
+
+  if (/^(pkg|dyn|ext)_[\w-]+$/i.test(ident)) {
+    return ident;
+  }
+
+  return validatePackageId(body?.packageId);
+}
+
 function validateQuantity(quantity) {
   const parsedQuantity = Number(quantity);
 
@@ -33,8 +43,9 @@ export async function POST(request, context) {
     const { ident } = await context.params;
     const body = await request.json();
     const basketIdent = validateBasketIdent(ident);
+    const currentBasket = await getTebexBasket(basketIdent);
 
-    await addTebexPackage(basketIdent, validatePackageId(body.packageId), 1);
+    await addTebexPackage(basketIdent, validatePackageRef(body), 1, currentBasket);
     const basket = await getTebexBasket(basketIdent);
 
     return NextResponse.json(basket);

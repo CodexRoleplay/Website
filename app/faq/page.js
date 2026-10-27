@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata = pageMetadata({
   path: "/faq",
-  title: "FAQ — Codex RP",
+  title: "FAQ - Codex RP",
   description:
     "FAQ Codex RP : installer FiveM, rejoindre le serveur, boutique Codyx et assistance Discord.",
 });

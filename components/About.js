@@ -91,7 +91,7 @@ export default function About() {
         <div className="about_content__wej3G">
           <p>
             On a vu les mêmes slogans que toi. Chez Codex RP, la différence, c&apos;est qu&apos;ils ne
-            sont pas là pour décorer. Tout ce qui est possible dans la vraie vie est possible ici —
+            sont pas là pour décorer. Tout ce qui est possible dans la vraie vie est possible ici :
             rien de plus, rien de moins.
           </p>
           <p>

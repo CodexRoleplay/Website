@@ -83,9 +83,24 @@ export default function SmoothScroll() {
 
     const stopLenis = () => lenis?.stop();
     const startLenis = () => lenis?.start();
+    const scrollToY = (event) => {
+      const top = Number(event.detail?.top);
+
+      if (!Number.isFinite(top)) {
+        return;
+      }
+
+      if (lenis) {
+        lenis.scrollTo(top, { force: true, immediate: true });
+        return;
+      }
+
+      window.scrollTo(0, top);
+    };
 
     window.addEventListener("codex:scroll-top", scrollToTop);
     window.addEventListener("codex:scroll-to", scrollToTarget);
+    window.addEventListener("codex:scroll-y", scrollToY);
     window.addEventListener("codex:lenis-stop", stopLenis);
     window.addEventListener("codex:lenis-start", startLenis);
     document.addEventListener("click", handleAnchorClick);
@@ -94,6 +109,7 @@ export default function SmoothScroll() {
       reducedMotionQuery.removeEventListener("change", configureScroll);
       window.removeEventListener("codex:scroll-top", scrollToTop);
       window.removeEventListener("codex:scroll-to", scrollToTarget);
+      window.removeEventListener("codex:scroll-y", scrollToY);
       window.removeEventListener("codex:lenis-stop", stopLenis);
       window.removeEventListener("codex:lenis-start", startLenis);
       document.removeEventListener("click", handleAnchorClick);

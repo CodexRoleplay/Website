@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata = pageMetadata({
   path: "/boutique",
-  title: "Boutique — Codex RP",
+  title: "Boutique - Codex RP",
   description:
     "Boutique Codex RP : packs Codyx et cosmétiques. Aucun avantage en jeu, paiement sécurisé.",
 });

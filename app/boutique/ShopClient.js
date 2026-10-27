@@ -7,6 +7,8 @@ import { normalizeShopSlug as normalizeSlug } from "@/lib/boutique/shop-links";
 import styles from "./shop.module.css";
 
 const BASKET_STORAGE_KEY = "codex-rp-tebex-basket";
+const SCROLL_STORAGE_KEY = "codex-rp-shop-scroll";
+const PENDING_PACKAGE_KEY = "codex-rp-shop-pending-package";
 
 async function apiRequest(path, options) {
   const response = await fetch(path, options);
@@ -17,6 +19,88 @@ async function apiRequest(path, options) {
   }
 
   return payload;
+}
+
+function rememberShopReturn(pendingPackage) {
+  window.sessionStorage.setItem(SCROLL_STORAGE_KEY, String(Math.round(window.scrollY)));
+
+  if (pendingPackage?.id) {
+    window.sessionStorage.setItem(
+      PENDING_PACKAGE_KEY,
+      JSON.stringify({
+        id: pendingPackage.id,
+        ident: pendingPackage.ident ?? "",
+      }),
+    );
+    return;
+  }
+
+  window.sessionStorage.removeItem(PENDING_PACKAGE_KEY);
+}
+
+function forgetShopReturn() {
+  window.sessionStorage.removeItem(SCROLL_STORAGE_KEY);
+  window.sessionStorage.removeItem(PENDING_PACKAGE_KEY);
+}
+
+function consumePendingPackage() {
+  const raw = window.sessionStorage.getItem(PENDING_PACKAGE_KEY);
+
+  if (!raw) {
+    return null;
+  }
+
+  window.sessionStorage.removeItem(PENDING_PACKAGE_KEY);
+
+  try {
+    const parsed = JSON.parse(raw);
+
+    if (parsed?.id) {
+      return {
+        id: parsed.id,
+        ident: typeof parsed.ident === "string" ? parsed.ident : "",
+      };
+    }
+  } catch {
+    if (/^\d+$/.test(raw)) {
+      return { id: Number(raw), ident: "" };
+    }
+  }
+
+  return null;
+}
+
+function restoreShopScroll() {
+  const raw = window.sessionStorage.getItem(SCROLL_STORAGE_KEY);
+
+  if (raw === null) {
+    return;
+  }
+
+  window.sessionStorage.removeItem(SCROLL_STORAGE_KEY);
+  const top = Number(raw);
+
+  if (!Number.isFinite(top) || top < 0) {
+    return;
+  }
+
+  const applyScroll = () => {
+    window.dispatchEvent(new CustomEvent("codex:scroll-y", { detail: { top } }));
+  };
+
+  applyScroll();
+  window.setTimeout(applyScroll, 80);
+}
+
+async function addPackageRequest(ident, product) {
+  return apiRequest(`/api/tebex/baskets/${ident}/packages`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      packageId: product.id,
+      packageIdent: product.ident ?? "",
+    }),
+  });
 }
 
 function formatPrice(value, currency = "EUR") {
@@ -226,6 +310,7 @@ export default function ShopClient({ initialCategories, catalogError }) {
     }
 
     initializedRef.current = true;
+    const pendingPackage = consumePendingPackage();
 
     async function restoreBasket() {
       setIsBusy(true);
@@ -240,22 +325,50 @@ export default function ShopClient({ initialCategories, catalogError }) {
           setMessage("Paiement annulé. Votre panier reste disponible.");
         }
 
+        let activeBasket = null;
+
         if (savedIdent) {
           try {
             const restoredBasket = await apiRequest(`/api/tebex/baskets/${savedIdent}`);
 
             if (!restoredBasket.complete) {
-              storeBasket(restoredBasket);
-              return;
+              activeBasket = storeBasket(restoredBasket);
             }
           } catch {
             window.localStorage.removeItem(BASKET_STORAGE_KEY);
           }
         }
 
-        await createBasket();
+        if (!activeBasket) {
+          activeBasket = await createBasket();
+        }
+
+        if (pendingPackage?.id && activeBasket?.username) {
+          try {
+            const updatedBasket = await addPackageRequest(activeBasket.ident, pendingPackage);
+            storeBasket(updatedBasket);
+            setIsCartOpen(true);
+            setMessage("Produit ajouté au panier.");
+          } catch (error) {
+            setMessage(error.message);
+          }
+        }
+
+        restoreShopScroll();
+
+        if (params.get("auth") === "complete") {
+          params.delete("auth");
+          const query = params.toString();
+          const hash = window.location.hash;
+          window.history.replaceState(
+            null,
+            "",
+            `${window.location.pathname}${query ? `?${query}` : ""}${hash}`,
+          );
+        }
       } catch (error) {
         setMessage(error.message);
+        restoreShopScroll();
       } finally {
         setIsBusy(false);
       }
@@ -310,13 +423,20 @@ export default function ShopClient({ initialCategories, catalogError }) {
     };
   }, [isCartOpen]);
 
-  async function connectFiveM() {
+  async function connectFiveM(pendingPackage = null) {
     setIsBusy(true);
     setMessage("");
+    let remembered = false;
 
     try {
       const activeBasket = basket?.ident ? basket : await createBasket();
-      const authLinks = await apiRequest(`/api/tebex/baskets/${activeBasket.ident}/auth`);
+      const params = new URLSearchParams(window.location.search);
+      params.delete("payment");
+      params.set("auth", "complete");
+      const returnPath = `/boutique?${params.toString()}`;
+      const authLinks = await apiRequest(
+        `/api/tebex/baskets/${activeBasket.ident}/auth?returnPath=${encodeURIComponent(returnPath)}`,
+      );
       const providers = Array.isArray(authLinks) ? authLinks : [authLinks];
       const provider = providers.find((item) => item?.name?.toLowerCase().includes("fivem")) ?? providers[0];
 
@@ -324,8 +444,14 @@ export default function ShopClient({ initialCategories, catalogError }) {
         throw new Error("Tebex n'a retourné aucun lien de connexion FiveM.");
       }
 
+      rememberShopReturn(pendingPackage);
+      remembered = true;
       window.location.assign(provider.url);
     } catch (error) {
+      if (remembered) {
+        forgetShopReturn();
+      }
+
       setMessage(error.message);
       setIsBusy(false);
     }
@@ -346,10 +472,10 @@ export default function ShopClient({ initialCategories, catalogError }) {
     }
   }
 
-  async function addProduct(packageId) {
+  async function addProduct(product) {
     if (!basket?.username) {
       setMessage("Connectez votre compte FiveM avant d'ajouter un produit.");
-      await connectFiveM();
+      await connectFiveM(product);
       return;
     }
 
@@ -357,11 +483,7 @@ export default function ShopClient({ initialCategories, catalogError }) {
     setMessage("");
 
     try {
-      const updatedBasket = await apiRequest(`/api/tebex/baskets/${basket.ident}/packages`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packageId }),
-      });
+      const updatedBasket = await addPackageRequest(basket.ident, product);
       storeBasket(updatedBasket);
       setIsCartOpen(true);
       setMessage("Produit ajouté au panier.");
@@ -471,7 +593,7 @@ export default function ShopClient({ initialCategories, catalogError }) {
                 <p>{description || "Produit disponible via la boutique sécurisée Tebex."}</p>
                 <div className={styles.productFooter}>
                   <strong>{formatPrice(product.base_price ?? product.total_price, product.currency)}</strong>
-                  <button disabled={isBusy} onClick={() => addProduct(product.id)} type="button">
+                  <button disabled={isBusy} onClick={() => addProduct(product)} type="button">
                     {basket?.username ? "Ajouter" : "Connexion requise"}
                   </button>
                 </div>

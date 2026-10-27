@@ -166,7 +166,7 @@ export default function CodePenalClient({ initialJurisdictions = [], initialSect
           <div className={styles.heroCopy}>
             <p className={styles.eyebrow}>
               <span aria-hidden="true" />
-              Central Intelligence System
+              Département de la Justice, Los Angeles
             </p>
             <h1 className={styles.heroTitle}>
               <span className={styles.titleCode} data-text="Code">Code</span>

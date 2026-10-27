@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata = pageMetadata({
   path: "/lore",
-  title: "Lore actuel — Codex RP",
+  title: "Lore actuel - Codex RP",
   description: "Le lore actuel de Codex RP : ce qui se passe en ce moment à Los Angeles.",
 });
 

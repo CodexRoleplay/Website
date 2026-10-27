@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { TebexApiError } from "@/lib/tebex";
+import { publicTebexMessage, TebexApiError } from "@/lib/tebex";
 
 export function getRequestOrigin(request) {
   const configuredOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
@@ -21,7 +21,7 @@ export function validateBasketIdent(ident) {
 
 export function tebexErrorResponse(error) {
   const status = error instanceof TebexApiError ? error.status : 500;
-  const message = error instanceof Error ? error.message : "Erreur Tebex inattendue.";
+  const message = publicTebexMessage(error);
 
   return NextResponse.json({ error: message }, { status });
 }
