@@ -68,6 +68,7 @@ export const footerGroups = [
       { label: "Règlement", href: "/reglement" },
       { label: "Code pénal", href: "/code-penal" },
       { label: "FAQ", href: "/faq" },
+      { label: "Lore actuel", href: "/lore" },
     ],
   },
   {
@@ -86,6 +87,15 @@ export const socialLinks = [
   { label: "TikTok", href: "https://www.tiktok.com/@codexrpofficiel", icon: "tiktok" },
   { label: "Youtube", href: "https://www.youtube.com/@CodexRPOfficiel", icon: "youtube" },
 ];
+
+export function galleryAlt(tag) {
+  const raw = String(tag ?? "").trim();
+  const label = raw
+    ? raw.charAt(0).toLocaleUpperCase("fr-FR") + raw.slice(1).toLocaleLowerCase("fr-FR")
+    : "Photo";
+
+  return `${label} sur Codex RP`;
+}
 
 export const galleryPhotos = [
   { src: "/img/portfolio/1.jpg", tag: "OFFROAD" },

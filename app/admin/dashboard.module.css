@@ -190,7 +190,7 @@
 
 .workspaceGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
 
@@ -225,6 +225,10 @@
   background: #64d99b;
 }
 
+.workspaceLore::before {
+  background: #ffc857;
+}
+
 .workspaceHeader {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -253,6 +257,12 @@
   border-color: rgba(100, 217, 155, 0.24);
   background: rgba(100, 217, 155, 0.07);
   color: #7dffb0;
+}
+
+.workspaceLore .workspaceIcon {
+  border-color: rgba(255, 200, 87, 0.28);
+  background: rgba(255, 200, 87, 0.08);
+  color: #ffc857;
 }
 
 .workspaceKicker {
@@ -343,6 +353,12 @@
   color: #a9f5cb;
 }
 
+.workspaceLore .primaryAction {
+  border-color: rgba(255, 200, 87, 0.35);
+  background: rgba(255, 200, 87, 0.08);
+  color: #ffd98a;
+}
+
 .secondaryAction {
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: transparent;
@@ -351,7 +367,7 @@
 
 .utilityGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
   margin-top: 18px;
 }

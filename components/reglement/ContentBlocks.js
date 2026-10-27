@@ -1,13 +1,28 @@
 "use client";
 
+import { containsFormattingHtml, normalizeNewlines, sanitizeRichText } from "./rich-text";
 import RuleIcon from "./RuleIcon";
 import styles from "./ContentBlocks.module.css";
+
+function FormattedText({ text }) {
+  const value = normalizeNewlines(text);
+
+  if (!value) {
+    return null;
+  }
+
+  if (containsFormattingHtml(value)) {
+    return <div className={styles.richHtml} dangerouslySetInnerHTML={{ __html: sanitizeRichText(value) }} />;
+  }
+
+  return <div className={styles.formatted}>{value}</div>;
+}
 
 function AlertBlock({ block }) {
   return (
     <div className={`${styles.alert} ${styles[`alert_${block.variant ?? "warning"}`]}`}>
-      {block.title ? <strong>{block.title}</strong> : null}
-      <p>{block.text}</p>
+      {block.title ? <strong className={styles.formatted}>{block.title}</strong> : null}
+      <FormattedText text={block.text} />
     </div>
   );
 }
@@ -20,7 +35,9 @@ function CardsBlock({ block }) {
           <h3>{card.title}</h3>
           <ul>
             {(card.items ?? []).map((item) => (
-              <li key={item}>{item}</li>
+              <li key={item}>
+                <FormattedText text={item} />
+              </li>
             ))}
           </ul>
         </article>
@@ -34,8 +51,8 @@ function ListBlock({ block }) {
     <div className={styles.listBlock}>
       {(block.items ?? []).map((item) => (
         <div className={styles.listItem} key={`${item.label}-${item.text}`}>
-          <strong>{item.label}</strong>
-          <span>{item.text}</span>
+          <strong className={styles.formatted}>{item.label}</strong>
+          <FormattedText text={item.text} />
         </div>
       ))}
     </div>
@@ -49,8 +66,8 @@ function RuleBlock({ block, ruleStyles }) {
         <RuleIcon name={block.icon} />
       </span>
       <div className={ruleStyles?.ruleBody ?? styles.ruleBody}>
-        <h2>{block.title}</h2>
-        <p>{block.description}</p>
+        <h2 className={styles.formatted}>{block.title}</h2>
+        <FormattedText text={block.description} />
       </div>
     </div>
   );
@@ -68,13 +85,13 @@ export default function ContentBlocks({ blocks = [], ruleStyles = null }) {
           case "heading":
             return (
               <div className={styles.heading} key={block.id}>
-                <h2>{block.text}</h2>
+                <h2 className={styles.formatted}>{block.text}</h2>
               </div>
             );
           case "text":
             return (
               <div className={styles.textBox} key={block.id}>
-                <p>{block.text}</p>
+                <FormattedText text={block.text} />
               </div>
             );
           case "alert":
@@ -86,7 +103,7 @@ export default function ContentBlocks({ blocks = [], ruleStyles = null }) {
           case "quote":
             return (
               <blockquote className={styles.quote} key={block.id}>
-                {block.text}
+                <FormattedText text={block.text} />
               </blockquote>
             );
           case "rule":

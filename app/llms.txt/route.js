@@ -16,6 +16,7 @@ Le serveur met l'accent sur l'immersion, la cohérence roleplay, l'économie, le
 - [Règlement](${absoluteUrl("/reglement")}): règles officielles du serveur Codex RP.
 - [Code pénal](${absoluteUrl("/code-penal")}): infractions, sanctions et procédures judiciaires en jeu.
 - [FAQ](${absoluteUrl("/faq")}): réponses aux questions fréquentes sur le serveur.
+- [Lore actuel](${absoluteUrl("/lore")}): récit synthétisé de ce qui se passe en ce moment à Los Angeles.
 
 ## Ressources d'exploration
 

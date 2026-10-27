@@ -2,6 +2,7 @@ import Image from "next/image";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { getBoutiqueSettings } from "@/lib/boutique/admin-persistence";
+import { pageMetadata } from "@/lib/seo";
 import { getTebexCategories } from "@/lib/tebex";
 import BoutiqueClosed from "./BoutiqueClosed";
 import ShopClient from "./ShopClient";
@@ -10,13 +11,12 @@ import styles from "./shop.module.css";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  alternates: {
-    canonical: "/boutique",
-  },
+export const metadata = pageMetadata({
+  path: "/boutique",
   title: "Boutique — Codex RP",
-  description: "Boutique Tebex Codex RP : catalogue, panier et connexion FiveM.",
-};
+  description:
+    "Boutique Codex RP : packs Codyx et cosmétiques. Aucun avantage en jeu, paiement sécurisé.",
+});
 
 export default async function ShopPage() {
   let boutiqueEnabled = false;

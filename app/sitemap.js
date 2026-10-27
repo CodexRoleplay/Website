@@ -6,6 +6,7 @@ const routes = [
   { path: "/reglement", priority: 0.8, changeFrequency: "monthly" },
   { path: "/code-penal", priority: 0.7, changeFrequency: "monthly" },
   { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/lore", priority: 0.7, changeFrequency: "weekly" },
 ];
 
 export default function sitemap() {

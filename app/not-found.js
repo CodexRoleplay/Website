@@ -4,10 +4,8 @@ import Header from "@/components/Header";
 import styles from "./not-found.module.css";
 
 export const metadata = {
-  title: "Page introuvable - Codex RP",
-  alternates: {
-    canonical: "/",
-  },
+  title: "Page introuvable — Codex RP",
+  description: "Cette page n'existe pas sur Codex RP.",
   robots: {
     index: false,
     follow: false,

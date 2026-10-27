@@ -1,0 +1,42 @@
+.layout {
+  position: relative;
+  z-index: 1;
+  width: min(980px, calc(100% - 48px));
+  margin: 0 auto;
+}
+
+.disclaimer {
+  margin: 0 0 28px;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 176, 32, 0.35);
+  border-radius: 18px;
+  background: rgba(255, 176, 32, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.7;
+}
+
+.updated {
+  margin: 18px 0 0;
+  color: rgba(223, 230, 255, 0.72);
+  font-size: 0.95rem;
+}
+
+.updated time {
+  color: #fff;
+}
+
+.empty {
+  margin: 0;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.7;
+}
+
+@media (max-width: 720px) {
+  .layout {
+    width: min(100% - 32px, 720px);
+  }
+}

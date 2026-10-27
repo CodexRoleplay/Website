@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   BookOpen,
   ChevronDown,
+  ScrollText,
   CircleHelp,
   ExternalLink,
   History,
@@ -31,6 +32,15 @@ const NAV_GROUPS = [
       label: "Historique",
       icon: History,
       match: (path) => path.startsWith("/admin/reglement/historique"),
+    },
+  ],
+  [
+    { href: "/admin/lore", label: "Lore actuel", icon: ScrollText, match: (path) => path === "/admin/lore" },
+    {
+      href: "/admin/lore/historique",
+      label: "Historique",
+      icon: History,
+      match: (path) => path.startsWith("/admin/lore/historique"),
     },
   ],
   [

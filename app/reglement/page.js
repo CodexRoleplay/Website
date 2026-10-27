@@ -1,19 +1,19 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { getPublishedReglement } from "@/lib/reglement/published";
+import { pageMetadata } from "@/lib/seo";
 import ReglementClient from "./ReglementClient";
 import styles from "./reglement.module.css";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  alternates: {
-    canonical: "/reglement",
-  },
+export const metadata = pageMetadata({
+  path: "/reglement",
   title: "Règlement — Codex RP",
-  description: "Règlement Codex RP : bases du RP, règles légales, illégales et sanctions.",
-};
+  description:
+    "Règlement officiel de Codex RP : bases du roleplay, règles légales, illégales et sanctions.",
+});
 
 export default async function ReglementPage() {
   const { categories } = await getPublishedReglement();

@@ -8,7 +8,7 @@ import { absoluteUrl, siteUrl } from "@/lib/site-url";
 
 const title = "Codex RP : Serveur RP FiveM français réaliste (GTA 5)";
 const description =
-  "Serveur roleplay GTA V communautaire Codex RP : scripts custom, immersion et communauté.";
+  "Serveur RP FiveM francophone réaliste. Tout ce qui est possible dans la vraie vie est possible ici. Accès libre, rejoins Los Angeles.";
 const socialProfiles = [
   "https://discord.gg/HwUqfteUHz",
   "https://www.tiktok.com/@codexrpofficiel",
@@ -47,9 +47,6 @@ const structuredData = {
 export const metadata = {
   metadataBase: new URL(siteUrl),
   applicationName: "Codex RP",
-  alternates: {
-    canonical: "/",
-  },
   title,
   description,
   keywords: [
@@ -82,28 +79,6 @@ export const metadata = {
   manifest: "/manifest.webmanifest",
   formatDetection: {
     telephone: false,
-  },
-  openGraph: {
-    type: "website",
-    locale: "fr_FR",
-    url: "/",
-    siteName: "Codex RP",
-    title,
-    description,
-    images: [
-      {
-        url: "/img/home_hero_bg.webp",
-        width: 1536,
-        height: 1024,
-        alt: "Codex RP, serveur roleplay FiveM français",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: ["/img/home_hero_bg.webp"],
   },
 };
 

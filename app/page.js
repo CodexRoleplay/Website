@@ -1,4 +1,5 @@
 import About from "@/components/About";
+import { pageMetadata } from "@/lib/seo";
 import CxGlide from "@/components/CxGlide";
 import Footer from "@/components/Footer";
 import FooterPalmier from "@/components/FooterPalmier";
@@ -9,6 +10,13 @@ import HeroPalmier from "@/components/HeroPalmier";
 import Services from "@/components/Services";
 import VideoTeaser from "@/components/VideoTeaser";
 import WordsTicker from "@/components/WordsTicker";
+
+export const metadata = pageMetadata({
+  path: "/",
+  title: "Codex RP : Serveur RP FiveM français réaliste (GTA 5)",
+  description:
+    "Serveur RP FiveM francophone réaliste. Tout ce qui est possible dans la vraie vie est possible ici. Accès libre, rejoins Los Angeles.",
+});
 
 export default function HomePage() {
   return (

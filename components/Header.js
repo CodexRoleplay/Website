@@ -9,6 +9,7 @@ const serverLinks = [
   { label: "Règlement", href: "/reglement" },
   { label: "Code pénal", href: "/code-penal" },
   { label: "FAQ", href: "/faq" },
+  { label: "Lore actuel", href: "/lore" },
 ];
 
 const shopLinks = [
@@ -271,7 +272,7 @@ export default function Header() {
               index="03"
               label="Serveur"
               links={serverLinks}
-              active={pathname.startsWith("/reglement") || pathname.startsWith("/code-penal")}
+              active={pathname.startsWith("/reglement") || pathname.startsWith("/code-penal") || pathname.startsWith("/lore")}
             />
           </ul>
 
@@ -333,7 +334,7 @@ export default function Header() {
             <li style={{ "--i": 2 }}>
               <span
                 className={`cxnav__drawer-group${
-                  pathname.startsWith("/reglement") || pathname.startsWith("/code-penal") ? " is-active" : ""
+                  pathname.startsWith("/reglement") || pathname.startsWith("/code-penal") || pathname.startsWith("/lore") ? " is-active" : ""
                 }`}
               >
                 <em>03</em>Serveur

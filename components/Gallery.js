@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import CxLine from "@/components/CxLine";
 import CxModal from "@/components/CxModal";
-import { galleryPhotos } from "@/data/site";
+import { galleryAlt, galleryPhotos } from "@/data/site";
 
 function GalleryPhotoModal({ open, photo, onClose }) {
   if (!photo) {
@@ -25,7 +25,7 @@ function GalleryPhotoModal({ open, photo, onClose }) {
       <Image
         className="cxvmodal__image"
         src={photo.src}
-        alt={`${photo.tag} — Codex RP`}
+        alt={galleryAlt(photo.tag)}
         width={1920}
         height={1080}
         sizes="(max-width: 960px) 100vw, 960px"
@@ -99,7 +99,7 @@ function PortfolioCard({ photo, index, onSelect }) {
       className="cxgal__card"
       data-cxgal-card
       style={{ "--card-i": index }}
-      aria-label={`Agrandir la photo ${photo.tag}`}
+      aria-label={`Agrandir la photo ${galleryAlt(photo.tag)}`}
       onClick={openPhoto}
     >
       <div className="cxgal__frame" aria-hidden="true">
@@ -114,13 +114,12 @@ function PortfolioCard({ photo, index, onSelect }) {
         <Image
           className="cxgal__img"
           src={photo.src}
-          alt=""
+          alt={galleryAlt(photo.tag)}
           width={800}
           height={450}
           sizes="(max-width: 500px) 90vw, (max-width: 1084px) 45vw, 320px"
           draggable={false}
           unoptimized
-          aria-hidden="true"
           style={{ color: "transparent" }}
         />
       </div>

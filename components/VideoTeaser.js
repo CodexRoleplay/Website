@@ -199,13 +199,12 @@ export default function VideoTeaser() {
           <Image
             className="module_video__visual"
             src="/img/codex_video.webp"
-            alt=""
+            alt="Vidéo sur Codex RP"
             width={980}
             height={1308}
             sizes="(max-width: 500px) 430px, (max-width: 768px) 520px, (max-width: 900px) 550px, 667px"
             draggable={false}
             unoptimized
-            aria-hidden="true"
             style={{ color: "transparent" }}
           />
         </div>

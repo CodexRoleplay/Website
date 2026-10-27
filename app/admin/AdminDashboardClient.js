@@ -12,6 +12,7 @@ import {
   History,
   RefreshCw,
   Scale,
+  ScrollText,
   ShieldCheck,
   Users,
 } from "lucide-react";
@@ -77,6 +78,13 @@ function countCodePenal(payload) {
   };
 }
 
+function countLore(payload) {
+  return {
+    blocks: Array.isArray(payload?.blocks) ? payload.blocks.length : 0,
+    updatedAt: payload?.updatedAt ?? null,
+  };
+}
+
 function countFaq(payload) {
   const categories = Array.isArray(payload?.categories) ? payload.categories : [];
 
@@ -90,14 +98,16 @@ function countFaq(payload) {
   };
 }
 
-export default function AdminDashboardClient({ initialReglement, initialCodePenal, initialFaq }) {
+export default function AdminDashboardClient({ initialReglement, initialCodePenal, initialFaq, initialLore }) {
   const { user, getIdToken, loading: authLoading } = useAuth();
   const [reglement, setReglement] = useState(initialReglement);
   const [codePenal, setCodePenal] = useState(initialCodePenal);
   const [faq, setFaq] = useState(initialFaq);
+  const [lore, setLore] = useState(initialLore);
   const [reglementLog, setReglementLog] = useState(null);
   const [codePenalLog, setCodePenalLog] = useState(null);
   const [faqLog, setFaqLog] = useState(null);
+  const [loreLog, setLoreLog] = useState(null);
   const [boutiqueEnabled, setBoutiqueEnabled] = useState(false);
   const [boutiqueSaving, setBoutiqueSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -118,13 +128,15 @@ export default function AdminDashboardClient({ initialReglement, initialCodePena
         throw new Error("Session expirée. Reconnecte-toi.");
       }
 
-      const [reglementResult, penalResult, faqResult, reglementLogsResult, penalLogsResult, faqLogsResult, boutiqueResult] = await Promise.allSettled([
+      const [reglementResult, penalResult, faqResult, loreResult, reglementLogsResult, penalLogsResult, faqLogsResult, loreLogsResult, boutiqueResult] = await Promise.allSettled([
         fetchAdminData("/api/admin/reglement", token),
         fetchAdminData("/api/admin/code-penal", token),
         fetchAdminData("/api/admin/faq", token),
+        fetchAdminData("/api/admin/lore", token),
         fetchAdminData("/api/admin/reglement/logs", token),
         fetchAdminData("/api/admin/code-penal/logs", token),
         fetchAdminData("/api/admin/faq/logs", token),
+        fetchAdminData("/api/admin/lore/logs", token),
         fetchAdminData("/api/admin/boutique", token),
       ]);
 
@@ -138,6 +150,10 @@ export default function AdminDashboardClient({ initialReglement, initialCodePena
 
       if (faqResult.status === "fulfilled") {
         setFaq(countFaq(faqResult.value));
+      }
+
+      if (loreResult.status === "fulfilled") {
+        setLore(countLore(loreResult.value));
       }
 
       if (boutiqueResult.status === "fulfilled") {
@@ -156,7 +172,11 @@ export default function AdminDashboardClient({ initialReglement, initialCodePena
         setFaqLog(faqLogsResult.value.logs?.[0] ?? null);
       }
 
-      const rejected = [reglementResult, penalResult, faqResult, reglementLogsResult, penalLogsResult, faqLogsResult, boutiqueResult].find(
+      if (loreLogsResult.status === "fulfilled") {
+        setLoreLog(loreLogsResult.value.logs?.[0] ?? null);
+      }
+
+      const rejected = [reglementResult, penalResult, faqResult, loreResult, reglementLogsResult, penalLogsResult, faqLogsResult, loreLogsResult, boutiqueResult].find(
         (result) => result.status === "rejected",
       );
 
@@ -389,6 +409,42 @@ export default function AdminDashboardClient({ initialReglement, initialCodePena
             </Link>
           </div>
         </article>
+
+        <article className={`${styles.workspace} ${styles.workspaceLore}`}>
+          <div className={styles.workspaceHeader}>
+            <span className={styles.workspaceIcon}><ScrollText aria-hidden="true" size={24} /></span>
+            <div>
+              <span className={styles.workspaceKicker}>Récit en cours</span>
+              <h2>Lore actuel</h2>
+            </div>
+          </div>
+
+          <p className={styles.workspaceDescription}>
+            Consignez sur une seule page les histoires qui se déroulent en ville.
+          </p>
+
+          <div className={styles.workspaceMeta}>
+            <span><strong>{lore?.blocks ?? 0}</strong> blocs</span>
+          </div>
+
+          <div className={styles.activity}>
+            <Clock3 aria-hidden="true" size={17} />
+            <div>
+              <span>Dernière activité</span>
+              <strong>{loreLog?.summary || formatDate(lore?.updatedAt)}</strong>
+              {loreLog?.createdAt ? <small>{formatDate(loreLog.createdAt)}</small> : null}
+            </div>
+          </div>
+
+          <div className={styles.actions}>
+            <Link className={styles.primaryAction} href="/admin/lore">
+              Ouvrir l’éditeur <ArrowUpRight aria-hidden="true" size={16} />
+            </Link>
+            <Link className={styles.secondaryAction} href="/admin/lore/historique">
+              <History aria-hidden="true" size={16} /> Historique
+            </Link>
+          </div>
+        </article>
       </section>
 
       <section className={styles.utilityGrid} aria-label="Outils rapides">
@@ -410,6 +466,11 @@ export default function AdminDashboardClient({ initialReglement, initialCodePena
         <Link className={styles.utility} href="/faq" rel="noreferrer" target="_blank">
           <ExternalLink aria-hidden="true" size={21} />
           <span><strong>Voir la FAQ</strong><small>Contrôler les réponses publiques</small></span>
+          <ArrowUpRight aria-hidden="true" size={17} />
+        </Link>
+        <Link className={styles.utility} href="/lore" rel="noreferrer" target="_blank">
+          <ExternalLink aria-hidden="true" size={21} />
+          <span><strong>Voir le lore</strong><small>Contrôler le récit public</small></span>
           <ArrowUpRight aria-hidden="true" size={17} />
         </Link>
       </section>
