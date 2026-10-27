@@ -1,8 +1,21 @@
+"use client";
+
 import { SocialIcon } from "@/components/Header";
 import ShopLink from "@/components/ShopLink";
+import { useShopCategoryLinks } from "@/components/ShopNavProvider";
 import { footerGroups, socialLinks } from "@/data/site";
 
 export default function Footer() {
+  const categoryLinks = useShopCategoryLinks();
+  const groups = footerGroups.map((group) =>
+    group.title === "Boutique"
+      ? {
+          ...group,
+          links: [{ label: "Catalogue", href: "/boutique" }, ...categoryLinks],
+        }
+      : group,
+  );
+
   return (
     <footer className="footer_footer__pTLpy">
       <div className="footer_bg__Qx50L" aria-hidden="true">
@@ -50,7 +63,7 @@ export default function Footer() {
 
           <nav className="footer_nav__nEw15" aria-label="Navigation du pied de page">
             <ul className="footer_menu__aJYNX">
-              {footerGroups.map((group) => (
+              {groups.map((group) => (
                 <li style={{ "--color": group.color }} key={group.title}>
                   <h3>{group.title}</h3>
                   <ul>

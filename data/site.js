@@ -1,3 +1,5 @@
+import { FALLBACK_SHOP_CATEGORY_LINKS } from "@/lib/boutique/shop-links";
+
 export const serviceCards = [
   {
     eyebrow: "Scripts",
@@ -74,11 +76,7 @@ export const footerGroups = [
   {
     title: "Boutique",
     color: "var(--tertiary)",
-    links: [
-      { label: "Catalogue", href: "/boutique" },
-      { label: "Packs Codyx", href: "#" },
-      { label: "Abonnements", href: "#" },
-    ],
+    links: [{ label: "Catalogue", href: "/boutique" }, ...FALLBACK_SHOP_CATEGORY_LINKS],
   },
 ];
 

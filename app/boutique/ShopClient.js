@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useSearchParams } from "next/navigation";
+import { normalizeShopSlug as normalizeSlug } from "@/lib/boutique/shop-links";
 import styles from "./shop.module.css";
 
 const BASKET_STORAGE_KEY = "codex-rp-tebex-basket";
@@ -34,16 +35,6 @@ function cleanDescription(value = "") {
     .replace(/&quot;/g, '"')
     .replace(/\s+/g, " ")
     .trim();
-}
-
-function normalizeSlug(value = "") {
-  return String(value)
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/&/g, " et ")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
 }
 
 function categoryMatchesTarget(category, target) {
@@ -274,12 +265,18 @@ export default function ShopClient({ initialCategories, catalogError }) {
   }, []);
 
   useEffect(() => {
-    const nextCategoryId = getInitialCategoryId(categories, targetedCategory);
-
-    if (nextCategoryId && nextCategoryId !== selectedCategoryId) {
-      setSelectedCategoryId(nextCategoryId);
+    if (!targetedCategory) {
+      return;
     }
-  }, [categories, selectedCategoryId, targetedCategory]);
+
+    const nextCategoryId = categories.find((category) => categoryMatchesTarget(category, targetedCategory))?.id;
+
+    if (!nextCategoryId) {
+      return;
+    }
+
+    setSelectedCategoryId((current) => (current === nextCategoryId ? current : nextCategoryId));
+  }, [categories, targetedCategory]);
 
   useEffect(() => {
     setPortalTarget(document.body);

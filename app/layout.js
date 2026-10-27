@@ -2,8 +2,10 @@ import "lenis/dist/lenis.css";
 import "./globals.css";
 import { BoutiqueProvider } from "@/components/BoutiqueProvider";
 import ScrollToTop from "@/components/ScrollToTop";
+import { ShopNavProvider } from "@/components/ShopNavProvider";
 import SitePreloader from "@/components/SitePreloader";
 import SmoothScroll from "@/components/SmoothScroll";
+import { getShopNavigationLinks } from "@/lib/boutique/navigation";
 import { absoluteUrl, siteUrl } from "@/lib/site-url";
 
 const title = "Codex RP : Serveur RP FiveM français réaliste (GTA 5)";
@@ -82,7 +84,9 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const shopCategoryLinks = await getShopNavigationLinks();
+
   return (
     <html lang="fr" dir="ltr" suppressHydrationWarning>
       <head>
@@ -125,10 +129,12 @@ export default function RootLayout({ children }) {
       >
         <div id="modal-root" />
         <BoutiqueProvider>
-          <SitePreloader />
-          <SmoothScroll />
-          {children}
-          <ScrollToTop />
+          <ShopNavProvider links={shopCategoryLinks}>
+            <SitePreloader />
+            <SmoothScroll />
+            {children}
+            <ScrollToTop />
+          </ShopNavProvider>
         </BoutiqueProvider>
       </body>
     </html>

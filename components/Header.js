@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import ShopLink from "@/components/ShopLink";
+import { useShopCategoryLinks } from "@/components/ShopNavProvider";
 import { socialLinks } from "@/data/site";
 
 const serverLinks = [
@@ -10,11 +11,6 @@ const serverLinks = [
   { label: "Code pénal", href: "/code-penal" },
   { label: "FAQ", href: "/faq" },
   { label: "Lore actuel", href: "/lore" },
-];
-
-const shopLinks = [
-  { label: "Abonnements", href: "/boutique?categorie=abonnements#catalogue" },
-  { label: "Packs Codyx", href: "/boutique?categorie=packs-codyx#catalogue" },
 ];
 
 export function SocialIcon({ name }) {
@@ -210,6 +206,7 @@ function NavDropdown({ index, label, links, active, featured, href }) {
 }
 
 export default function Header() {
+  const shopLinks = useShopCategoryLinks();
   const [isOpen, setIsOpen] = useState(false);
   const [isCompact, setIsCompact] = useState(false);
   const pathname = usePathname();
