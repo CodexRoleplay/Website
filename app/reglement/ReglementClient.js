@@ -66,12 +66,15 @@ function scrollToReglementTarget(targetId) {
 export default function ReglementClient({ initialCategories = [] }) {
   const [categories, setCategories] = useState(initialCategories);
   const [activeCategoryId, setActiveCategoryId] = useState(null);
+  const [expandedCategoryId, setExpandedCategoryId] = useState(null);
   const [activeSectionId, setActiveSectionId] = useState(null);
   const [openSections, setOpenSections] = useState({});
   const [query, setQuery] = useState("");
   const [collapsedWhileSearching, setCollapsedWhileSearching] = useState({});
   const heroRef = useRef(null);
+  const sidebarRef = useRef(null);
   const pendingScrollId = useRef(null);
+  const pendingSidebarReveal = useRef(null);
   const normalizedQuery = query.trim();
   const isSearching = normalizedQuery.length > 0;
 
@@ -106,6 +109,31 @@ export default function ReglementClient({ initialCategories = [] }) {
     return () => cancelAnimationFrame(frame);
   }, [activeSectionId, activeCategoryId, openSections, collapsedWhileSearching]);
 
+  useLayoutEffect(() => {
+    const categoryId = pendingSidebarReveal.current;
+
+    if (!categoryId) {
+      return;
+    }
+
+    pendingSidebarReveal.current = null;
+    const sidebar = sidebarRef.current;
+    const node = sidebar?.querySelector(`[data-category-id="${CSS.escape(categoryId)}"]`);
+
+    if (!sidebar || !node) {
+      return;
+    }
+
+    const sidebarRect = sidebar.getBoundingClientRect();
+    const nodeRect = node.getBoundingClientRect();
+
+    if (nodeRect.top < sidebarRect.top) {
+      sidebar.scrollTop += nodeRect.top - sidebarRect.top - 8;
+    } else if (nodeRect.bottom > sidebarRect.bottom) {
+      sidebar.scrollTop += nodeRect.bottom - sidebarRect.bottom + 8;
+    }
+  }, [expandedCategoryId]);
+
   const activeCategory = useMemo(
     () => categories.find((category) => category.id === activeCategoryId) ?? null,
     [categories, activeCategoryId],
@@ -131,7 +159,19 @@ export default function ReglementClient({ initialCategories = [] }) {
   const sidebarCategories = searchResults ?? categories;
 
   function selectCategory(categoryId) {
+    if (expandedCategoryId === categoryId) {
+      pendingSidebarReveal.current = categoryId;
+      setExpandedCategoryId(null);
+      return;
+    }
+
     const nextCategory = categories.find((category) => category.id === categoryId);
+
+    setExpandedCategoryId(categoryId);
+
+    if (categoryId === activeCategoryId) {
+      return;
+    }
 
     pendingScrollId.current = null;
     setActiveCategoryId(categoryId);
@@ -176,6 +216,7 @@ export default function ReglementClient({ initialCategories = [] }) {
   function resetToIndex() {
     pendingScrollId.current = null;
     setActiveCategoryId(null);
+    setExpandedCategoryId(null);
     setActiveSectionId(null);
     setOpenSections({});
     scrollToHero();
@@ -187,6 +228,7 @@ export default function ReglementClient({ initialCategories = [] }) {
 
     if (categoryId !== activeCategoryId) {
       const nextCategory = categories.find((category) => category.id === categoryId);
+      setExpandedCategoryId(categoryId);
       setActiveCategoryId(categoryId);
       setOpenSections((current) => {
         const next = { ...current };
@@ -278,23 +320,40 @@ export default function ReglementClient({ initialCategories = [] }) {
       </div>
 
       <div className={styles.layout}>
-        <aside className={styles.sidebar} aria-label="Catégories du règlement" data-lenis-prevent="true">
+        <aside
+          className={styles.sidebar}
+          aria-label="Catégories du règlement"
+          data-lenis-prevent="true"
+          ref={sidebarRef}
+        >
           <ul className={styles.sideNav}>
             {sidebarCategories.map((category) => {
               const isActive = category.id === activeCategoryId;
+              const isExpanded = category.id === expandedCategoryId;
               const sections = category.sections ?? [];
-              const showSections = isActive && sections.length > 0;
+              const showSections = isExpanded && sections.length > 0;
 
               return (
                 <li className={styles.sideGroup} key={category.id}>
                   <button
                     aria-controls={showSections ? `reglement-sub-${category.id}` : undefined}
-                    aria-expanded={sections.length > 0 ? isActive : undefined}
+                    aria-expanded={isExpanded}
                     className={`${styles.sideLink} ${isActive ? styles.sideLinkActive : ""}`}
+                    data-category-id={category.id}
                     onClick={() => selectCategory(category.id)}
                     type="button"
                   >
-                    {isSearching ? <SearchHighlight text={category.title} query={normalizedQuery} /> : category.title}
+                    <span className={styles.sideLinkLabel}>
+                      {isSearching ? (
+                        <SearchHighlight text={category.title} query={normalizedQuery} />
+                      ) : (
+                        category.title
+                      )}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className={`${styles.sideChevron} ${isExpanded ? styles.sideChevronOpen : ""}`}
+                    />
                   </button>
                   {showSections ? (
                     <ul

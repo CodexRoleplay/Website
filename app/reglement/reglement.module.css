@@ -116,6 +116,10 @@
 
 .sideLink {
   position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 8px;
   width: 100%;
   padding: 8px 18px 8px 0;
   color: rgba(223, 230, 255, 0.68);
@@ -124,6 +128,26 @@
   line-height: 1.35;
   text-align: right;
   transition: color 180ms ease, transform 180ms ease;
+}
+
+.sideLinkLabel {
+  min-width: 0;
+}
+
+.sideChevron {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  margin-top: 4px;
+  border-top: 2px solid rgb(var(--primary-rgb));
+  border-right: 2px solid rgb(var(--primary-rgb));
+  filter: drop-shadow(0 0 6px rgba(var(--primary-rgb), 0.7));
+  transform: rotate(135deg);
+  transition: transform 180ms ease;
+}
+
+.sideChevronOpen {
+  transform: rotate(-45deg);
 }
 
 .sideLink:hover,
@@ -617,10 +641,16 @@
   }
 
   .sideLink {
+    justify-content: flex-start;
     width: 100%;
     padding: 11px 4px;
     text-align: left;
     white-space: normal;
+  }
+
+  .sideChevron {
+    margin-top: 6px;
+    margin-left: auto;
   }
 
   .sideLink:hover,
