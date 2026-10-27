@@ -22,6 +22,44 @@ export function normalizeNewlines(value) {
   return String(value ?? "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 }
 
+const SENTENCE_END = /[.!?…][»"'’)\]]*$/;
+const NEXT_PARAGRAPH = /^[0-9«"“A-ZÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸŒ]/;
+
+export function splitProseParagraphs(value) {
+  const source = normalizeNewlines(value).trim();
+
+  if (!source) {
+    return [];
+  }
+
+  const paragraphs = [];
+
+  for (const block of source.split(/\n{2,}/)) {
+    const lines = block
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+    let current = "";
+
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = lines[index];
+      const next = lines[index + 1] ?? "";
+      current = current ? `${current} ${line}` : line;
+
+      if (next && SENTENCE_END.test(line) && NEXT_PARAGRAPH.test(next)) {
+        paragraphs.push(current);
+        current = "";
+      }
+    }
+
+    if (current) {
+      paragraphs.push(current);
+    }
+  }
+
+  return paragraphs;
+}
+
 export function containsFormattingHtml(value) {
   return FORMATTING_TAG_PATTERN.test(normalizeNewlines(value));
 }

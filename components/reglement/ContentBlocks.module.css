@@ -232,6 +232,27 @@
   line-height: 1.65;
 }
 
+.prose {
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+.prose .proseParagraph + .proseParagraph {
+  margin-top: 1em;
+}
+
+.prose.richHtml :is(p, ul, ol, blockquote) {
+  margin-bottom: 1em;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+.prose.richHtml :is(p, ul, ol, blockquote):last-child {
+  margin-bottom: 0;
+}
+
 @media (max-width: 820px) {
   .cardsGrid {
     grid-template-columns: 1fr;

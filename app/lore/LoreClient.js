@@ -45,7 +45,7 @@ export default function LoreClient({ initialLore }) {
         </header>
 
         {blocks.length > 0 ? (
-          <ContentBlocks blocks={blocks} />
+          <ContentBlocks blocks={blocks} prose />
         ) : (
           <p className={styles.empty}>
             Rien n&apos;a encore été publié ici. Les histoires en cours apparaîtront dès qu&apos;elles seront

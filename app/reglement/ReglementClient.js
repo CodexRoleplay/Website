@@ -153,6 +153,7 @@ export default function ReglementClient({ initialCategories = [] }) {
                         {sectionContent.length > 0 ? (
                           <ContentBlocks
                             blocks={sectionContent}
+                            prose
                             ruleStyles={{
                               ruleItem: blockStyles.ruleItem,
                               ruleIcon: blockStyles.ruleIcon,

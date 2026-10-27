@@ -1,33 +1,52 @@
 "use client";
 
-import { containsFormattingHtml, normalizeNewlines, sanitizeRichText } from "./rich-text";
+import { containsFormattingHtml, normalizeNewlines, sanitizeRichText, splitProseParagraphs } from "./rich-text";
 import RuleIcon from "./RuleIcon";
 import styles from "./ContentBlocks.module.css";
 
-function FormattedText({ text }) {
+function FormattedText({ text, prose = false }) {
   const value = normalizeNewlines(text);
 
-  if (!value) {
+  if (!value.trim()) {
     return null;
   }
 
   if (containsFormattingHtml(value)) {
-    return <div className={styles.richHtml} dangerouslySetInnerHTML={{ __html: sanitizeRichText(value) }} />;
+    const className = prose ? `${styles.richHtml} ${styles.prose}` : styles.richHtml;
+    return <div className={className} dangerouslySetInnerHTML={{ __html: sanitizeRichText(value) }} />;
   }
 
-  return <div className={styles.formatted}>{value}</div>;
-}
+  if (!prose) {
+    return <div className={styles.formatted}>{value}</div>;
+  }
 
-function AlertBlock({ block }) {
+  const paragraphs = splitProseParagraphs(value);
+
+  if (paragraphs.length <= 1) {
+    return <div className={`${styles.formatted} ${styles.prose}`}>{paragraphs[0] ?? value.trim()}</div>;
+  }
+
   return (
-    <div className={`${styles.alert} ${styles[`alert_${block.variant ?? "warning"}`]}`}>
-      {block.title ? <strong className={styles.formatted}>{block.title}</strong> : null}
-      <FormattedText text={block.text} />
+    <div className={styles.prose}>
+      {paragraphs.map((paragraph, index) => (
+        <p className={`${styles.formatted} ${styles.proseParagraph}`} key={`${index}-${paragraph.slice(0, 24)}`}>
+          {paragraph}
+        </p>
+      ))}
     </div>
   );
 }
 
-function CardsBlock({ block }) {
+function AlertBlock({ block, prose = false }) {
+  return (
+    <div className={`${styles.alert} ${styles[`alert_${block.variant ?? "warning"}`]}`}>
+      {block.title ? <strong className={styles.formatted}>{block.title}</strong> : null}
+      <FormattedText prose={prose} text={block.text} />
+    </div>
+  );
+}
+
+function CardsBlock({ block, prose = false }) {
   return (
     <div className={styles.cardsGrid}>
       {(block.cards ?? []).map((card) => (
@@ -36,7 +55,7 @@ function CardsBlock({ block }) {
           <ul>
             {(card.items ?? []).map((item) => (
               <li key={item}>
-                <FormattedText text={item} />
+                <FormattedText prose={prose} text={item} />
               </li>
             ))}
           </ul>
@@ -46,20 +65,20 @@ function CardsBlock({ block }) {
   );
 }
 
-function ListBlock({ block }) {
+function ListBlock({ block, prose = false }) {
   return (
     <div className={styles.listBlock}>
       {(block.items ?? []).map((item) => (
         <div className={styles.listItem} key={`${item.label}-${item.text}`}>
           <strong className={styles.formatted}>{item.label}</strong>
-          <FormattedText text={item.text} />
+          <FormattedText prose={prose} text={item.text} />
         </div>
       ))}
     </div>
   );
 }
 
-function RuleBlock({ block, ruleStyles }) {
+function RuleBlock({ block, ruleStyles, prose = false }) {
   return (
     <div className={ruleStyles?.ruleItem ?? styles.ruleItem}>
       <span className={ruleStyles?.ruleIcon ?? styles.ruleIcon}>
@@ -67,13 +86,13 @@ function RuleBlock({ block, ruleStyles }) {
       </span>
       <div className={ruleStyles?.ruleBody ?? styles.ruleBody}>
         <h2 className={styles.formatted}>{block.title}</h2>
-        <FormattedText text={block.description} />
+        <FormattedText prose={prose} text={block.description} />
       </div>
     </div>
   );
 }
 
-export default function ContentBlocks({ blocks = [], ruleStyles = null }) {
+export default function ContentBlocks({ blocks = [], ruleStyles = null, prose = false }) {
   if (!blocks.length) {
     return null;
   }
@@ -91,15 +110,15 @@ export default function ContentBlocks({ blocks = [], ruleStyles = null }) {
           case "text":
             return (
               <div className={styles.textBox} key={block.id}>
-                <FormattedText text={block.text} />
+                <FormattedText prose={prose} text={block.text} />
               </div>
             );
           case "alert":
-            return <AlertBlock block={block} key={block.id} />;
+            return <AlertBlock block={block} key={block.id} prose={prose} />;
           case "list":
-            return <ListBlock block={block} key={block.id} />;
+            return <ListBlock block={block} key={block.id} prose={prose} />;
           case "cards":
-            return <CardsBlock block={block} key={block.id} />;
+            return <CardsBlock block={block} key={block.id} prose={prose} />;
           case "quote":
             return (
               <blockquote className={styles.quote} key={block.id}>
@@ -107,7 +126,7 @@ export default function ContentBlocks({ blocks = [], ruleStyles = null }) {
               </blockquote>
             );
           case "rule":
-            return <RuleBlock block={block} key={block.id} ruleStyles={ruleStyles} />;
+            return <RuleBlock block={block} key={block.id} prose={prose} ruleStyles={ruleStyles} />;
           default:
             return null;
         }
