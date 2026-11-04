@@ -494,7 +494,7 @@
 .checkoutPanel {
   position: relative;
   z-index: 1;
-  width: min(520px, 100%);
+  width: min(1100px, 100%);
   padding: 42px 16px 16px;
   border: 1px solid rgba(36, 182, 189, 0.28);
   background: rgba(1, 8, 26, 0.97);
@@ -515,7 +515,8 @@
 
 .checkoutFrame {
   width: 100%;
-  min-height: min(720px, calc(100dvh - 140px));
+  height: min(780px, calc(100dvh - 96px));
+  min-height: min(640px, calc(100dvh - 96px));
 }
 
 .giftActions button:first-child {
@@ -1095,7 +1096,9 @@
 }
 
 .bonusPill {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   box-sizing: border-box;
   max-width: 100%;
   min-height: 28px;
@@ -1109,4 +1112,11 @@
   line-height: 1.35;
   text-transform: uppercase;
   white-space: normal;
+}
+
+.bonusSign {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  fill: currentColor;
 }

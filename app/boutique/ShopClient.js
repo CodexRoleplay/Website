@@ -14,12 +14,7 @@ const DISCORD_PENDING_KEY = "codex-rp-discord-pending";
 const SCROLL_STORAGE_KEY = "codex-rp-shop-scroll";
 const PENDING_PACKAGE_KEY = "codex-rp-shop-pending-package";
 const DISCORD_ID_PATTERN = /^\d{17,20}$/;
-const GIFT_USERNAME_PATTERN = /^[\p{L}\p{N} _.-]{2,32}$/u;
 let tebexCheckoutBound = false;
-
-function normalizeGiftUsername(value) {
-  return String(value ?? "").trim().replace(/\s+/g, " ");
-}
 
 function readDiscordAccount() {
   try {
@@ -98,7 +93,6 @@ function rememberShopReturn(pendingPackage) {
       JSON.stringify({
         id: pendingPackage.id,
         ident: pendingPackage.ident ?? "",
-        giftUsername: normalizeGiftUsername(pendingPackage.giftUsername),
       }),
     );
     return;
@@ -128,7 +122,6 @@ function consumePendingPackage() {
       return {
         id: parsed.id,
         ident: typeof parsed.ident === "string" ? parsed.ident : "",
-        giftUsername: normalizeGiftUsername(parsed.giftUsername),
       };
     }
   } catch {
@@ -170,7 +163,6 @@ async function addPackageRequest(ident, product) {
       packageId: product.id,
       packageIdent: product.ident ?? "",
       discordId: readDiscordAccount()?.id ?? "",
-      giftUsername: normalizeGiftUsername(product.giftUsername),
     }),
   });
 }
@@ -288,7 +280,6 @@ function basketPackageDetails(item, catalogPrice = 0) {
     name: product.name ?? item.name ?? "Produit Tebex",
     quantity: Number(item.in_basket?.quantity ?? item.qty ?? item.quantity ?? 1),
     price: Number(basketPrice) > 0 ? basketPrice : catalogPrice,
-    giftUsername: String(item.in_basket?.gift_username ?? item.gift_username ?? "").trim(),
   };
 }
 
@@ -375,15 +366,12 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
   const [basket, setBasket] = useState(null);
   const [discordAccount, setDiscordAccount] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [giftProduct, setGiftProduct] = useState(null);
-  const [giftName, setGiftName] = useState("");
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isBusy, setIsBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [portalTarget, setPortalTarget] = useState(null);
   const initializedRef = useRef(false);
   const cartCloseRef = useRef(null);
-  const giftInputRef = useRef(null);
   const checkoutFrameRef = useRef(null);
   const renderedCheckoutRef = useRef("");
   const onCheckoutPaidRef = useRef(async () => {});
@@ -484,11 +472,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
             const updatedBasket = await addPackageRequest(activeBasket.ident, pendingPackage);
             storeBasket(updatedBasket);
             setIsCartOpen(true);
-            setMessage(
-              pendingPackage.giftUsername
-                ? `Produit offert à ${pendingPackage.giftUsername} ajouté au panier.`
-                : "Produit ajouté au panier.",
-            );
+            setMessage("Produit ajouté au panier.");
           } catch (error) {
             setMessage(error.message);
           }
@@ -570,33 +554,6 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
     };
   }, [isCartOpen]);
 
-  useEffect(() => {
-    if (!giftProduct) {
-      return undefined;
-    }
-
-    const previouslyFocused = document.activeElement;
-    const focusFrame = window.requestAnimationFrame(() => giftInputRef.current?.focus());
-    const closeOnEscape = (event) => {
-      if (event.key === "Escape") {
-        setGiftProduct(null);
-      }
-    };
-
-    window.dispatchEvent(new Event("codex:lenis-stop"));
-    window.addEventListener("keydown", closeOnEscape);
-
-    return () => {
-      window.cancelAnimationFrame(focusFrame);
-      window.removeEventListener("keydown", closeOnEscape);
-      window.dispatchEvent(new Event("codex:lenis-start"));
-
-      if (previouslyFocused instanceof HTMLElement) {
-        previouslyFocused.focus();
-      }
-    };
-  }, [giftProduct]);
-
   async function connectFiveM(pendingPackage = null) {
     setIsBusy(true);
     setMessage("");
@@ -658,29 +615,10 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
     }
   }
 
-  async function addProduct(product, giftUsername = "") {
-    const requestProduct = {
-      ...product,
-      giftUsername: normalizeGiftUsername(giftUsername || product.giftUsername),
-    };
-
-    if (requestProduct.giftUsername && product.disable_gifting) {
-      setMessage("Ce produit ne peut pas être offert.");
-      return;
-    }
-
-    if (
-      requestProduct.giftUsername &&
-      basket?.username &&
-      requestProduct.giftUsername.toLowerCase() === basket.username.toLowerCase()
-    ) {
-      setMessage("Indiquez le pseudo FiveM de votre ami, pas le vôtre.");
-      return;
-    }
-
+  async function addProduct(product) {
     if (!basket?.username) {
       setMessage("Connectez votre compte FiveM avant d'ajouter un produit.");
-      await connectFiveM(requestProduct);
+      await connectFiveM(product);
       return;
     }
 
@@ -688,17 +626,13 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
     setMessage("");
 
     try {
-      const updatedBasket = await addPackageRequest(basket.ident, requestProduct);
+      const updatedBasket = await addPackageRequest(basket.ident, product);
       storeBasket(updatedBasket);
       setIsCartOpen(true);
-      setMessage(
-        requestProduct.giftUsername
-          ? `Produit offert à ${requestProduct.giftUsername} ajouté au panier.`
-          : "Produit ajouté au panier.",
-      );
+      setMessage("Produit ajouté au panier.");
     } catch (error) {
       if (error.code === "discord_required") {
-        connectDiscord(requestProduct);
+        connectDiscord(product);
         return;
       }
 
@@ -706,27 +640,6 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
     } finally {
       setIsBusy(false);
     }
-  }
-
-  function openGift(product) {
-    setGiftName("");
-    setGiftProduct(product);
-    setMessage("");
-  }
-
-  async function confirmGift(event) {
-    event.preventDefault();
-    const name = normalizeGiftUsername(giftName);
-
-    if (!GIFT_USERNAME_PATTERN.test(name)) {
-      setMessage("Indiquez le pseudo FiveM de votre ami.");
-      return;
-    }
-
-    const product = giftProduct;
-    setGiftProduct(null);
-    setGiftName("");
-    await addProduct(product, name);
   }
 
   async function removeProduct(packageId) {
@@ -846,6 +759,8 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
     renderedCheckoutRef.current = basket.ident;
     const frame = checkoutFrameRef.current;
     frame.replaceChildren();
+    const width = Math.min(1040, Math.max(320, window.innerWidth - 48));
+    const height = Math.min(780, Math.max(560, window.innerHeight - 96));
     window.Tebex.checkout.init({
       ident: basket.ident,
       locale: "fr_FR",
@@ -855,12 +770,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
         { name: "secondary", color: "#fe14be" },
       ],
     });
-    window.Tebex.checkout.render(
-      frame,
-      Math.min(460, window.innerWidth - 64),
-      Math.min(720, window.innerHeight - 140),
-      false,
-    );
+    window.Tebex.checkout.render(frame, width, height, false);
 
     return undefined;
   }, [isCheckoutOpen, basket?.ident, portalTarget]);
@@ -933,7 +843,12 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
                 <div className={styles.productFooter}>
                   {bonusPercent ? (
                     <div className={styles.bonusRow}>
-                      <span className={styles.bonusPill}>{formatBonusLabel(bonusPercent)}</span>
+                      <span className={styles.bonusPill}>
+                        <svg className={styles.bonusSign} viewBox="0 0 12 12" aria-hidden="true">
+                          <path d="M5 0h2v12H5zM0 5h12v2H0z" />
+                        </svg>
+                        {formatBonusLabel(bonusPercent).replace(/^\+/, "")}
+                      </span>
                     </div>
                   ) : null}
                   <div className={styles.productPrice}>
@@ -943,11 +858,6 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
                     <button disabled={isBusy} onClick={() => addProduct(product)} type="button">
                       {basket?.username ? "Ajouter" : "Connexion requise"}
                     </button>
-                    {product.disable_gifting ? null : (
-                      <button className={styles.giftLink} disabled={isBusy} onClick={() => openGift(product)} type="button">
-                        Offrir à un ami
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
@@ -995,7 +905,6 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
                 <div className={styles.cartItem} key={`${details.id ?? details.name}-${index}`}>
                   <div>
                     <strong>{details.name}</strong>
-                    {details.giftUsername ? <small>Offert à {details.giftUsername}</small> : null}
                     {quantityDisabled ? (
                       <small>Quantité unique</small>
                     ) : (
@@ -1041,39 +950,6 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
           Accéder au paiement Tebex
         </button>
               </aside>
-            </div>,
-            portalTarget,
-          )
-        : null}
-
-      {portalTarget && giftProduct
-        ? createPortal(
-            <div className={styles.giftModal}>
-              <button
-                aria-label="Fermer"
-                className={styles.giftBackdrop}
-                onClick={() => setGiftProduct(null)}
-                type="button"
-              />
-              <form aria-labelledby="gift-title" aria-modal="true" className={styles.giftPanel} onSubmit={confirmGift} role="dialog">
-                <span>Cadeau</span>
-                <h2 id="gift-title">Offrir {giftProduct.name}</h2>
-                <p>Indiquez le pseudo FiveM de votre ami. Le pack sera livré sur son compte.</p>
-                <input
-                  ref={giftInputRef}
-                  autoComplete="off"
-                  maxLength={32}
-                  onChange={(event) => setGiftName(event.target.value)}
-                  placeholder="Pseudo FiveM"
-                  value={giftName}
-                />
-                <div className={styles.giftActions}>
-                  <button onClick={() => setGiftProduct(null)} type="button">Annuler</button>
-                  <button className={styles.checkoutButton} disabled={isBusy} type="submit">
-                    Ajouter au panier
-                  </button>
-                </div>
-              </form>
             </div>,
             portalTarget,
           )
