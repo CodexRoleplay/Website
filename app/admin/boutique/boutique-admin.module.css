@@ -97,6 +97,12 @@
   list-style: none;
 }
 
+.categoryDivider {
+  height: 1px;
+  margin: 14px 0 6px;
+  background: rgba(36, 182, 189, 0.75);
+}
+
 .row {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(180px, 0.7fr) minmax(240px, 0.9fr);
@@ -155,10 +161,21 @@
 }
 
 .check input {
+  appearance: none;
   width: 20px;
   height: 20px;
   margin: 0;
-  accent-color: #fe14be;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.check input:checked {
+  border-color: #fe14be;
+  background:
+    linear-gradient(#fe14be, #fe14be) center / 10px 10px no-repeat,
+    #14040f;
 }
 
 .bonus {

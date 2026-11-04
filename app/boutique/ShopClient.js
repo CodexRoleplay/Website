@@ -356,7 +356,17 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
     [categories],
   );
   const cardHighlights = useMemo(
-    () => resolveCardHighlights(categories.flatMap((category) => category.packages), cardDisplay),
+    () =>
+      resolveCardHighlights(
+        categories.flatMap((category) =>
+          category.packages.map((product) => ({
+            id: product.id,
+            ident: product.ident,
+            categoryName: category.name,
+          })),
+        ),
+        cardDisplay,
+      ),
     [cardDisplay, categories],
   );
   const [selectedCategoryId, setSelectedCategoryId] = useState(() =>

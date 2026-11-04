@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { readApiJson } from "@/lib/admin/read-api-json";
-import { BONUS_PERCENT_MAX, BONUS_PERCENT_MIN, formatBonusLabel } from "@/lib/boutique/card-display";
+import { BONUS_PERCENT_MAX, BONUS_PERCENT_MIN, cardCategoryKey, formatBonusLabel } from "@/lib/boutique/card-display";
 import styles from "./boutique-admin.module.css";
 
 function formatDate(value) {
@@ -137,15 +137,20 @@ export default function BoutiqueCardsClient() {
   function toggleFeatured(packageId) {
     setRows((current) => {
       const target = current.find((row) => row.packageId === packageId);
-      const category = target?.categoryName ?? "";
-      const nextFeatured = target?.featured !== true;
+
+      if (!target) {
+        return current;
+      }
+
+      const category = cardCategoryKey(target.categoryName);
+      const nextFeatured = target.featured !== true;
 
       return current.map((row) => {
         if (row.packageId === packageId) {
           return { ...row, featured: nextFeatured };
         }
 
-        if (nextFeatured && (row.categoryName ?? "") === category) {
+        if (nextFeatured && cardCategoryKey(row.categoryName) === category) {
           return { ...row, featured: false };
         }
 
@@ -211,7 +216,7 @@ export default function BoutiqueCardsClient() {
         <div>
           <h2>Produits Tebex</h2>
           <div className={styles.help}>
-            <p>Le badge public affiche « Meilleure vente ». Une seule carte par catégorie, ou aucune.</p>
+            <p>Le badge public affiche « Meilleure vente ». Une par catégorie : une seule carte peut le porter, ou aucune dans une catégorie.</p>
             <p>Le bonus n’est pas calculé. Coche « Afficher un bonus » et saisis le pourcentage seulement si tu veux le montrer.</p>
             {updatedAt ? <p>Dernier enregistrement : {formatDate(updatedAt)}.</p> : null}
           </div>
@@ -237,11 +242,16 @@ export default function BoutiqueCardsClient() {
 
       {rows.length ? (
         <ul className={styles.list}>
-          {rows.map((row) => {
+          {rows.map((row, index) => {
             const price = formatPrice(row.price, row.currency);
+            const categoryChanged =
+              index > 0 &&
+              cardCategoryKey(rows[index - 1].categoryName) !== cardCategoryKey(row.categoryName);
 
             return (
-              <li className={`${styles.row} ${row.featured ? styles.rowFeatured : ""}`} key={row.packageId}>
+              <Fragment key={row.packageId}>
+              {categoryChanged ? <li aria-hidden="true" className={styles.categoryDivider} /> : null}
+              <li className={`${styles.row} ${row.featured ? styles.rowFeatured : ""}`}>
                 <div className={styles.identity}>
                   <strong>{row.name}</strong>
                   <span>{[row.categoryName, price].filter(Boolean).join(" · ")}</span>
@@ -301,6 +311,7 @@ export default function BoutiqueCardsClient() {
                   ) : null}
                 </div>
               </li>
+              </Fragment>
             );
           })}
         </ul>
