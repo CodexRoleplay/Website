@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import Script from "next/script";
 import { useSearchParams } from "next/navigation";
+import { asPackageId, FEATURED_BADGE_LABEL, formatBonusLabel, resolveCardHighlights } from "@/lib/boutique/card-display";
 import { normalizeShopSlug as normalizeSlug } from "@/lib/boutique/shop-links";
 import styles from "./shop.module.css";
 
@@ -12,6 +14,12 @@ const DISCORD_PENDING_KEY = "codex-rp-discord-pending";
 const SCROLL_STORAGE_KEY = "codex-rp-shop-scroll";
 const PENDING_PACKAGE_KEY = "codex-rp-shop-pending-package";
 const DISCORD_ID_PATTERN = /^\d{17,20}$/;
+const GIFT_USERNAME_PATTERN = /^[\p{L}\p{N} _.-]{2,32}$/u;
+let tebexCheckoutBound = false;
+
+function normalizeGiftUsername(value) {
+  return String(value ?? "").trim().replace(/\s+/g, " ");
+}
 
 function readDiscordAccount() {
   try {
@@ -90,6 +98,7 @@ function rememberShopReturn(pendingPackage) {
       JSON.stringify({
         id: pendingPackage.id,
         ident: pendingPackage.ident ?? "",
+        giftUsername: normalizeGiftUsername(pendingPackage.giftUsername),
       }),
     );
     return;
@@ -119,6 +128,7 @@ function consumePendingPackage() {
       return {
         id: parsed.id,
         ident: typeof parsed.ident === "string" ? parsed.ident : "",
+        giftUsername: normalizeGiftUsername(parsed.giftUsername),
       };
     }
   } catch {
@@ -160,6 +170,7 @@ async function addPackageRequest(ident, product) {
       packageId: product.id,
       packageIdent: product.ident ?? "",
       discordId: readDiscordAccount()?.id ?? "",
+      giftUsername: normalizeGiftUsername(product.giftUsername),
     }),
   });
 }
@@ -215,6 +226,13 @@ function decodeDescriptionText(value = "") {
     .replace(/&ccedil;/g, "c");
 }
 
+function hideCalculatedBonusNote(value) {
+  return String(value ?? "")
+    .replace(/bonus\s+calcul[ée][^.]*(?:\.|$)/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function getCategoryDescriptionBlocks(value = "") {
   const html = String(value);
   const paragraphMatches = [...html.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)];
@@ -226,7 +244,10 @@ function getCategoryDescriptionBlocks(value = "") {
       const lead = strongMatch ? decodeDescriptionText(strongMatch[1]) : "";
       const text = decodeDescriptionText(strongMatch ? paragraph.replace(strongMatch[0], "") : paragraph);
 
-      return { lead, text };
+      return {
+        lead: hideCalculatedBonusNote(lead),
+        text: hideCalculatedBonusNote(text),
+      };
     })
     .filter((block) => block.lead || block.text);
 }
@@ -267,6 +288,7 @@ function basketPackageDetails(item, catalogPrice = 0) {
     name: product.name ?? item.name ?? "Produit Tebex",
     quantity: Number(item.in_basket?.quantity ?? item.qty ?? item.quantity ?? 1),
     price: Number(basketPrice) > 0 ? basketPrice : catalogPrice,
+    giftUsername: String(item.in_basket?.gift_username ?? item.gift_username ?? "").trim(),
   };
 }
 
@@ -308,7 +330,7 @@ function Icon({ name }) {
   );
 }
 
-export default function ShopClient({ initialCategories, catalogError }) {
+export default function ShopClient({ initialCategories, catalogError, cardDisplay = null }) {
   const searchParams = useSearchParams();
   const targetedCategory = searchParams.get("categorie") ?? searchParams.get("category") ?? "";
   const categories = useMemo(
@@ -333,17 +355,29 @@ export default function ShopClient({ initialCategories, catalogError }) {
       ),
     [categories],
   );
+  const cardHighlights = useMemo(
+    () => resolveCardHighlights(categories.flatMap((category) => category.packages), cardDisplay),
+    [cardDisplay, categories],
+  );
   const [selectedCategoryId, setSelectedCategoryId] = useState(() =>
     getInitialCategoryId(categories, targetedCategory),
   );
   const [basket, setBasket] = useState(null);
   const [discordAccount, setDiscordAccount] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [giftProduct, setGiftProduct] = useState(null);
+  const [giftName, setGiftName] = useState("");
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isBusy, setIsBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [portalTarget, setPortalTarget] = useState(null);
   const initializedRef = useRef(false);
   const cartCloseRef = useRef(null);
+  const giftInputRef = useRef(null);
+  const checkoutFrameRef = useRef(null);
+  const renderedCheckoutRef = useRef("");
+  const onCheckoutPaidRef = useRef(async () => {});
+  const onCheckoutNoticeRef = useRef(() => {});
 
   const selectedCategory =
     categories.find((category) => category.id === selectedCategoryId) ?? categories[0] ?? null;
@@ -440,7 +474,11 @@ export default function ShopClient({ initialCategories, catalogError }) {
             const updatedBasket = await addPackageRequest(activeBasket.ident, pendingPackage);
             storeBasket(updatedBasket);
             setIsCartOpen(true);
-            setMessage("Produit ajouté au panier.");
+            setMessage(
+              pendingPackage.giftUsername
+                ? `Produit offert à ${pendingPackage.giftUsername} ajouté au panier.`
+                : "Produit ajouté au panier.",
+            );
           } catch (error) {
             setMessage(error.message);
           }
@@ -522,6 +560,33 @@ export default function ShopClient({ initialCategories, catalogError }) {
     };
   }, [isCartOpen]);
 
+  useEffect(() => {
+    if (!giftProduct) {
+      return undefined;
+    }
+
+    const previouslyFocused = document.activeElement;
+    const focusFrame = window.requestAnimationFrame(() => giftInputRef.current?.focus());
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") {
+        setGiftProduct(null);
+      }
+    };
+
+    window.dispatchEvent(new Event("codex:lenis-stop"));
+    window.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      window.removeEventListener("keydown", closeOnEscape);
+      window.dispatchEvent(new Event("codex:lenis-start"));
+
+      if (previouslyFocused instanceof HTMLElement) {
+        previouslyFocused.focus();
+      }
+    };
+  }, [giftProduct]);
+
   async function connectFiveM(pendingPackage = null) {
     setIsBusy(true);
     setMessage("");
@@ -583,10 +648,29 @@ export default function ShopClient({ initialCategories, catalogError }) {
     }
   }
 
-  async function addProduct(product) {
+  async function addProduct(product, giftUsername = "") {
+    const requestProduct = {
+      ...product,
+      giftUsername: normalizeGiftUsername(giftUsername || product.giftUsername),
+    };
+
+    if (requestProduct.giftUsername && product.disable_gifting) {
+      setMessage("Ce produit ne peut pas être offert.");
+      return;
+    }
+
+    if (
+      requestProduct.giftUsername &&
+      basket?.username &&
+      requestProduct.giftUsername.toLowerCase() === basket.username.toLowerCase()
+    ) {
+      setMessage("Indiquez le pseudo FiveM de votre ami, pas le vôtre.");
+      return;
+    }
+
     if (!basket?.username) {
       setMessage("Connectez votre compte FiveM avant d'ajouter un produit.");
-      await connectFiveM(product);
+      await connectFiveM(requestProduct);
       return;
     }
 
@@ -594,13 +678,17 @@ export default function ShopClient({ initialCategories, catalogError }) {
     setMessage("");
 
     try {
-      const updatedBasket = await addPackageRequest(basket.ident, product);
+      const updatedBasket = await addPackageRequest(basket.ident, requestProduct);
       storeBasket(updatedBasket);
       setIsCartOpen(true);
-      setMessage("Produit ajouté au panier.");
+      setMessage(
+        requestProduct.giftUsername
+          ? `Produit offert à ${requestProduct.giftUsername} ajouté au panier.`
+          : "Produit ajouté au panier.",
+      );
     } catch (error) {
       if (error.code === "discord_required") {
-        connectDiscord(product);
+        connectDiscord(requestProduct);
         return;
       }
 
@@ -608,6 +696,27 @@ export default function ShopClient({ initialCategories, catalogError }) {
     } finally {
       setIsBusy(false);
     }
+  }
+
+  function openGift(product) {
+    setGiftName("");
+    setGiftProduct(product);
+    setMessage("");
+  }
+
+  async function confirmGift(event) {
+    event.preventDefault();
+    const name = normalizeGiftUsername(giftName);
+
+    if (!GIFT_USERNAME_PATTERN.test(name)) {
+      setMessage("Indiquez le pseudo FiveM de votre ami.");
+      return;
+    }
+
+    const product = giftProduct;
+    setGiftProduct(null);
+    setGiftName("");
+    await addProduct(product, name);
   }
 
   async function removeProduct(packageId) {
@@ -653,22 +762,122 @@ export default function ShopClient({ initialCategories, catalogError }) {
     }
   }
 
+  onCheckoutPaidRef.current = async () => {
+    window.localStorage.removeItem(BASKET_STORAGE_KEY);
+    setIsCartOpen(false);
+    setIsCheckoutOpen(false);
+    setMessage("Paiement terminé. Merci pour votre achat !");
+
+    try {
+      await createBasket();
+    } catch (error) {
+      setBasket(null);
+      setMessage(error.message);
+    }
+  };
+  onCheckoutNoticeRef.current = setMessage;
+
+  function ensureTebexCheckoutEvents() {
+    if (tebexCheckoutBound || !window.Tebex?.checkout?.on) {
+      return;
+    }
+
+    tebexCheckoutBound = true;
+    window.Tebex.checkout.on("open", () => {
+      window.dispatchEvent(new Event("codex:lenis-stop"));
+    });
+    window.Tebex.checkout.on("close", () => {
+      window.dispatchEvent(new Event("codex:lenis-start"));
+      setIsCheckoutOpen(false);
+    });
+    window.Tebex.checkout.on("payment:complete", () => {
+      onCheckoutPaidRef.current();
+    });
+    window.Tebex.checkout.on("payment:error", () => {
+      onCheckoutNoticeRef.current("Le paiement n'a pas abouti. Vous pouvez réessayer.");
+    });
+  }
+
   function checkout() {
     if (!basket?.username) {
       setMessage("Connectez votre compte FiveM avant le paiement.");
       return;
     }
 
-    if (!basketItems.length || !basket?.links?.checkout) {
+    if (!basketItems.length || !basket?.ident) {
       setMessage("Votre panier est vide.");
       return;
     }
 
-    window.location.assign(basket.links.checkout);
+    if (!window.Tebex?.checkout) {
+      setMessage("Le paiement Tebex se charge. Réessayez dans un instant.");
+      return;
+    }
+
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
   }
+
+  useEffect(() => {
+    if (!isCheckoutOpen) {
+      renderedCheckoutRef.current = "";
+      return undefined;
+    }
+
+    if (!checkoutFrameRef.current || !window.Tebex?.checkout?.render || !basket?.ident) {
+      return undefined;
+    }
+
+    if (renderedCheckoutRef.current === basket.ident) {
+      return undefined;
+    }
+
+    ensureTebexCheckoutEvents();
+    renderedCheckoutRef.current = basket.ident;
+    const frame = checkoutFrameRef.current;
+    frame.replaceChildren();
+    window.Tebex.checkout.init({
+      ident: basket.ident,
+      locale: "fr_FR",
+      theme: "dark",
+      colors: [
+        { name: "primary", color: "#24b6bd" },
+        { name: "secondary", color: "#fe14be" },
+      ],
+    });
+    window.Tebex.checkout.render(
+      frame,
+      Math.min(460, window.innerWidth - 64),
+      Math.min(720, window.innerHeight - 140),
+      false,
+    );
+
+    return undefined;
+  }, [isCheckoutOpen, basket?.ident, portalTarget]);
+
+  useEffect(() => {
+    if (!isCheckoutOpen) {
+      return undefined;
+    }
+
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") {
+        setIsCheckoutOpen(false);
+      }
+    };
+
+    window.dispatchEvent(new Event("codex:lenis-stop"));
+    window.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      window.dispatchEvent(new Event("codex:lenis-start"));
+    };
+  }, [isCheckoutOpen]);
 
   return (
     <section className={styles.store}>
+      <Script src="https://js.tebex.io/v/1.js" strategy="afterInteractive" onLoad={ensureTebexCheckoutEvents} />
       {message ? <div className={styles.notice}>{message}</div> : null}
       {catalogError ? <div className={styles.error}>{catalogError}</div> : null}
 
@@ -696,11 +905,15 @@ export default function ShopClient({ initialCategories, catalogError }) {
 
       <div className={styles.products}>
         {selectedCategory?.packages?.map((product) => {
-          const description = cleanDescription(product.description);
+          const description = hideCalculatedBonusNote(cleanDescription(product.description));
+          const productId = asPackageId(product.id);
+          const isFeatured = productId !== "" && cardHighlights.featuredId === productId;
+          const bonusPercent = productId ? cardHighlights.bonusById.get(productId) ?? null : null;
 
           return (
-            <article className={styles.productCard} key={product.id}>
+            <article className={isFeatured ? `${styles.productCard} ${styles.productCardFeatured}` : styles.productCard} key={product.id}>
               <div className={styles.productMedia}>
+                {isFeatured ? <span className={styles.valueBadge}>{FEATURED_BADGE_LABEL}</span> : null}
                 {product.image ? <img alt="" loading="lazy" src={product.image} /> : <Icon name="catalog" />}
               </div>
               <div className={styles.productBody}>
@@ -708,10 +921,20 @@ export default function ShopClient({ initialCategories, catalogError }) {
                 <h3>{product.name}</h3>
                 <p>{description || "Produit disponible via la boutique sécurisée Tebex."}</p>
                 <div className={styles.productFooter}>
-                  <strong>{formatPrice(product.base_price ?? product.total_price, product.currency)}</strong>
-                  <button disabled={isBusy} onClick={() => addProduct(product)} type="button">
-                    {basket?.username ? "Ajouter" : "Connexion requise"}
-                  </button>
+                  <div className={styles.productPrice}>
+                    {bonusPercent ? <span className={styles.bonusPill}>{formatBonusLabel(bonusPercent)}</span> : null}
+                    <strong>{formatPrice(product.base_price ?? product.total_price, product.currency)}</strong>
+                  </div>
+                  <div className={styles.productActions}>
+                    <button disabled={isBusy} onClick={() => addProduct(product)} type="button">
+                      {basket?.username ? "Ajouter" : "Connexion requise"}
+                    </button>
+                    {product.disable_gifting ? null : (
+                      <button className={styles.giftButton} disabled={isBusy} onClick={() => openGift(product)} type="button">
+                        Offrir à un ami
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </article>
@@ -758,6 +981,7 @@ export default function ShopClient({ initialCategories, catalogError }) {
                 <div className={styles.cartItem} key={`${details.id ?? details.name}-${index}`}>
                   <div>
                     <strong>{details.name}</strong>
+                    {details.giftUsername ? <small>Offert à {details.giftUsername}</small> : null}
                     {quantityDisabled ? (
                       <small>Quantité unique</small>
                     ) : (
@@ -803,6 +1027,59 @@ export default function ShopClient({ initialCategories, catalogError }) {
           Accéder au paiement Tebex
         </button>
               </aside>
+            </div>,
+            portalTarget,
+          )
+        : null}
+
+      {portalTarget && giftProduct
+        ? createPortal(
+            <div className={styles.giftModal}>
+              <button
+                aria-label="Fermer"
+                className={styles.giftBackdrop}
+                onClick={() => setGiftProduct(null)}
+                type="button"
+              />
+              <form aria-labelledby="gift-title" aria-modal="true" className={styles.giftPanel} onSubmit={confirmGift} role="dialog">
+                <span>Cadeau</span>
+                <h2 id="gift-title">Offrir {giftProduct.name}</h2>
+                <p>Indiquez le pseudo FiveM de votre ami. Le pack sera livré sur son compte.</p>
+                <input
+                  ref={giftInputRef}
+                  autoComplete="off"
+                  maxLength={32}
+                  onChange={(event) => setGiftName(event.target.value)}
+                  placeholder="Pseudo FiveM"
+                  value={giftName}
+                />
+                <div className={styles.giftActions}>
+                  <button onClick={() => setGiftProduct(null)} type="button">Annuler</button>
+                  <button className={styles.checkoutButton} disabled={isBusy} type="submit">
+                    Ajouter au panier
+                  </button>
+                </div>
+              </form>
+            </div>,
+            portalTarget,
+          )
+        : null}
+
+      {portalTarget && isCheckoutOpen
+        ? createPortal(
+            <div className={styles.checkoutModal}>
+              <button
+                aria-label="Fermer le paiement"
+                className={styles.giftBackdrop}
+                onClick={() => setIsCheckoutOpen(false)}
+                type="button"
+              />
+              <div aria-label="Paiement Tebex" aria-modal="true" className={styles.checkoutPanel} role="dialog">
+                <button aria-label="Fermer" className={styles.checkoutClose} onClick={() => setIsCheckoutOpen(false)} type="button">
+                  ×
+                </button>
+                <div ref={checkoutFrameRef} className={styles.checkoutFrame} />
+              </div>
             </div>,
             portalTarget,
           )

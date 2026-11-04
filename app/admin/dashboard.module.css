@@ -91,6 +91,25 @@
   color: rgba(255, 255, 255, 0.62);
 }
 
+.shopCardsLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 4px;
+  color: #fe14be;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.shopCardsLink:hover {
+  color: #ff7ad8;
+}
+
+.shopCardsLink:focus-visible {
+  outline: 2px solid #24b6bd;
+  outline-offset: 3px;
+}
+
 .shopSwitchControl {
   display: inline-flex;
   flex-shrink: 0;

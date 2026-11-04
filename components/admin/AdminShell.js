@@ -16,6 +16,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Scale,
+  Store,
   Users,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -24,6 +25,9 @@ import styles from "@/components/admin/admin.module.css";
 const NAV_GROUPS = [
   [
     { href: "/admin", label: "Tableau de bord", icon: LayoutDashboard, match: (path) => path === "/admin" },
+  ],
+  [
+    { href: "/admin/boutique", label: "Cartes boutique", icon: Store, match: (path) => path.startsWith("/admin/boutique") },
   ],
   [
     { href: "/admin/reglement", label: "Règlement", icon: BookOpen, match: (path) => path === "/admin/reglement" },

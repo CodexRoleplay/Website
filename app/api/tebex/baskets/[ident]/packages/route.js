@@ -42,6 +42,20 @@ function validateDiscordId(value) {
   return id;
 }
 
+function validateGiftUsername(value) {
+  if (value == null || value === "") {
+    return "";
+  }
+
+  const name = String(value).trim().replace(/\s+/g, " ");
+
+  if (name.length < 2 || name.length > 32 || !/^[\p{L}\p{N} _.-]+$/u.test(name)) {
+    throw new TebexApiError("Le pseudo FiveM du destinataire est invalide.", 400);
+  }
+
+  return name;
+}
+
 function validateQuantity(quantity) {
   const parsedQuantity = Number(quantity);
 
@@ -65,6 +79,7 @@ export async function POST(request, context) {
       1,
       currentBasket,
       validateDiscordId(body?.discordId),
+      validateGiftUsername(body?.giftUsername),
     );
     const basket = await getTebexBasket(basketIdent);
 

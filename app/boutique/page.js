@@ -2,6 +2,7 @@ import Image from "next/image";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { getBoutiqueSettings } from "@/lib/boutique/admin-persistence";
+import { emptyCardDisplay } from "@/lib/boutique/card-display";
 import { pageMetadata } from "@/lib/seo";
 import { getTebexCategories } from "@/lib/tebex";
 import BoutiqueClosed from "./BoutiqueClosed";
@@ -20,9 +21,12 @@ export const metadata = pageMetadata({
 
 export default async function ShopPage() {
   let boutiqueEnabled = false;
+  let cardDisplay = emptyCardDisplay();
 
   try {
-    boutiqueEnabled = (await getBoutiqueSettings()).enabled;
+    const settings = await getBoutiqueSettings();
+    boutiqueEnabled = settings.enabled;
+    cardDisplay = settings.cardDisplay ?? cardDisplay;
   } catch (error) {
     console.error("[boutique] Impossible de lire le statut.", error);
   }
@@ -68,10 +72,10 @@ export default async function ShopPage() {
             </div>
             <p>
               Connecte ton compte FiveM et Discord, choisis tes produits puis finalise ton achat
-              sur le paiement sécurisé Tebex.
+              dans la fenêtre de paiement Tebex. Tu peux aussi offrir un pack à un ami.
             </p>
           </section>
-          <ShopClient catalogError={catalogError} initialCategories={categories} />
+          <ShopClient cardDisplay={cardDisplay} catalogError={catalogError} initialCategories={categories} />
         </main>
         <Footer />
       </div>

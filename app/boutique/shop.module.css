@@ -388,6 +388,131 @@
   font-size: 28px;
 }
 
+.productActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.productFooter .giftButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(232, 236, 255, 0.68);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+}
+
+.productFooter .giftButton:hover {
+  background: transparent;
+  color: #fe14be;
+}
+
+.giftModal {
+  position: fixed;
+  z-index: 11000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.giftBackdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 4, 16, 0.72);
+  cursor: default;
+}
+
+.giftPanel {
+  position: relative;
+  z-index: 1;
+  width: min(440px, 100%);
+  padding: 28px;
+  border: 1px solid rgba(36, 182, 189, 0.28);
+  background: rgba(1, 8, 26, 0.97);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.giftPanel h2 {
+  margin: 8px 0 12px;
+  font-size: 36px;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.giftPanel p {
+  color: rgba(224, 230, 255, 0.68);
+  line-height: 1.55;
+}
+
+.giftPanel input {
+  width: 100%;
+  margin: 18px 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(36, 182, 189, 0.35);
+  background: rgba(13, 23, 54, 0.8);
+  color: white;
+  font-family: var(--font-secondary);
+}
+
+.giftActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.giftActions .checkoutButton {
+  width: auto;
+}
+
+.checkoutModal {
+  position: fixed;
+  z-index: 12000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.checkoutPanel {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 100%);
+  padding: 42px 16px 16px;
+  border: 1px solid rgba(36, 182, 189, 0.28);
+  background: rgba(1, 8, 26, 0.97);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.checkoutClose {
+  position: absolute;
+  top: 4px;
+  right: 10px;
+  border: 0;
+  background: transparent;
+  color: white;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.checkoutFrame {
+  width: 100%;
+  min-height: min(720px, calc(100dvh - 140px));
+}
+
+.giftActions button:first-child {
+  border: 0;
+  background: transparent;
+  color: rgba(232, 236, 255, 0.7);
+  font-family: var(--font-secondary);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
 .productFooter button,
 .checkoutButton {
   padding: 13px 16px;
@@ -838,4 +963,52 @@
   .shopDock svg {
     width: 20px;
   }
+}
+
+.productMedia {
+  position: relative;
+}
+
+.productCardFeatured {
+  border-color: #fe14be;
+  box-shadow: 0 0 0 1px rgba(254, 20, 190, 0.45), 0 22px 60px rgba(0, 0, 0, 0.28);
+}
+
+.valueBadge {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  right: 14px;
+  padding: 7px 10px;
+  background: #fe14be;
+  color: #fff;
+  font-family: var(--font-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.productPrice {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.bonusPill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 1px solid #fe14be;
+  color: #fe14be;
+  font-family: var(--font-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
