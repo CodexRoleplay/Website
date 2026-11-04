@@ -21,7 +21,7 @@ function validatePackageId(packageId) {
 function validatePackageRef(body) {
   const ident = typeof body?.packageIdent === "string" ? body.packageIdent.trim() : "";
 
-  if (/^(pkg|dyn|ext)_[\w-]+$/i.test(ident)) {
+  if (/^(?:pkg|dyn|ext)_[\w.-]+$/i.test(ident)) {
     return ident;
   }
 
