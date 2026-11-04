@@ -422,8 +422,8 @@
   bottom: 20px;
   left: 50%;
   display: grid;
-  width: min(780px, calc(100% - 28px));
-  grid-template-columns: repeat(3, 1fr);
+  width: min(1040px, calc(100% - 28px));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   transform: translateX(-50%) translateZ(0);
   border: 0;
   background: transparent;
@@ -468,6 +468,7 @@
 .shopDock button {
   z-index: 1;
   display: flex;
+  min-width: 0;
   min-height: 78px;
   align-items: center;
   justify-content: center;
@@ -510,12 +511,28 @@
   color: #24b6bd;
 }
 
+.shopDock a > span,
+.shopDock button > span {
+  min-width: 0;
+}
+
 .shopDock small {
   display: block;
+  max-width: 100%;
   margin-top: 4px;
+  overflow: hidden;
   color: rgba(232, 236, 255, 0.42);
   font-size: 8px;
   letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dockName {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cartModal {
@@ -813,9 +830,9 @@
 
   .shopDock a,
   .shopDock button {
-    min-height: 66px;
-    gap: 7px;
-    font-size: 10px;
+    min-height: 64px;
+    gap: 6px;
+    font-size: 9px;
   }
 
   .shopDock svg {

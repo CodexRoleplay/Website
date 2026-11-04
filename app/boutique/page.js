@@ -67,8 +67,8 @@ export default async function ShopPage() {
               />
             </div>
             <p>
-              Connecte ton compte FiveM, choisis tes produits puis finalise ton achat sur le
-              paiement sécurisé Tebex.
+              Connecte ton compte FiveM et Discord, choisis tes produits puis finalise ton achat
+              sur le paiement sécurisé Tebex.
             </p>
           </section>
           <ShopClient catalogError={catalogError} initialCategories={categories} />

@@ -22,6 +22,7 @@ export function validateBasketIdent(ident) {
 export function tebexErrorResponse(error) {
   const status = error instanceof TebexApiError ? error.status : 500;
   const message = publicTebexMessage(error);
+  const code = error instanceof TebexApiError ? error.code : "";
 
-  return NextResponse.json({ error: message }, { status });
+  return NextResponse.json(code ? { error: message, code } : { error: message }, { status });
 }

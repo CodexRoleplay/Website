@@ -7,15 +7,75 @@ import { normalizeShopSlug as normalizeSlug } from "@/lib/boutique/shop-links";
 import styles from "./shop.module.css";
 
 const BASKET_STORAGE_KEY = "codex-rp-tebex-basket";
+const DISCORD_STORAGE_KEY = "codex-rp-tebex-discord";
+const DISCORD_PENDING_KEY = "codex-rp-discord-pending";
 const SCROLL_STORAGE_KEY = "codex-rp-shop-scroll";
 const PENDING_PACKAGE_KEY = "codex-rp-shop-pending-package";
+const DISCORD_ID_PATTERN = /^\d{17,20}$/;
+
+function readDiscordAccount() {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(DISCORD_STORAGE_KEY) || "");
+    const id = String(parsed?.id ?? "");
+
+    if (!DISCORD_ID_PATTERN.test(id)) {
+      return null;
+    }
+
+    const name = String(parsed?.name ?? "").trim().slice(0, 64);
+
+    return { id, name: name || "Discord" };
+  } catch {
+    return null;
+  }
+}
+
+function storeDiscordAccount(account) {
+  window.localStorage.setItem(
+    DISCORD_STORAGE_KEY,
+    JSON.stringify({ id: account.id, name: account.name || "Discord" }),
+  );
+}
+
+function discordAccountFromSearch(params, pending) {
+  const explicitId = ["discord_id", "discordId"]
+    .map((key) => String(params.get(key) ?? "").trim())
+    .find((value) => DISCORD_ID_PATTERN.test(value));
+  const returnedId =
+    explicitId ||
+    ((pending || params.get("auth") === "discord") && DISCORD_ID_PATTERN.test(String(params.get("id") ?? "").trim())
+      ? String(params.get("id")).trim()
+      : "");
+
+  if (!returnedId) {
+    return null;
+  }
+
+  const name = ["username", "ign", "discord_tag", "discord_username"]
+    .map((key) => String(params.get(key) ?? "").trim())
+    .find(Boolean);
+
+  return { id: returnedId, name: (name || "Discord").slice(0, 64) };
+}
+
+function boutiqueReturnPath(authValue) {
+  const params = new URLSearchParams(window.location.search);
+  ["payment", "discord_id", "discordId", "id", "username", "ign", "discord_tag", "discord_username"].forEach((key) => {
+    params.delete(key);
+  });
+  params.set("auth", authValue);
+
+  return `/boutique?${params.toString()}`;
+}
 
 async function apiRequest(path, options) {
   const response = await fetch(path, options);
   const payload = await response.json().catch(() => null);
 
   if (!response.ok) {
-    throw new Error(payload?.error || "Une erreur est survenue avec Tebex.");
+    const error = new Error(payload?.error || "Une erreur est survenue avec Tebex.");
+    error.code = typeof payload?.code === "string" ? payload.code : "";
+    throw error;
   }
 
   return payload;
@@ -99,6 +159,7 @@ async function addPackageRequest(ident, product) {
     body: JSON.stringify({
       packageId: product.id,
       packageIdent: product.ident ?? "",
+      discordId: readDiscordAccount()?.id ?? "",
     }),
   });
 }
@@ -229,6 +290,17 @@ function Icon({ name }) {
     );
   }
 
+  if (name === "discord") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7.2 8.4c3.1-1.2 6.5-1.2 9.6 0" />
+        <path d="M8.4 16.8 7.2 19S4.2 18 3.2 16.2c0-.8-.4-6.4 2.4-8.3 1.2-.8 3.2-1.2 3.2-1.2l.8 1.6" />
+        <path d="m15.6 16.8 1.2 2.2s3-1 4-2.8c0-.8.4-6.4-2.4-8.3-1.2-.8-3.2-1.2-3.2-1.2l-.8 1.6" />
+        <path d="M9.2 14.2a.9.9 0 1 0 0-1.8.9.9 0 0 0 0 1.8Zm5.6 0a.9.9 0 1 0 0-1.8.9.9 0 0 0 0 1.8Z" />
+      </svg>
+    );
+  }
+
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M4 5h16v14H4zM8 9h8M8 13h5" />
@@ -265,6 +337,7 @@ export default function ShopClient({ initialCategories, catalogError }) {
     getInitialCategoryId(categories, targetedCategory),
   );
   const [basket, setBasket] = useState(null);
+  const [discordAccount, setDiscordAccount] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isBusy, setIsBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -318,11 +391,30 @@ export default function ShopClient({ initialCategories, catalogError }) {
       try {
         const savedIdent = window.localStorage.getItem(BASKET_STORAGE_KEY);
         const params = new URLSearchParams(window.location.search);
+        const pendingDiscord = window.sessionStorage.getItem(DISCORD_PENDING_KEY) === "1";
+        const returnedDiscord = discordAccountFromSearch(params, pendingDiscord);
+
+        if (pendingDiscord) {
+          window.sessionStorage.removeItem(DISCORD_PENDING_KEY);
+        }
+
+        if (returnedDiscord) {
+          storeDiscordAccount(returnedDiscord);
+          setDiscordAccount(returnedDiscord);
+        } else {
+          setDiscordAccount(readDiscordAccount());
+        }
 
         if (params.get("payment") === "success") {
           setMessage("Paiement terminé. Merci pour votre achat !");
         } else if (params.get("payment") === "cancelled") {
           setMessage("Paiement annulé. Votre panier reste disponible.");
+        } else if (pendingDiscord) {
+          setMessage(
+            returnedDiscord
+              ? "Compte Discord connecté."
+              : "La connexion Discord n'a pas abouti. Réessayez.",
+          );
         }
 
         let activeBasket = null;
@@ -356,8 +448,15 @@ export default function ShopClient({ initialCategories, catalogError }) {
 
         restoreShopScroll();
 
-        if (params.get("auth") === "complete") {
+        if (params.get("auth") === "complete" || params.get("auth") === "discord" || returnedDiscord || pendingDiscord) {
           params.delete("auth");
+
+          if (returnedDiscord || pendingDiscord) {
+            ["discord_id", "discordId", "id", "username", "ign", "discord_tag", "discord_username"].forEach((key) => {
+              params.delete(key);
+            });
+          }
+
           const query = params.toString();
           const hash = window.location.hash;
           window.history.replaceState(
@@ -430,10 +529,7 @@ export default function ShopClient({ initialCategories, catalogError }) {
 
     try {
       const activeBasket = basket?.ident ? basket : await createBasket();
-      const params = new URLSearchParams(window.location.search);
-      params.delete("payment");
-      params.set("auth", "complete");
-      const returnPath = `/boutique?${params.toString()}`;
+      const returnPath = boutiqueReturnPath("complete");
       const authLinks = await apiRequest(
         `/api/tebex/baskets/${activeBasket.ident}/auth?returnPath=${encodeURIComponent(returnPath)}`,
       );
@@ -455,6 +551,21 @@ export default function ShopClient({ initialCategories, catalogError }) {
       setMessage(error.message);
       setIsBusy(false);
     }
+  }
+
+  function connectDiscord(pendingPackage = null) {
+    setIsBusy(true);
+    setMessage(pendingPackage ? "Connectez votre compte Discord pour ajouter ce produit." : "");
+    rememberShopReturn(pendingPackage);
+    window.sessionStorage.setItem(DISCORD_PENDING_KEY, "1");
+    const returnUrl = `${window.location.origin}${boutiqueReturnPath("discord")}`;
+    window.location.assign(`https://ident.tebex.io/discord/?return=${encodeURIComponent(returnUrl)}`);
+  }
+
+  function disconnectDiscord() {
+    window.localStorage.removeItem(DISCORD_STORAGE_KEY);
+    setDiscordAccount(null);
+    setMessage("Compte Discord déconnecté.");
   }
 
   async function disconnectFiveM() {
@@ -488,6 +599,11 @@ export default function ShopClient({ initialCategories, catalogError }) {
       setIsCartOpen(true);
       setMessage("Produit ajouté au panier.");
     } catch (error) {
+      if (error.code === "discord_required") {
+        connectDiscord(product);
+        return;
+      }
+
       setMessage(error.message);
     } finally {
       setIsBusy(false);
@@ -716,12 +832,23 @@ export default function ShopClient({ initialCategories, catalogError }) {
         {basket?.username ? (
           <button disabled={isBusy} onClick={disconnectFiveM} type="button">
             <Icon name="user" />
-            <span>{basket.username}<small>Se déconnecter</small></span>
+            <span><span className={styles.dockName}>{basket.username}</span><small>Se déconnecter</small></span>
           </button>
         ) : (
           <button disabled={isBusy} onClick={connectFiveM} type="button">
             <Icon name="user" />
             <span>{isBusy ? "Préparation..." : "Se connecter"}<small>Compte FiveM</small></span>
+          </button>
+        )}
+        {discordAccount ? (
+          <button disabled={isBusy} onClick={disconnectDiscord} type="button">
+            <Icon name="discord" />
+            <span><span className={styles.dockName}>{discordAccount.name}</span><small>Se déconnecter</small></span>
+          </button>
+        ) : (
+          <button disabled={isBusy} onClick={() => connectDiscord()} type="button">
+            <Icon name="discord" />
+            <span>Discord<small>Se connecter</small></span>
           </button>
         )}
       </nav>

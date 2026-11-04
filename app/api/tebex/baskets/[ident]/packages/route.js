@@ -28,6 +28,20 @@ function validatePackageRef(body) {
   return validatePackageId(body?.packageId);
 }
 
+function validateDiscordId(value) {
+  if (value == null || value === "") {
+    return "";
+  }
+
+  const id = String(value).trim();
+
+  if (!/^\d{17,20}$/.test(id)) {
+    throw new TebexApiError("Identifiant Discord invalide.", 400);
+  }
+
+  return id;
+}
+
 function validateQuantity(quantity) {
   const parsedQuantity = Number(quantity);
 
@@ -45,7 +59,13 @@ export async function POST(request, context) {
     const basketIdent = validateBasketIdent(ident);
     const currentBasket = await getTebexBasket(basketIdent);
 
-    await addTebexPackage(basketIdent, validatePackageRef(body), 1, currentBasket);
+    await addTebexPackage(
+      basketIdent,
+      validatePackageRef(body),
+      1,
+      currentBasket,
+      validateDiscordId(body?.discordId),
+    );
     const basket = await getTebexBasket(basketIdent);
 
     return NextResponse.json(basket);
