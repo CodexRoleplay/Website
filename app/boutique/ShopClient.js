@@ -907,7 +907,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
         {selectedCategory?.packages?.map((product) => {
           const description = hideCalculatedBonusNote(cleanDescription(product.description));
           const productId = asPackageId(product.id);
-          const isFeatured = productId !== "" && cardHighlights.featuredId === productId;
+          const isFeatured = productId !== "" && cardHighlights.featuredIds.has(productId);
           const bonusPercent = productId ? cardHighlights.bonusById.get(productId) ?? null : null;
 
           return (

@@ -51,11 +51,17 @@ function bonusError(row) {
 }
 
 function cardsPayload(rows) {
-  const featured = rows.find((row) => row.featured);
+  const featuredProducts = rows
+    .filter((row) => row.featured)
+    .map((row) => ({
+      packageId: row.packageId,
+      packageIdent: row.packageIdent,
+    }));
 
   return {
-    featuredPackageId: featured?.packageId ?? "",
-    featuredPackageIdent: featured?.packageIdent ?? "",
+    featuredPackageId: "",
+    featuredPackageIdent: "",
+    featuredProducts,
     knownProducts: rows.map((row) => ({
       packageId: row.packageId,
       packageIdent: row.packageIdent,
@@ -129,12 +135,23 @@ export default function BoutiqueCardsClient() {
   }
 
   function toggleFeatured(packageId) {
-    setRows((current) =>
-      current.map((row) => ({
-        ...row,
-        featured: row.packageId === packageId ? !row.featured : false,
-      })),
-    );
+    setRows((current) => {
+      const target = current.find((row) => row.packageId === packageId);
+      const category = target?.categoryName ?? "";
+      const nextFeatured = target?.featured !== true;
+
+      return current.map((row) => {
+        if (row.packageId === packageId) {
+          return { ...row, featured: nextFeatured };
+        }
+
+        if (nextFeatured && (row.categoryName ?? "") === category) {
+          return { ...row, featured: false };
+        }
+
+        return row;
+      });
+    });
     setMessage("");
   }
 
@@ -194,7 +211,7 @@ export default function BoutiqueCardsClient() {
         <div>
           <h2>Produits Tebex</h2>
           <div className={styles.help}>
-            <p>Le badge public affiche « Meilleure valeur ». Une seule carte peut le porter, ou aucune.</p>
+            <p>Le badge public affiche « Meilleure vente ». Une seule carte par catégorie, ou aucune.</p>
             <p>Le bonus n’est pas calculé. Coche « Afficher un bonus » et saisis le pourcentage seulement si tu veux le montrer.</p>
             {updatedAt ? <p>Dernier enregistrement : {formatDate(updatedAt)}.</p> : null}
           </div>
