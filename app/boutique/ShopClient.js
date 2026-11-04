@@ -931,8 +931,12 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
                 <h3>{product.name}</h3>
                 <p>{description || "Produit disponible via la boutique sécurisée Tebex."}</p>
                 <div className={styles.productFooter}>
+                  {bonusPercent ? (
+                    <div className={styles.bonusRow}>
+                      <span className={styles.bonusPill}>{formatBonusLabel(bonusPercent)}</span>
+                    </div>
+                  ) : null}
                   <div className={styles.productPrice}>
-                    {bonusPercent ? <span className={styles.bonusPill}>{formatBonusLabel(bonusPercent)}</span> : null}
                     <strong>{formatPrice(product.base_price ?? product.total_price, product.currency)}</strong>
                   </div>
                   <div className={styles.productActions}>
