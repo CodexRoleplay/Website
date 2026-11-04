@@ -142,7 +142,7 @@ export default function LoreAdminClient() {
         </div>
       </div>
 
-      <section className={styles.panel}>
+      <section className={`${styles.panel} ${styles.panelEditor}`}>
         <label className={styles.field}>
           <span>Titre de la page</span>
           <input onChange={(event) => setTitle(event.target.value)} value={title} />

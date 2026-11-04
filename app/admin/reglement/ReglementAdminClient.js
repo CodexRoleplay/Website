@@ -358,7 +358,7 @@ export default function ReglementAdminClient() {
           </section>
         )}
 
-        <section className={styles.panel}>
+        <section className={`${styles.panel} ${styles.panelEditor}`}>
           {!activeSection ? (
             <div className={styles.statusBox}>
               <h2>Contenu</h2>

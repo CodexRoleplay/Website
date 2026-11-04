@@ -63,6 +63,13 @@
   overflow: hidden;
 }
 
+.panelEditor {
+  position: sticky;
+  top: 16px;
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+}
+
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -268,7 +275,6 @@
   border-radius: 16px;
   background: rgba(49, 246, 255, 0.04);
   min-width: 0;
-  overflow: hidden;
 }
 
 .contentList {
@@ -289,6 +295,7 @@
 .contentCardHeader {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: center;
   margin-bottom: 12px;
@@ -355,7 +362,68 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
+}
+
+.contentComposer {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(49, 246, 255, 0.28);
+  border-radius: 14px;
+  background: #071422;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.insertPosition {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.88rem;
+}
+
+.insertPosition input,
+.positionInput {
+  box-sizing: border-box;
+  width: 76px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font: inherit;
+}
+
+.insertPosition small {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.blockActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.moveButton {
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.moveButton:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 .blockToolbar button {

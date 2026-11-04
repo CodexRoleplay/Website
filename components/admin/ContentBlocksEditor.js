@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import IconPicker from "@/components/admin/IconPicker";
 import { ALERT_VARIANTS, CARD_VARIANTS } from "@/lib/reglement/constants";
 import { CONTENT_TYPE_OPTIONS, createContentItem, getContentTypeLabel } from "@/lib/reglement/content";
@@ -37,7 +37,63 @@ function getContentItemDeleteLabel(item) {
   return getContentTypeLabel(item?.type) || "ce bloc";
 }
 
-function ContentItemEditor({ item, dragProps, onChange, onDelete }) {
+function duplicateContentItem(item) {
+  const copy = structuredClone(item);
+  copy.id = `${item.type ?? "bloc"}-${crypto.randomUUID().slice(0, 8)}`;
+  return copy;
+}
+
+function PositionField({ index, total, onMove }) {
+  const [value, setValue] = useState(String(index + 1));
+
+  useEffect(() => {
+    setValue(String(index + 1));
+  }, [index]);
+
+  function commit() {
+    const next = Number(value);
+
+    if (!Number.isInteger(next)) {
+      setValue(String(index + 1));
+      return;
+    }
+
+    onMove(Math.min(Math.max(1, next), total));
+  }
+
+  return (
+    <input
+      aria-label={`Position ${index + 1} sur ${total}`}
+      className={styles.positionInput}
+      inputMode="numeric"
+      max={total}
+      min={1}
+      onBlur={commit}
+      onChange={(event) => setValue(event.target.value)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          event.currentTarget.blur();
+        }
+      }}
+      title="Aller à cette position"
+      type="number"
+      value={value}
+    />
+  );
+}
+
+function ContentItemEditor({
+  item,
+  index,
+  total,
+  dragProps,
+  onChange,
+  onDelete,
+  onDuplicate,
+  onMoveUp,
+  onMoveDown,
+  onMoveTo,
+}) {
   function update(partial) {
     onChange({ ...item, ...partial });
   }
@@ -60,9 +116,21 @@ function ContentItemEditor({ item, dragProps, onChange, onDelete }) {
           ) : null}
           <span className={styles.blockType}>{getContentTypeLabel(item.type)}</span>
         </div>
-        <button className={styles.dangerButton} onClick={onDelete} type="button">
-          Supprimer
-        </button>
+        <div className={styles.blockActions}>
+          <button className={styles.moveButton} disabled={index === 0} onClick={onMoveUp} type="button">
+            Monter
+          </button>
+          <button className={styles.moveButton} disabled={index >= total - 1} onClick={onMoveDown} type="button">
+            Descendre
+          </button>
+          <PositionField index={index} onMove={onMoveTo} total={total} />
+          <button className={styles.moveButton} onClick={onDuplicate} type="button">
+            Dupliquer
+          </button>
+          <button className={styles.dangerButton} onClick={onDelete} type="button">
+            Supprimer
+          </button>
+        </div>
       </div>
 
       {item.type === "rule" ? (
@@ -248,29 +316,84 @@ export default function ContentBlocksEditor({
   content,
   onChange,
   title = "Contenu de la sous-rubrique",
-  description = "Mélange librement règles, paragraphes, warnings… Glisse ⋮⋮ pour réordonner.",
+  description = "Indique une position pour créer le bloc au bon endroit. Monte, descends, ou saisis le numéro. Dupliquer le place juste en dessous.",
   emptyLabel = "Aucun contenu — ajoute une règle ou un bloc ci-dessus.",
 }) {
   const [dragIndex, setDragIndex] = useState(null);
+  const [insertAt, setInsertAt] = useState("");
+  const [pendingScrollId, setPendingScrollId] = useState("");
   const items = Array.isArray(content) ? content : [];
+
+  useEffect(() => {
+    if (!pendingScrollId) {
+      return;
+    }
+
+    document.getElementById(`content-block-${pendingScrollId}`)?.scrollIntoView({
+      block: "center",
+      behavior: "smooth",
+    });
+    setPendingScrollId("");
+  }, [pendingScrollId, items]);
 
   function updateItem(index, nextItem) {
     onChange(items.map((item, itemIndex) => (itemIndex === index ? nextItem : item)));
   }
 
+  function addItem(type) {
+    const next = createContentItem(type);
+    const raw = insertAt.trim();
+    let index = items.length;
+
+    if (raw) {
+      const position = Number(raw);
+
+      if (Number.isInteger(position) && position >= 1) {
+        index = Math.min(position - 1, items.length);
+        setInsertAt(String(index + 2));
+      }
+    }
+
+    const copy = [...items];
+    copy.splice(index, 0, next);
+    onChange(copy);
+    setPendingScrollId(next.id);
+  }
+
+  function moveItem(fromIndex, position) {
+    const target = Math.min(Math.max(1, position), items.length) - 1;
+    onChange(reorderItems(items, fromIndex, target));
+  }
+
   return (
     <div className={styles.contentSection}>
-      <div className={styles.sectionIntro}>
-        <h3>{title}</h3>
-        <p>{description}</p>
-      </div>
+      <div className={styles.contentComposer}>
+        <div className={styles.sectionIntro}>
+          <h3>{title}</h3>
+          <p>{description}</p>
+        </div>
 
-      <div className={styles.blockToolbar}>
-        {CONTENT_TYPE_OPTIONS.map((option) => (
-          <button key={option.id} onClick={() => onChange([...items, createContentItem(option.id)])} type="button">
-            + {option.label}
-          </button>
-        ))}
+        <label className={styles.insertPosition}>
+          <span>Créer à la position</span>
+          <input
+            inputMode="numeric"
+            max={items.length + 1}
+            min={1}
+            onChange={(event) => setInsertAt(event.target.value)}
+            placeholder={String(items.length + 1)}
+            type="number"
+            value={insertAt}
+          />
+          <small>{insertAt.trim() ? `Le prochain bloc sera inséré ici.` : `${items.length} blocs · vide = à la fin`}</small>
+        </label>
+
+        <div className={styles.blockToolbar}>
+          {CONTENT_TYPE_OPTIONS.map((option) => (
+            <button key={option.id} onClick={() => addItem(option.id)} type="button">
+              + {option.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className={styles.contentList}>
@@ -278,6 +401,7 @@ export default function ContentBlocksEditor({
 
         {items.map((item, index) => (
           <div
+            id={`content-block-${item.id}`}
             key={item.id}
             onDragOver={(event) => {
               event.preventDefault();
@@ -295,6 +419,7 @@ export default function ContentBlocksEditor({
                 onDragEnd: () => setDragIndex(null),
                 onDragStart: (_event, itemIndex) => setDragIndex(itemIndex),
               }}
+              index={index}
               item={item}
               onChange={(nextItem) => updateItem(index, nextItem)}
               onDelete={() => {
@@ -302,6 +427,17 @@ export default function ContentBlocksEditor({
                   onChange(items.filter((_, itemIndex) => itemIndex !== index));
                 }
               }}
+              onDuplicate={() => {
+                const copy = duplicateContentItem(item);
+                const nextItems = [...items];
+                nextItems.splice(index + 1, 0, copy);
+                onChange(nextItems);
+                setPendingScrollId(copy.id);
+              }}
+              onMoveDown={() => moveItem(index, index + 2)}
+              onMoveTo={(position) => moveItem(index, position)}
+              onMoveUp={() => moveItem(index, index)}
+              total={items.length}
             />
           </div>
         ))}
