@@ -229,7 +229,7 @@
 .main {
   min-width: 0;
   padding: 32px;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .loadingState {
