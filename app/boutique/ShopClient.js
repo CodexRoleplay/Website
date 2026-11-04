@@ -940,7 +940,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
                       {basket?.username ? "Ajouter" : "Connexion requise"}
                     </button>
                     {product.disable_gifting ? null : (
-                      <button className={styles.giftButton} disabled={isBusy} onClick={() => openGift(product)} type="button">
+                      <button className={styles.giftLink} disabled={isBusy} onClick={() => openGift(product)} type="button">
                         Offrir à un ami
                       </button>
                     )}

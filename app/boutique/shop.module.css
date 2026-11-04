@@ -549,15 +549,22 @@
   text-align: center;
 }
 
-.productFooter .giftButton {
-  border-color: #fe14be;
-  background: rgba(254, 20, 190, 0.12);
+.productFooter .giftLink {
+  width: auto;
+  align-self: center;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
   color: #fe14be;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-.productFooter .giftButton:hover:not(:disabled) {
-  background: #fe14be;
-  color: #fff;
+.productFooter .giftLink:hover:not(:disabled) {
+  background: transparent;
+  color: #ff5ad4;
 }
 
 .productFooter button:disabled,
@@ -1061,23 +1068,28 @@
 
 .productPrice {
   display: flex;
-  min-width: 0;
+  flex: 1 1 11rem;
+  min-width: min(100%, 11rem);
+  max-width: 100%;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
 }
 
 .bonusPill {
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
+  box-sizing: border-box;
+  max-width: 100%;
   min-height: 28px;
   padding: 4px 8px;
   border: 1px solid #fe14be;
   color: #fe14be;
   font-family: var(--font-secondary);
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
   text-transform: uppercase;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
