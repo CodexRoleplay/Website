@@ -8,6 +8,11 @@ import { asPackageId, FEATURED_BADGE_LABEL, formatBonusLabel, resolveCardHighlig
 import { normalizeShopSlug as normalizeSlug } from "@/lib/boutique/shop-links";
 import styles from "./shop.module.css";
 
+const TEBEX_LEGAL_LINKS = [
+  { label: "Impressum", href: "https://checkout.tebex.io/impressum" },
+  { label: "Terms & Conditions", href: "https://checkout.tebex.io/terms" },
+  { label: "Privacy Policy", href: "https://checkout.tebex.io/privacy" },
+];
 const BASKET_STORAGE_KEY = "codex-rp-tebex-basket";
 const DISCORD_STORAGE_KEY = "codex-rp-tebex-discord";
 const DISCORD_PENDING_KEY = "codex-rp-discord-pending";
@@ -978,6 +983,14 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
             portalTarget,
           )
         : null}
+
+      <nav className={styles.legalBar} aria-label="Informations légales Tebex">
+        {TEBEX_LEGAL_LINKS.map((link) => (
+          <a href={link.href} key={link.href} rel="noopener noreferrer" target="_blank">
+            {link.label}
+          </a>
+        ))}
+      </nav>
 
       <nav className={styles.shopDock} aria-label="Navigation boutique" data-lenis-prevent>
         <div className={styles.shopDockGlass} aria-hidden="true" />

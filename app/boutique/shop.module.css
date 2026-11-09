@@ -586,6 +586,28 @@
   cursor: wait;
 }
 
+.legalBar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 28px;
+  margin-top: 56px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(178, 190, 255, 0.16);
+}
+
+.legalBar a {
+  color: rgba(224, 230, 255, 0.62);
+  font-family: var(--font-secondary);
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+}
+
+.legalBar a:hover {
+  color: #24b6bd;
+}
+
 .shopDock {
   --dock-cut: 4%;
   --dock-border: rgba(112, 137, 220, 0.34);
