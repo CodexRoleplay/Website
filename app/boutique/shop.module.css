@@ -479,6 +479,8 @@
   border: 1px solid rgba(254, 20, 190, 0.55);
   background: rgba(254, 20, 190, 0.12);
   color: #fff;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .detailPanel {
