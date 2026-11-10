@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createTebexBasket } from "@/lib/tebex";
-import { getRequestOrigin, tebexErrorResponse } from "@/app/api/tebex/_utils";
+import { getClientIp, getRequestOrigin, tebexErrorResponse } from "@/app/api/tebex/_utils";
 
 export async function POST(request) {
   try {
@@ -8,6 +8,7 @@ export async function POST(request) {
     const basket = await createTebexBasket({
       completeUrl: `${origin}/boutique?payment=success`,
       cancelUrl: `${origin}/boutique?payment=cancelled`,
+      ipAddress: getClientIp(request),
     });
 
     return NextResponse.json(basket);

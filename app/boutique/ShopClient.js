@@ -462,6 +462,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
   const checkoutFrameRef = useRef(null);
   const renderedCheckoutRef = useRef("");
   const onCheckoutPaidRef = useRef(async () => {});
+  const paidBasketRef = useRef("");
   const onCheckoutNoticeRef = useRef(() => {});
 
   const selectedCategory =
@@ -840,6 +841,11 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
   }
 
   onCheckoutPaidRef.current = async () => {
+    if (paidBasketRef.current && paidBasketRef.current === basket?.ident) {
+      return;
+    }
+
+    paidBasketRef.current = basket?.ident ?? "";
     rememberFiveMUser(basket);
     window.sessionStorage.setItem(FIVEM_REAUTH_KEY, "1");
     window.sessionStorage.setItem(PAYMENT_THANKS_KEY, "1");
@@ -884,7 +890,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
     });
   }
 
-  function checkout() {
+  async function checkout() {
     if (!basket?.username) {
       setMessage("Connectez votre compte FiveM avant le paiement.");
       return;
@@ -900,8 +906,37 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
       return;
     }
 
-    setIsCartOpen(false);
-    setIsCheckoutOpen(true);
+    setIsBusy(true);
+    setMessage("");
+
+    try {
+      const freshBasket = await apiRequest(`/api/tebex/baskets/${basket.ident}`);
+
+      if (freshBasket.complete) {
+        await onCheckoutPaidRef.current();
+        return;
+      }
+
+      const freshItems = Array.isArray(freshBasket.packages) ? freshBasket.packages : [];
+      storeBasket(freshBasket);
+
+      if (!freshItems.length) {
+        setMessage("Votre panier est vide.");
+        return;
+      }
+
+      if (!freshBasket.username) {
+        setMessage("Connectez votre compte FiveM avant le paiement.");
+        return;
+      }
+
+      setIsCartOpen(false);
+      setIsCheckoutOpen(true);
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setIsBusy(false);
+    }
   }
 
   useEffect(() => {
