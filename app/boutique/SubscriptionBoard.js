@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { asPackageId } from "@/lib/boutique/card-display";
 import {
   SUBSCRIPTION_GRADES,
@@ -84,6 +84,43 @@ function visiblePerkRows(perks) {
   return perks.filter((row) => String(row?.label ?? "").trim());
 }
 
+function packageImageSrc(product) {
+  const image = product?.image;
+
+  if (typeof image === "string") {
+    const value = image.trim();
+    return value && value !== "null" && value !== "undefined" ? value : "";
+  }
+
+  if (image && typeof image === "object") {
+    const nested = [image.url, image.src, image.thumbnail].find(
+      (item) => typeof item === "string" && item.trim(),
+    );
+    return nested ? nested.trim() : "";
+  }
+
+  return "";
+}
+
+function GradePackImage({ src }) {
+  const [failedSrc, setFailedSrc] = useState("");
+
+  if (!src || failedSrc === src) {
+    return null;
+  }
+
+  return (
+    <img
+      alt=""
+      className={styles.gradeThumb}
+      decoding="async"
+      loading="lazy"
+      onError={() => setFailedSrc(src)}
+      src={src}
+    />
+  );
+}
+
 function PerkValue({ cell }) {
   if (cell?.kind === "check") {
     return (
@@ -148,24 +185,30 @@ export default function SubscriptionBoard({
           const currency = product?.currency || "EUR";
           const caption = subscriptionTotalCaption(offer.months);
           const termLabel = SUBSCRIPTION_TERMS.find((item) => item.key === term)?.label ?? "";
+          const imageSrc = packageImageSrc(product);
 
           return (
             <article className={banner ? `${styles.gradeColumn} ${styles.productCardFeatured}` : styles.gradeColumn} key={grade.key}>
               {banner ? <span className={styles.gradeBanner}>{banner}</span> : null}
-              {termLabel ? <span className={styles.productType}>{termLabel}</span> : null}
-              <h3>{grade.label}</h3>
-              {badge ? <BonusPill label={badge} /> : null}
-              {product ? (
-                <p className={styles.gradePrice}>
-                  <strong>
-                    {offer.months > 1 ? `${formatPrice(total / offer.months, currency)}/mois` : formatPrice(total, currency)}
-                  </strong>
-                  {caption ? <span>soit {formatPrice(total, currency)} {caption}</span> : null}
-                  {priceNote ? <small className={styles.priceNote}>{priceNote}</small> : null}
-                </p>
-              ) : (
-                <p className={styles.gradeMissing}>Cette durée n’est pas en ligne.</p>
-              )}
+              <div className={styles.gradeIntro}>
+                {imageSrc ? <GradePackImage src={imageSrc} /> : null}
+                <div className={styles.gradeIntroCopy}>
+                  {termLabel ? <span className={styles.productType}>{termLabel}</span> : null}
+                  <h3>{grade.label}</h3>
+                  {badge ? <BonusPill label={badge} /> : null}
+                  {product ? (
+                    <p className={styles.gradePrice}>
+                      <strong>
+                        {offer.months > 1 ? `${formatPrice(total / offer.months, currency)}/mois` : formatPrice(total, currency)}
+                      </strong>
+                      {caption ? <span>soit {formatPrice(total, currency)} {caption}</span> : null}
+                      {priceNote ? <small className={styles.priceNote}>{priceNote}</small> : null}
+                    </p>
+                  ) : (
+                    <p className={styles.gradeMissing}>Cette durée n’est pas en ligne.</p>
+                  )}
+                </div>
+              </div>
               {product ? (
                 <div className={styles.productActions}>
                   <button className={styles.addButton} disabled={isBusy} onClick={() => onSubscribe(product)} type="button">

@@ -958,8 +958,8 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
 
           return (
             <article className={banner ? `${styles.productCard} ${styles.productCardFeatured}` : styles.productCard} key={product.id}>
+              {banner ? <span className={styles.valueBadge}>{banner}</span> : null}
               <div className={styles.productMedia}>
-                {banner ? <span className={styles.valueBadge}>{banner}</span> : null}
                 {product.image ? <img alt="" loading="lazy" src={product.image} /> : <Icon name="catalog" />}
               </div>
               <div className={styles.productBody}>
