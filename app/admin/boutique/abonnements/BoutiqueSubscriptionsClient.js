@@ -191,10 +191,6 @@ export default function BoutiqueSubscriptionsClient() {
         <div>
           <h2>Tableau comparatif</h2>
           <div className={styles.help}>
-            <p>Le libellé est le nom de la ligne, le même pour les trois grades. Exemples : « Poser des props », « Argent toutes les 10 min ».</p>
-            <p>Chaque grade a ensuite sa valeur : une coche, une croix, ou un texte (« 50 », « Illimité », « 35 props », « Bientôt », « 3 000 $/jour »).</p>
-            <p>Exemple : « Poser des props » avec une coche pour Pacific, Penthouse et Bel Air. « Argent toutes les 10 min » avec le texte 50, 100, puis Illimité.</p>
-            <p>Une ligne sans libellé n’apparaît pas en boutique. Une case Texte vide n’affiche rien. Le tableau est le même pour Mensuel, 3 mois et 12 mois.</p>
             {updatedAt ? <p>Dernier enregistrement : {formatDate(updatedAt)}.</p> : null}
           </div>
         </div>
