@@ -12,7 +12,7 @@
 }
 
 .article {
-  width: min(820px, calc(100% - 40px));
+  width: min(920px, calc(100% - 40px));
   margin: 0 auto;
   padding: clamp(140px, 16vw, 190px) 0 96px;
 }
@@ -43,15 +43,15 @@
 .hero p,
 .article section p,
 .article li {
-  color: rgba(224, 230, 255, 0.78);
+  color: rgba(232, 236, 255, 0.9);
   font-family: var(--font-secondary);
-  font-size: 16px;
-  line-height: 1.7;
+  font-size: 20px;
+  line-height: 1.75;
 }
 
 .updated {
-  color: rgba(224, 230, 255, 0.48);
-  font-size: 13px;
+  color: rgba(224, 230, 255, 0.62);
+  font-size: 16px;
 }
 
 .article section {
@@ -61,9 +61,9 @@
 }
 
 .article h2 {
-  margin: 22px 0 12px;
+  margin: 22px 0 16px;
   font-family: var(--font-primary);
-  font-size: 28px;
+  font-size: 36px;
   font-weight: 400;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -76,10 +76,11 @@
 
 .article strong {
   display: block;
-  margin-bottom: 2px;
-  color: rgba(255, 255, 255, 0.92);
+  margin-bottom: 4px;
+  color: #fff;
+  font-size: 15px;
   font-weight: 400;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -109,5 +110,15 @@
 
   .hero h1 {
     font-size: 40px;
+  }
+
+  .hero p,
+  .article section p,
+  .article li {
+    font-size: 18px;
+  }
+
+  .article h2 {
+    font-size: 30px;
   }
 }
