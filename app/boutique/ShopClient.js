@@ -8,7 +8,7 @@ import { asPackageId, resolveCardHighlights } from "@/lib/boutique/card-display"
 import { buildSubscriptionBoard, isMonthlySubscriptionPackage, isSubscriptionCategory, subscriptionGradeFromName } from "@/lib/boutique/subscriptions";
 import { normalizeShopSlug as normalizeSlug } from "@/lib/boutique/shop-links";
 import styles from "./shop.module.css";
-import SubscriptionBoard from "./SubscriptionBoard";
+import SubscriptionBoard, { BonusPill } from "./SubscriptionBoard";
 
 const TEBEX_LEGAL_LINKS = [
   { label: "Impressum", href: "https://checkout.tebex.io/impressum" },
@@ -924,7 +924,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
                 <div className={styles.productFooter}>
                   {badge ? (
                     <div className={styles.bonusRow}>
-                      <span className={styles.bonusPill}>{badge}</span>
+                      <BonusPill label={badge} />
                     </div>
                   ) : null}
                   <div className={styles.productPrice}>
@@ -932,7 +932,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
                     {priceNote ? <small className={styles.priceNote}>{priceNote}</small> : null}
                   </div>
                   <div className={styles.productActions}>
-                    <button disabled={isBusy} onClick={() => addProduct(product)} type="button">
+                    <button className={styles.addButton} disabled={isBusy} onClick={() => addProduct(product)} type="button">
                       {basket?.username ? "Ajouter" : "Connexion requise"}
                     </button>
                     <button className={styles.giftLink} disabled={isBusy} onClick={() => openGift(product)} type="button">

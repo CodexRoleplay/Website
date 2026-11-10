@@ -16,6 +16,24 @@ function formatPrice(value, currency = "EUR") {
   }).format(Number(value ?? 0));
 }
 
+export function BonusPill({ label }) {
+  const text = String(label ?? "");
+  const startsWithPlus = text.startsWith("+");
+  const rest = startsWithPlus ? text.slice(1).replace(/^\s+/, "") : text;
+
+  return (
+    <span className={styles.bonusPill}>
+      {startsWithPlus ? (
+        <svg aria-hidden="true" className={styles.bonusSign} viewBox="0 0 12 12">
+          <path d="M5 0h2v12H5zM0 5h12v2H0" />
+        </svg>
+      ) : null}
+      {startsWithPlus ? <span className={styles.bonusPlusText}>+</span> : null}
+      {rest ? <span className={styles.bonusPillText}>{rest}</span> : null}
+    </span>
+  );
+}
+
 function PerkLine({ perk }) {
   if (perk.kind === "check") {
     return (
@@ -88,7 +106,7 @@ export default function SubscriptionBoard({
             <article className={styles.gradeColumn} key={grade.key}>
               {banner ? <span className={styles.gradeBanner}>{banner}</span> : null}
               <h3>{grade.label}</h3>
-              {badge ? <span className={styles.bonusPill}>{badge}</span> : null}
+              {badge ? <BonusPill label={badge} /> : null}
               {product ? (
                 <p className={styles.gradePrice}>
                   <strong>
@@ -109,7 +127,7 @@ export default function SubscriptionBoard({
               ) : null}
               {product ? (
                 <div className={styles.productActions}>
-                  <button disabled={isBusy} onClick={() => onSubscribe(product)} type="button">
+                  <button className={styles.addButton} disabled={isBusy} onClick={() => onSubscribe(product)} type="button">
                     {signedIn ? "S'abonner" : "Connexion requise"}
                   </button>
                   <button className={styles.giftLink} disabled={isBusy} onClick={() => onGift(product)} type="button">
