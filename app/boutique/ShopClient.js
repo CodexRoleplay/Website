@@ -5,10 +5,10 @@ import { createPortal } from "react-dom";
 import Script from "next/script";
 import { useSearchParams } from "next/navigation";
 import { asPackageId, resolveCardHighlights } from "@/lib/boutique/card-display";
-import { buildSubscriptionBoard, isMonthlySubscriptionPackage, isSubscriptionCategory, subscriptionGradeFromName } from "@/lib/boutique/subscriptions";
+import { SUBSCRIPTION_TERMS, buildSubscriptionBoard, isMonthlySubscriptionPackage, isSubscriptionCategory, subscriptionGradeFromName, subscriptionTermFromName } from "@/lib/boutique/subscriptions";
 import { normalizeShopSlug as normalizeSlug } from "@/lib/boutique/shop-links";
 import styles from "./shop.module.css";
-import SubscriptionBoard, { BonusPill } from "./SubscriptionBoard";
+import SubscriptionBoard, { BonusPill, GiftMark } from "./SubscriptionBoard";
 
 const TEBEX_LEGAL_LINKS = [
   { label: "Impressum", href: "https://checkout.tebex.io/impressum" },
@@ -21,6 +21,8 @@ const DISCORD_PENDING_KEY = "codex-rp-discord-pending";
 const SCROLL_STORAGE_KEY = "codex-rp-shop-scroll";
 const PENDING_PACKAGE_KEY = "codex-rp-shop-pending-package";
 const DISCORD_ID_PATTERN = /^\d{17,20}$/;
+const GIFT_DISCORD_MESSAGE =
+  "Connecte d’abord Discord avec le bouton Discord en bas de la boutique. On ne demande pas le Discord du destinataire.";
 let tebexCheckoutBound = false;
 
 function readDiscordAccount() {
@@ -251,6 +253,25 @@ function hideCalculatedBonusNote(value) {
     .replace(/bonus\s+calcul[ée][^.]*(?:\.|$)/gi, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function productKindLabel(product) {
+  if (product?.type !== "subscription") {
+    return "Achat unique";
+  }
+
+  const term = subscriptionTermFromName(product?.name);
+  const known = SUBSCRIPTION_TERMS.find((item) => item.key === term);
+
+  if (known) {
+    return known.label;
+  }
+
+  if (term === "half") {
+    return "6 mois";
+  }
+
+  return "Abonnement";
 }
 
 function getCategoryDescriptionBlocks(value = "") {
@@ -659,6 +680,14 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
   async function addProduct(product, targetUsername = "") {
     const payload = purchasePayload(product, targetUsername);
 
+    if (targetUsername && !readDiscordAccount()?.id) {
+      setMessage(GIFT_DISCORD_MESSAGE);
+      if (discordAccount?.id) {
+        setGiftError(GIFT_DISCORD_MESSAGE);
+      }
+      return;
+    }
+
     if (!basket?.username) {
       setMessage("Connectez votre compte FiveM avant d'ajouter un produit.");
       await connectFiveM(payload);
@@ -675,16 +704,16 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
       setGiftProduct(null);
       setMessage(updatedBasket.notice || "Produit ajouté au panier.");
     } catch (error) {
-      if (error.code === "discord_required") {
+      if (error.code === "discord_required" && !targetUsername) {
         connectDiscord(payload);
         return;
       }
 
-      if (giftProduct) {
-        setGiftError(error.message);
+      if (targetUsername || giftProduct) {
+        setGiftError(error.code === "discord_required" ? error.message || GIFT_DISCORD_MESSAGE : error.message);
       }
 
-      setMessage(error.message);
+      setMessage(error.code === "discord_required" ? error.message || GIFT_DISCORD_MESSAGE : error.message);
     } finally {
       setIsBusy(false);
     }
@@ -700,8 +729,13 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
     event.preventDefault();
     const name = giftName.trim();
 
-    if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{1,31}$/.test(name)) {
+    if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{1,31}$/.test(name) || DISCORD_ID_PATTERN.test(name)) {
       setGiftError("Indique le pseudo FiveM du joueur, comme REX-STUDIO. Le pseudo Discord ne fonctionne pas.");
+      return;
+    }
+
+    if (!readDiscordAccount()?.id) {
+      setMessage(GIFT_DISCORD_MESSAGE);
       return;
     }
 
@@ -861,6 +895,17 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
     };
   }, [isCheckoutOpen]);
 
+  const listedProducts = subscriptionView ? subscriptionView.leftovers : selectedCategory?.packages ?? [];
+  const categorySlug = normalizeSlug(selectedCategory?.name ?? "");
+  const isCodyxPackCategory = categorySlug.includes("codyx") || (categorySlug.includes("pack") && !categorySlug.includes("cadeau"));
+  const showPackBonusNote =
+    isCodyxPackCategory &&
+    !subscriptionView &&
+    listedProducts.some((product) => {
+      const productId = asPackageId(product.id);
+      return Boolean(productId && cardHighlights.badgeById.get(productId));
+    });
+
   return (
     <section className={styles.store}>
       <Script src="https://js.tebex.io/v/1.js" strategy="afterInteractive" onLoad={ensureTebexCheckoutEvents} />
@@ -904,7 +949,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
             term={subscriptionTerm}
           />
         ) : null}
-        {(subscriptionView ? subscriptionView.leftovers : selectedCategory?.packages ?? []).map((product) => {
+        {listedProducts.map((product) => {
           const description = hideCalculatedBonusNote(cleanDescription(product.description));
           const productId = asPackageId(product.id);
           const banner = productId ? cardHighlights.bannerById.get(productId) ?? "" : "";
@@ -918,24 +963,21 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
                 {product.image ? <img alt="" loading="lazy" src={product.image} /> : <Icon name="catalog" />}
               </div>
               <div className={styles.productBody}>
-                <span className={styles.productType}>{product.type === "subscription" ? "Abonnement" : "Achat unique"}</span>
+                <span className={styles.productType}>{productKindLabel(product)}</span>
                 <h3>{product.name}</h3>
                 <p>{description || "Produit disponible via la boutique sécurisée Tebex."}</p>
                 <div className={styles.productFooter}>
-                  {badge ? (
-                    <div className={styles.bonusRow}>
-                      <BonusPill label={badge} />
-                    </div>
-                  ) : null}
+                  {badge ? <BonusPill label={badge} /> : null}
                   <div className={styles.productPrice}>
                     <strong>{formatPrice(product.base_price ?? product.total_price, product.currency)}</strong>
                     {priceNote ? <small className={styles.priceNote}>{priceNote}</small> : null}
                   </div>
                   <div className={styles.productActions}>
                     <button className={styles.addButton} disabled={isBusy} onClick={() => addProduct(product)} type="button">
-                      {basket?.username ? "Ajouter" : "Connexion requise"}
+                      {basket?.username ? "Acheter" : "Connexion requise"}
                     </button>
                     <button className={styles.giftLink} disabled={isBusy} onClick={() => openGift(product)} type="button">
+                      <GiftMark />
                       Offrir
                     </button>
                   </div>
@@ -945,6 +987,12 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
           );
         })}
       </div>
+      {showPackBonusNote ? (
+        <p className={styles.bonusFootnote}>
+          <span aria-hidden="true" className={styles.bonusFootnoteMark} />
+          Bonus calculé par rapport au pack Venice.
+        </p>
+      ) : null}
 
       {portalTarget
         ? createPortal(
@@ -1073,13 +1121,12 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
                 <span>Cadeau</span>
                 <h2>Offrir {giftProduct.name}</h2>
                 <p>Indique le pseudo FiveM du joueur, comme REX-STUDIO. Le pseudo Discord ne fonctionne pas.</p>
-                {giftProduct.type === "subscription" || subscriptionGradeFromName(giftProduct.name) ? (
-                  <p className={styles.renewalWarning}>
-                    Cet abonnement offert se renouvelle comme un abonnement normal. C’est le moyen de paiement de cette commande qui sera débité aux échéances suivantes, jusqu’à annulation. Le joueur qui reçoit le grade n’est pas débité à ta place.
-                  </p>
-                ) : (
-                  <p>Le produit est livré sur ce compte FiveM, pas sur le tien.</p>
-                )}
+                <p className={styles.renewalWarning}>
+                  {giftProduct.type === "subscription" || subscriptionGradeFromName(giftProduct.name)
+                    ? `Le grade en jeu va au pseudo FiveM. Le rôle Discord reste sur le Discord connecté${discordAccount?.name ? ` (${discordAccount.name})` : ""}, celui qui paie. L’abonnement se renouvelle et le prélèvement se fait sur ce paiement.`
+                    : `Le produit en jeu va au pseudo FiveM. Le rôle Discord reste sur le Discord connecté${discordAccount?.name ? ` (${discordAccount.name})` : ""}, celui qui paie.`}
+                </p>
+                {discordAccount ? null : <p className={styles.giftError}>{GIFT_DISCORD_MESSAGE}</p>}
                 <label>
                   Pseudo FiveM
                   <input
@@ -1096,7 +1143,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
                 {giftError ? <p className={styles.giftError}>{giftError}</p> : null}
                 <div className={styles.giftActions}>
                   <button onClick={() => setGiftProduct(null)} type="button">Annuler</button>
-                  <button className={styles.checkoutButton} disabled={isBusy} type="submit">
+                  <button className={styles.checkoutButton} disabled={isBusy || !discordAccount} type="submit">
                     {isBusy ? "Ajout…" : "Ajouter au panier"}
                   </button>
                 </div>

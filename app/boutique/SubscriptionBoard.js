@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import { asPackageId } from "@/lib/boutique/card-display";
 import {
   SUBSCRIPTION_GRADES,
@@ -16,21 +17,62 @@ function formatPrice(value, currency = "EUR") {
   }).format(Number(value ?? 0));
 }
 
-export function BonusPill({ label }) {
-  const text = String(label ?? "");
-  const startsWithPlus = text.startsWith("+");
-  const rest = startsWithPlus ? text.slice(1).replace(/^\s+/, "") : text;
+function splitBonusCopy(label) {
+  const text = String(label ?? "").trim();
+  const match = text.match(/^(.*?)(\s+de\s+bonus\b[\s\S]*)$/i);
+
+  if (!match || !match[1].trim()) {
+    return { lead: text, suffix: "" };
+  }
+
+  return {
+    lead: match[1].trim(),
+    suffix: match[2].trim(),
+  };
+}
+
+function SignedCopy({ value, className }) {
+  const chunks = String(value ?? "").split("+");
 
   return (
-    <span className={styles.bonusPill}>
-      {startsWithPlus ? (
-        <svg aria-hidden="true" className={styles.bonusSign} viewBox="0 0 12 12">
-          <path d="M5 0h2v12H5zM0 5h12v2H0" />
-        </svg>
-      ) : null}
-      {startsWithPlus ? <span className={styles.bonusPlusText}>+</span> : null}
-      {rest ? <span className={styles.bonusPillText}>{rest}</span> : null}
+    <span className={className}>
+      {chunks.map((chunk, index) => (
+        <Fragment key={`${index}-${chunk}`}>
+          {index > 0 ? (
+            <>
+              <svg aria-hidden="true" className={styles.bonusSign} viewBox="0 0 12 12">
+                <path d="M5 0h2v12H5zM0 5h12v2H0" />
+              </svg>
+              <span className={styles.bonusPlusText}>+</span>
+            </>
+          ) : null}
+          {index > 0 ? chunk.replace(/^\s+/, "") : chunk}
+        </Fragment>
+      ))}
     </span>
+  );
+}
+
+export function BonusPill({ label }) {
+  const { lead, suffix } = splitBonusCopy(label);
+
+  return (
+    <span className={suffix ? `${styles.bonusPill} ${styles.bonusPillSplit}` : styles.bonusPill}>
+      {lead ? <SignedCopy className={suffix ? styles.bonusLead : styles.bonusPillText} value={lead} /> : null}
+      {suffix ? <SignedCopy className={styles.bonusSuffix} value={suffix} /> : null}
+    </span>
+  );
+}
+
+export function GiftMark() {
+  return (
+    <svg aria-hidden="true" className={styles.giftIcon} viewBox="0 0 24 24">
+      <rect x="3" y="8" width="18" height="4" />
+      <path d="M12 8v13" />
+      <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" />
+      <path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8" />
+      <path d="M16.5 8a2.5 2.5 0 0 0 0-5C13 3 12 8 12 8" />
+    </svg>
   );
 }
 
@@ -102,9 +144,12 @@ export default function SubscriptionBoard({
           const caption = subscriptionTotalCaption(offer.months);
           const lines = Array.isArray(perks?.[grade.key]) ? perks[grade.key] : [];
 
+          const termLabel = SUBSCRIPTION_TERMS.find((item) => item.key === term)?.label ?? "";
+
           return (
-            <article className={styles.gradeColumn} key={grade.key}>
+            <article className={banner ? `${styles.gradeColumn} ${styles.productCardFeatured}` : styles.gradeColumn} key={grade.key}>
               {banner ? <span className={styles.gradeBanner}>{banner}</span> : null}
+              {termLabel ? <span className={styles.productType}>{termLabel}</span> : null}
               <h3>{grade.label}</h3>
               {badge ? <BonusPill label={badge} /> : null}
               {product ? (
@@ -131,6 +176,7 @@ export default function SubscriptionBoard({
                     {signedIn ? "S'abonner" : "Connexion requise"}
                   </button>
                   <button className={styles.giftLink} disabled={isBusy} onClick={() => onGift(product)} type="button">
+                    <GiftMark />
                     Offrir
                   </button>
                   <button className={styles.detailLink} onClick={() => onDetail(product)} type="button">

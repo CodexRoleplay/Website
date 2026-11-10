@@ -307,27 +307,29 @@
 }
 
 .productCard {
+  position: relative;
   display: flex;
-  min-height: 520px;
+  min-height: 0;
   flex-direction: column;
   overflow: visible;
-  border: 1px solid rgba(178, 190, 255, 0.13);
-  background: linear-gradient(145deg, rgba(15, 26, 62, 0.95), rgba(3, 10, 30, 0.94));
+  border: 1px solid rgba(120, 150, 210, 0.2);
+  background: linear-gradient(180deg, rgba(8, 16, 42, 0.98), rgba(4, 9, 26, 0.98));
   box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
 }
 
 .productMedia {
+  position: relative;
   display: grid;
-  min-height: 220px;
+  min-height: 188px;
   place-items: center;
   overflow: hidden;
-  background: radial-gradient(circle, rgba(254, 20, 190, 0.18), transparent 68%);
+  background: #070d22;
 }
 
 .productMedia img {
   z-index: 0;
   width: 100%;
-  height: 230px;
+  height: 196px;
   object-fit: cover;
   transition: transform 400ms ease;
 }
@@ -347,56 +349,67 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 24px;
+  padding: 18px 18px 16px;
 }
 
 .productType {
-  color: #24b6bd;
+  color: rgba(214, 222, 245, 0.5);
+  font-family: var(--font-primary);
   font-size: 11px;
-  letter-spacing: 0.32em;
+  letter-spacing: 0.2em;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
 .productBody h3 {
-  margin: 12px 0;
+  margin: 8px 0 10px;
+  color: #fff;
   font-family: var(--font-primary);
-  font-size: 32px;
-  line-height: 1;
+  font-size: clamp(28px, 2.5vw, 36px);
+  font-weight: 400;
+  line-height: 0.95;
   text-transform: uppercase;
 }
 
-.productBody p {
+.productBody > p {
+  display: -webkit-box;
   margin: 0;
-  color: rgba(224, 230, 255, 0.6);
-  line-height: 1.65;
-  white-space: pre-line;
+  overflow: hidden;
+  color: rgba(196, 206, 230, 0.58);
+  font-size: 14px;
+  line-height: 1.45;
+  white-space: normal;
   overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 .productFooter {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 14px 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
   margin-top: auto;
-  padding-top: 22px;
+  padding-top: 16px;
 }
 
 .productFooter strong {
   color: #fe14be;
   font-family: var(--font-primary);
-  font-size: 28px;
+  font-size: clamp(40px, 3.5vw, 52px);
+  font-weight: 400;
+  line-height: 0.95;
 }
 
 .productActions {
   display: flex;
-  flex: 1 1 200px;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: stretch;
   gap: 8px;
-  min-width: min(100%, 200px);
-  max-width: 100%;
+  width: 100%;
+  margin-top: 8px;
 }
 
 .giftModal {
@@ -421,7 +434,7 @@
   position: relative;
   z-index: 1;
   box-sizing: border-box;
-  width: min(440px, 100%);
+  width: min(560px, 100%);
   max-width: 100%;
   min-width: 0;
   padding: 28px;
@@ -576,69 +589,67 @@
 }
 
 .productFooter .addButton,
-.gradeColumn .addButton {
+.gradeColumn .addButton,
+.productFooter button.giftLink,
+.gradeColumn .giftLink {
+  display: inline-flex;
   box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
   min-width: 0;
-  min-height: 48px;
-  padding: 14px 16px;
-  border: 0;
-  background: #0e7380;
-  box-shadow: inset 0 0 0 2px #24b6bd;
-  color: #fff;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid #24b6bd;
+  border-radius: 3px;
+  background: transparent;
+  box-shadow: none;
+  color: #24b6bd;
   font-family: var(--font-primary);
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 400;
-  letter-spacing: 0.04em;
-  line-height: 1.15;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
   text-align: center;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  text-decoration: none;
+  text-shadow: none;
   text-transform: uppercase;
-  white-space: normal;
-  overflow-wrap: anywhere;
   cursor: pointer;
 }
 
-.productFooter .addButton:hover:not(:disabled),
-.gradeColumn .addButton:hover:not(:disabled) {
-  background: #0b5f6a;
-  color: #fff;
+.productFooter .addButton,
+.gradeColumn .addButton {
+  flex: 1 1 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .productFooter button.giftLink,
 .gradeColumn .giftLink {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  min-height: 48px;
-  align-self: stretch;
-  margin: 0;
-  padding: 14px 16px;
-  border: 0;
-  background: #fe14be;
-  box-shadow: none;
-  color: #fff;
-  font-family: var(--font-primary);
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  line-height: 1.15;
-  text-align: center;
-  text-decoration: none;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
-  text-transform: uppercase;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  cursor: pointer;
+  flex: 0 0 auto;
+  padding-inline: 12px;
+  white-space: nowrap;
 }
 
+.productFooter .addButton:hover:not(:disabled),
+.gradeColumn .addButton:hover:not(:disabled),
 .productFooter button.giftLink:hover:not(:disabled),
 .gradeColumn .giftLink:hover:not(:disabled) {
-  background: #d4009e;
-  color: #fff;
+  background: rgba(36, 182, 189, 0.12);
+  color: #5fe3ea;
   text-decoration: none;
+}
+
+.giftIcon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .productFooter button:disabled,
@@ -1089,12 +1100,11 @@
   }
 
   .productFooter {
-    flex-direction: column;
     align-items: stretch;
   }
 
   .productActions {
-    flex-basis: auto;
+    flex-direction: row;
     width: 100%;
     min-width: 0;
   }
@@ -1134,85 +1144,121 @@
   }
 }
 
-.productMedia {
-  position: relative;
-}
-
 .productCardFeatured {
   border-color: #fe14be;
-  box-shadow: 0 0 0 1px rgba(254, 20, 190, 0.45), 0 22px 60px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+}
+
+.productCardFeatured::before {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  inset: -1px;
+  pointer-events: none;
+  background:
+    linear-gradient(#fe14be, #fe14be) left top / 16px 2px no-repeat,
+    linear-gradient(#fe14be, #fe14be) left top / 2px 16px no-repeat,
+    linear-gradient(#fe14be, #fe14be) right top / 16px 2px no-repeat,
+    linear-gradient(#fe14be, #fe14be) right top / 2px 16px no-repeat,
+    linear-gradient(#fe14be, #fe14be) left bottom / 16px 2px no-repeat,
+    linear-gradient(#fe14be, #fe14be) left bottom / 2px 16px no-repeat,
+    linear-gradient(#fe14be, #fe14be) right bottom / 16px 2px no-repeat,
+    linear-gradient(#fe14be, #fe14be) right bottom / 2px 16px no-repeat;
+}
+
+.valueBadge,
+.gradeBanner {
+  display: block;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: calc(100% - 28px);
+  padding: 6px 11px;
+  border-radius: 3px;
+  background: #fe14be;
+  color: #fff;
+  font-family: var(--font-primary);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+  text-align: center;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
 .valueBadge {
   position: absolute;
   z-index: 3;
-  top: 12px;
-  right: 12px;
-  max-width: calc(100% - 24px);
-  padding: 8px 12px;
-  background: #fe14be;
-  color: #fff;
-  font-family: var(--font-primary);
-  font-size: 20px;
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  line-height: 1.05;
-  text-align: center;
-  text-transform: uppercase;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
-  overflow-wrap: anywhere;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .productPrice {
   display: flex;
-  flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
   max-width: 100%;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
-}
-
-.bonusRow {
-  flex: 1 0 100%;
-  min-width: 0;
-  max-width: 100%;
-  overflow: visible;
+  gap: 4px;
 }
 
 .bonusPill {
   position: relative;
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   align-self: flex-start;
-  gap: 8px;
+  gap: 6px;
   box-sizing: border-box;
   width: fit-content;
   max-width: 100%;
   min-width: 0;
-  height: auto;
-  min-height: 36px;
-  padding: 8px 12px;
+  padding: 5px 10px 5px 8px;
   overflow: visible;
   border: 0;
+  border-radius: 4px;
   background: #fe14be;
   color: #fff;
   font-family: var(--font-primary);
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 400;
-  letter-spacing: 0.02em;
-  line-height: 1.3;
+  letter-spacing: 0.01em;
+  line-height: 1;
   text-transform: none;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
-  white-space: normal;
-  overflow-wrap: anywhere;
+}
+
+.bonusPillSplit {
+  flex-wrap: nowrap;
+}
+
+.bonusLead,
+.bonusPillText,
+.bonusSuffix {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+}
+
+.bonusLead,
+.bonusPillText {
+  color: #fff;
+}
+
+.bonusSuffix {
+  color: #ffe6f7;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .bonusPillText {
-  min-width: 0;
-  flex: 1 1 auto;
-  overflow-wrap: anywhere;
+  flex-wrap: wrap;
+  white-space: normal;
 }
 
 .bonusPlusText {
@@ -1228,14 +1274,33 @@
   display: block;
   max-width: 100%;
   overflow: visible;
-  color: rgba(232, 236, 255, 0.92);
+  color: rgba(214, 222, 245, 0.48);
   font-family: var(--font-secondary);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   letter-spacing: 0;
-  line-height: 1.4;
+  line-height: 1.35;
   text-transform: none;
   white-space: normal;
+}
+
+.bonusFootnote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 0;
+  color: rgba(210, 218, 240, 0.62);
+  font-family: var(--font-secondary);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.bonusFootnoteMark {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  background: #fe14be;
+  transform: rotate(45deg);
 }
 
 .gradeBoard {
@@ -1287,6 +1352,7 @@
 }
 
 .gradeColumn {
+  position: relative;
   display: flex;
   min-width: 0;
   flex-direction: column;
@@ -1299,15 +1365,6 @@
 
 .gradeBanner {
   align-self: flex-start;
-  max-width: 100%;
-  padding: 8px 12px;
-  background: #fe14be;
-  color: #fff;
-  font-family: var(--font-primary);
-  font-size: 20px;
-  line-height: 1.05;
-  text-transform: uppercase;
-  overflow-wrap: anywhere;
 }
 
 .gradeColumn h3 {
@@ -1328,9 +1385,9 @@
 .gradePrice strong {
   color: #fe14be;
   font-family: var(--font-primary);
-  font-size: clamp(28px, 3vw, 40px);
+  font-size: clamp(34px, 3vw, 46px);
   font-weight: 400;
-  line-height: 1;
+  line-height: 0.95;
 }
 
 .gradePrice > span,
@@ -1368,16 +1425,23 @@
 }
 
 .detailLink {
+  flex: 1 0 100%;
+  align-self: flex-start;
   padding: 0;
   border: 0;
   background: none;
   color: #24b6bd;
   font-family: var(--font-secondary);
   font-size: 14px;
+  letter-spacing: 0;
   text-align: left;
   text-decoration: underline;
   text-transform: none;
   cursor: pointer;
+}
+
+.gradeColumn .productActions {
+  margin-top: auto;
 }
 
 .gradeColumn .productActions > button:disabled {
@@ -1405,8 +1469,8 @@
 }
 
 .bonusSign {
-  width: 0.9em;
-  height: 0.9em;
+  width: 0.82em;
+  height: 0.82em;
   flex: 0 0 auto;
   fill: currentColor;
 }
