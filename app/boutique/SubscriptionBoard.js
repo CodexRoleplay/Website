@@ -102,22 +102,28 @@ function packageImageSrc(product) {
   return "";
 }
 
-function GradePackImage({ src }) {
+function GradeMedia({ src, banner, termLabel, title }) {
   const [failedSrc, setFailedSrc] = useState("");
-
-  if (!src || failedSrc === src) {
-    return null;
-  }
+  const showImage = Boolean(src) && failedSrc !== src;
 
   return (
-    <img
-      alt=""
-      className={styles.gradeThumb}
-      decoding="async"
-      loading="lazy"
-      onError={() => setFailedSrc(src)}
-      src={src}
-    />
+    <div className={styles.gradeMedia}>
+      {showImage ? (
+        <img
+          alt=""
+          className={styles.gradeMediaImage}
+          decoding="async"
+          loading="lazy"
+          onError={() => setFailedSrc(src)}
+          src={src}
+        />
+      ) : null}
+      {banner ? <span className={styles.gradeRibbon}>{banner}</span> : null}
+      <div className={styles.gradeMediaTitle}>
+        {termLabel ? <span>{termLabel}</span> : null}
+        <h3>{title}</h3>
+      </div>
+    </div>
   );
 }
 
@@ -188,41 +194,45 @@ export default function SubscriptionBoard({
           const imageSrc = packageImageSrc(product);
 
           return (
-            <article className={banner ? `${styles.gradeColumn} ${styles.productCardFeatured}` : styles.gradeColumn} key={grade.key}>
-              {banner ? <span className={styles.gradeBanner}>{banner}</span> : null}
-              <div className={styles.gradeIntro}>
-                {imageSrc ? <GradePackImage src={imageSrc} /> : null}
-                <div className={styles.gradeIntroCopy}>
-                  {termLabel ? <span className={styles.productType}>{termLabel}</span> : null}
-                  <h3>{grade.label}</h3>
-                  {badge ? <BonusPill label={badge} /> : null}
-                  {product ? (
-                    <p className={styles.gradePrice}>
-                      <strong>
-                        {offer.months > 1 ? `${formatPrice(total / offer.months, currency)}/mois` : formatPrice(total, currency)}
-                      </strong>
-                      {caption ? <span>soit {formatPrice(total, currency)} {caption}</span> : null}
-                      {priceNote ? <small className={styles.priceNote}>{priceNote}</small> : null}
-                    </p>
-                  ) : (
-                    <p className={styles.gradeMissing}>Cette durée n’est pas en ligne.</p>
-                  )}
-                </div>
+            <article className={banner ? `${styles.gradeColumn} ${styles.gradeFeatured}` : styles.gradeColumn} key={grade.key}>
+              <GradeMedia banner={banner} src={imageSrc} termLabel={termLabel} title={grade.label} />
+              <div className={styles.gradeBody}>
+                {product ? (
+                  <div className={styles.gradePrice}>
+                    {badge ? <BonusPill label={badge} /> : null}
+                    <strong>
+                      {offer.months > 1 ? (
+                        <>
+                          {formatPrice(total / offer.months, currency)}
+                          <small>/mois</small>
+                        </>
+                      ) : (
+                        formatPrice(total, currency)
+                      )}
+                    </strong>
+                    {caption ? <span>soit {formatPrice(total, currency)} {caption}</span> : null}
+                    {priceNote ? <span className={styles.gradeNote}>{priceNote}</span> : null}
+                  </div>
+                ) : (
+                  <p className={styles.gradeMissing}>Cette durée n’est pas en ligne.</p>
+                )}
+                {product ? (
+                  <div className={styles.gradeActions}>
+                    <button className={styles.gradeSubscribe} disabled={isBusy} onClick={() => onSubscribe(product)} type="button">
+                      {signedIn ? "S'abonner" : "Connexion requise"}
+                    </button>
+                    <div className={styles.gradeSecondary}>
+                      <button className={styles.gradeGift} disabled={isBusy} onClick={() => onGift(product)} type="button">
+                        <GiftMark />
+                        Offrir
+                      </button>
+                      <button className={styles.gradeDetail} onClick={() => onDetail(product)} type="button">
+                        Voir le détail
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
               </div>
-              {product ? (
-                <div className={styles.productActions}>
-                  <button className={styles.addButton} disabled={isBusy} onClick={() => onSubscribe(product)} type="button">
-                    {signedIn ? "S'abonner" : "Connexion requise"}
-                  </button>
-                  <button className={styles.giftLink} disabled={isBusy} onClick={() => onGift(product)} type="button">
-                    <GiftMark />
-                    Offrir
-                  </button>
-                  <button className={styles.detailLink} onClick={() => onDetail(product)} type="button">
-                    Voir le détail
-                  </button>
-                </div>
-              ) : null}
             </article>
           );
         })}

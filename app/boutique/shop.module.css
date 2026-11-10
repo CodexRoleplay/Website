@@ -645,9 +645,7 @@ form.giftPanel .giftActions {
 }
 
 .productFooter .addButton,
-.gradeColumn .addButton,
-.productFooter button.giftLink,
-.gradeColumn .giftLink {
+.productFooter button.giftLink {
   display: inline-flex;
   box-sizing: border-box;
   min-width: 0;
@@ -674,24 +672,20 @@ form.giftPanel .giftActions {
   cursor: pointer;
 }
 
-.productFooter .addButton,
-.gradeColumn .addButton {
+.productFooter .addButton {
   flex: 1 1 0;
   white-space: normal;
   overflow-wrap: anywhere;
 }
 
-.productFooter button.giftLink,
-.gradeColumn .giftLink {
+.productFooter button.giftLink {
   flex: 0 0 auto;
   padding-inline: 12px;
   white-space: nowrap;
 }
 
 .productFooter .addButton:hover:not(:disabled),
-.gradeColumn .addButton:hover:not(:disabled),
-.productFooter button.giftLink:hover:not(:disabled),
-.gradeColumn .giftLink:hover:not(:disabled) {
+.productFooter button.giftLink:hover:not(:disabled) {
   background: rgba(36, 182, 189, 0.12);
   color: #5fe3ea;
   text-decoration: none;
@@ -1240,8 +1234,7 @@ form.giftPanel .giftActions {
     linear-gradient(#fe14be, #fe14be) right bottom / 2px 16px no-repeat;
 }
 
-.valueBadge,
-.gradeBanner {
+.valueBadge {
   position: relative;
   z-index: 6;
   display: block;
@@ -1400,32 +1393,43 @@ form.giftPanel .giftActions {
 }
 
 .termSwitch {
-  display: flex;
+  display: inline-flex;
+  justify-self: start;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba(36, 182, 189, 0.28);
+  background: rgba(3, 10, 30, 0.85);
 }
 
 .termSwitch button {
-  min-height: 44px;
-  padding: 0 18px;
-  border: 1px solid rgba(36, 182, 189, 0.5);
-  background: rgba(3, 10, 30, 0.8);
-  color: #fff;
-  font-family: var(--font-secondary);
+  min-height: 42px;
+  padding: 0 22px;
+  border: 0;
+  background: transparent;
+  color: rgba(232, 236, 255, 0.72);
+  font-family: var(--font-primary);
+  font-size: 15px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.termSwitch button:hover {
+  color: #fff;
 }
 
 .termActive {
-  border-color: #fe14be;
-  background: rgba(254, 20, 190, 0.16);
+  background: #fe14be !important;
+  color: #fff !important;
 }
 
 .gradeGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  align-items: stretch;
+  gap: 20px;
 }
 
 .gradeColumn {
@@ -1433,71 +1437,215 @@ form.giftPanel .giftActions {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 12px;
-  padding: 22px 18px 18px;
-  overflow: visible;
-  border: 1px solid rgba(36, 182, 189, 0.28);
-  background: linear-gradient(160deg, rgba(15, 26, 62, 0.96), rgba(3, 10, 30, 0.94));
+  overflow: hidden;
+  border: 1px solid rgba(36, 182, 189, 0.24);
+  background: linear-gradient(180deg, rgba(10, 20, 50, 0.98), rgba(3, 8, 24, 0.98));
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.gradeBanner {
-  align-self: stretch;
-  margin: -22px -18px 2px;
+.gradeColumn:hover {
+  border-color: rgba(36, 182, 189, 0.6);
+  transform: translateY(-3px);
 }
 
-.gradeIntro {
+.gradeFeatured,
+.gradeFeatured:hover {
+  border-color: #fe14be;
+  box-shadow: 0 0 0 1px #fe14be, 0 20px 60px rgba(254, 20, 190, 0.18);
+}
+
+.gradeMedia {
+  position: relative;
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  min-width: 0;
+  min-height: 190px;
+  align-items: flex-end;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 70% 20%, rgba(36, 182, 189, 0.28), transparent 60%),
+    linear-gradient(160deg, #111d48, #050a1e);
 }
 
-.gradeThumb {
-  width: 68px;
-  height: 68px;
-  flex: 0 0 auto;
+.gradeFeatured .gradeMedia {
+  background:
+    radial-gradient(circle at 70% 20%, rgba(254, 20, 190, 0.32), transparent 60%),
+    linear-gradient(160deg, #1c0f3d, #050a1e);
+}
+
+.gradeMediaImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border: 1px solid rgba(36, 182, 189, 0.4);
-  background: #070d22;
 }
 
-.gradeIntroCopy {
-  display: flex;
-  min-width: 0;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: 12px;
+.gradeMedia::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(3, 8, 24, 0) 30%, rgba(3, 8, 24, 0.7) 70%, rgba(6, 13, 36, 1));
+  pointer-events: none;
 }
 
-.gradeColumn h3 {
-  margin: 0;
+.gradeRibbon {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  max-width: calc(100% - 28px);
+  padding: 7px 12px;
+  background: #fe14be;
+  box-shadow: 0 6px 20px rgba(254, 20, 190, 0.45);
+  color: #fff;
   font-family: var(--font-primary);
-  font-size: clamp(32px, 3vw, 44px);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.gradeMediaTitle {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 0 22px 14px;
+}
+
+.gradeMediaTitle span {
+  color: #24b6bd;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.gradeMediaTitle h3 {
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-primary);
+  font-size: clamp(34px, 3.2vw, 46px);
   font-weight: 400;
   line-height: 0.95;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
   text-transform: uppercase;
+}
+
+.gradeBody {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 20px;
+  padding: 6px 22px 22px;
 }
 
 .gradePrice {
   display: grid;
-  gap: 4px;
-  margin: 0;
+  justify-items: start;
+  gap: 6px;
 }
 
 .gradePrice strong {
-  color: #fe14be;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 4px;
+  color: #fff;
   font-family: var(--font-primary);
-  font-size: clamp(34px, 3vw, 46px);
+  font-size: clamp(38px, 3.4vw, 52px);
   font-weight: 400;
-  line-height: 0.95;
+  line-height: 1;
+}
+
+.gradePrice strong small {
+  color: rgba(232, 236, 255, 0.6);
+  font-size: 0.4em;
+  letter-spacing: 0.04em;
 }
 
 .gradePrice > span,
 .gradeMissing {
-  color: rgba(232, 236, 255, 0.9);
+  margin: 0;
+  color: rgba(232, 236, 255, 0.72);
   font-family: var(--font-secondary);
   font-size: 15px;
   line-height: 1.45;
+}
+
+.gradePrice > .gradeNote {
+  color: #fe14be;
+  font-size: 14px;
+}
+
+.gradeActions {
+  display: grid;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.gradeSubscribe {
+  min-height: 50px;
+  border: 0;
+  background: #24b6bd;
+  color: #031018;
+  font-family: var(--font-primary);
+  font-size: 18px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gradeFeatured .gradeSubscribe {
+  background: #fe14be;
+  color: #fff;
+}
+
+.gradeSubscribe:hover:not(:disabled) {
+  box-shadow: 0 0 24px rgba(36, 182, 189, 0.45);
+}
+
+.gradeFeatured .gradeSubscribe:hover:not(:disabled) {
+  box-shadow: 0 0 24px rgba(254, 20, 190, 0.5);
+}
+
+.gradeSecondary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.gradeGift,
+.gradeDetail {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid rgba(232, 236, 255, 0.22);
+  background: transparent;
+  color: #fff;
+  font-family: var(--font-primary);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.gradeGift:hover:not(:disabled),
+.gradeDetail:hover {
+  border-color: #24b6bd;
+  color: #5fe3ea;
+}
+
+.gradeSubscribe:disabled,
+.gradeGift:disabled {
+  opacity: 0.45;
+  cursor: wait;
 }
 
 .perkCompare {
@@ -1549,6 +1697,14 @@ form.giftPanel .giftActions {
   text-align: left;
 }
 
+.perkCompare thead th:not(:first-child) {
+  color: #24b6bd;
+}
+
+.perkCompare tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.025);
+}
+
 .perkCompare tbody tr:last-child th,
 .perkCompare tbody tr:last-child td {
   border-bottom: 0;
@@ -1566,31 +1722,6 @@ form.giftPanel .giftActions {
 
 .perkCross {
   color: #fe14be;
-}
-
-.detailLink {
-  flex: 1 0 100%;
-  align-self: flex-start;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: #24b6bd;
-  font-family: var(--font-secondary);
-  font-size: 14px;
-  letter-spacing: 0;
-  text-align: left;
-  text-decoration: underline;
-  text-transform: none;
-  cursor: pointer;
-}
-
-.gradeColumn .productActions {
-  margin-top: auto;
-}
-
-.gradeColumn .productActions > button:disabled {
-  opacity: 0.45;
-  cursor: wait;
 }
 
 .cartItem small.renewalNote {
