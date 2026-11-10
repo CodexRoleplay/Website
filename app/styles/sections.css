@@ -282,7 +282,9 @@
 
 .footer_copyright__nEw16 {
     display: flex;
-    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 18px;
     color: var(--text-secondary);
     font-size: clamp(10px, .8vw, 12px)
 }
@@ -299,9 +301,9 @@
 
 .footer_legal__nEw18 {
     display: flex;
-    grid-column: 1 / -1;
     flex-wrap: wrap;
-    gap: 8px 22px
+    align-items: center;
+    gap: 8px 18px
 }
 
 .footer_legal__nEw18 a {

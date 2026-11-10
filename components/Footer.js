@@ -87,17 +87,17 @@ export default function Footer() {
         </div>
 
         <div className="footer_bottom__j1FqV">
-          <p className="footer_copyright__nEw16">
+          <div className="footer_copyright__nEw16">
             <strong>© 2026 Codex RP</strong>
             <span>Tous droits réservés.</span>
-          </p>
+            <nav className="footer_legal__nEw18" aria-label="Informations légales">
+              <a href="/mentions-legales">Mentions légales</a>
+              <a href="/confidentialite">Confidentialité</a>
+            </nav>
+          </div>
           <p className="footer_disclaimer__nEw17">
             Codex RP n&apos;est ni approuvé ni sponsorisé par Rockstar Games.
           </p>
-          <nav className="footer_legal__nEw18" aria-label="Informations légales">
-            <a href="/mentions-legales">Mentions légales</a>
-            <a href="/confidentialite">Confidentialité</a>
-          </nav>
         </div>
       </div>
     </footer>
