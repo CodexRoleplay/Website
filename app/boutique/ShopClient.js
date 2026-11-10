@@ -730,7 +730,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
     const name = giftName.trim();
 
     if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{1,31}$/.test(name) || DISCORD_ID_PATTERN.test(name)) {
-      setGiftError("Indique le pseudo FiveM du joueur, comme REX-STUDIO. Le pseudo Discord ne fonctionne pas.");
+      setGiftError("Indique le pseudo du joueur à qui offrir.");
       return;
     }
 
@@ -1120,15 +1120,14 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
               <form className={styles.giftPanel} onSubmit={submitGift}>
                 <span>Cadeau</span>
                 <h2>Offrir {giftProduct.name}</h2>
-                <p>Indique le pseudo FiveM du joueur, comme REX-STUDIO. Le pseudo Discord ne fonctionne pas.</p>
-                <p className={styles.renewalWarning}>
-                  {giftProduct.type === "subscription" || subscriptionGradeFromName(giftProduct.name)
-                    ? `Le grade en jeu va au pseudo FiveM. Le rôle Discord reste sur le Discord connecté${discordAccount?.name ? ` (${discordAccount.name})` : ""}, celui qui paie. L’abonnement se renouvelle et le prélèvement se fait sur ce paiement.`
-                    : `Le produit en jeu va au pseudo FiveM. Le rôle Discord reste sur le Discord connecté${discordAccount?.name ? ` (${discordAccount.name})` : ""}, celui qui paie.`}
-                </p>
-                {discordAccount ? null : <p className={styles.giftError}>{GIFT_DISCORD_MESSAGE}</p>}
+                <p>Pseudo du joueur à qui offrir.</p>
+                {discordAccount ? null : (
+                  <p className={styles.giftNote}>
+                    Connecte Discord avec le bouton en bas de la boutique. Ferme cette fenêtre pour l’atteindre.
+                  </p>
+                )}
                 <label>
-                  Pseudo FiveM
+                  Pseudo du joueur
                   <input
                     autoComplete="off"
                     maxLength={32}
@@ -1136,7 +1135,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
                       setGiftName(event.target.value);
                       setGiftError("");
                     }}
-                    placeholder="REX-STUDIO"
+                    placeholder="Pseudo"
                     value={giftName}
                   />
                 </label>
