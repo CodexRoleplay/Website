@@ -8,11 +8,17 @@ import { LEGAL_FIELDS, defaultLegalDocument, missingLegalFields, normalizeLegalD
 import shellStyles from "@/components/admin/admin.module.css";
 import styles from "./legal-admin.module.css";
 
-const SECTIONS = [
+const TABS = [
+  { id: "identity", label: "Identité" },
+  { id: "mentions", label: "Textes des mentions" },
+  { id: "privacy", label: "Textes de la confidentialité" },
+];
+
+const IDENTITY_SECTIONS = [
   {
     id: "editor",
     title: "Éditeur du site",
-    text: "Ces informations apparaissent dans les mentions légales. Pour une société, ajoute aussi la forme, le capital, le SIRET et le RCS.",
+    text: "Ces informations s'affichent dans les mentions légales. Pour une société, ajoute aussi la forme, le capital, le SIRET et le RCS.",
   },
   {
     id: "publication",
@@ -26,13 +32,8 @@ const SECTIONS = [
   },
   {
     id: "privacy",
-    title: "Confidentialité",
-    text: "L'adresse sert aux demandes d'accès, de rectification et de suppression. Les durées sont déjà rédigées et restent modifiables.",
-  },
-  {
-    id: "notes",
-    title: "Compléments",
-    text: "Paragraphes facultatifs ajoutés en bas de chaque page.",
+    title: "Contact confidentialité",
+    text: "L'adresse sert aux demandes d'accès, de rectification et de suppression.",
   },
 ];
 
@@ -47,6 +48,7 @@ function formatDate(value) {
 export default function LegalAdminClient() {
   const { user, getIdToken, loading: authLoading } = useAuth();
   const [legalDocument, setLegalDocument] = useState(defaultLegalDocument);
+  const [tab, setTab] = useState("identity");
   const [lastMeta, setLastMeta] = useState({ updatedAt: null, updatedByEmail: null });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -151,7 +153,7 @@ export default function LegalAdminClient() {
     <div className={styles.editor}>
       <header className={shellStyles.pageHeader}>
         <h1>Pages légales</h1>
-        <p>Renseigne l&apos;identité du site. Les paragraphes obligatoires sont déjà rédigés sur les pages publiques.</p>
+        <p>Tous les textes des deux pages sont modifiables. L&apos;identité du site reste dans le premier onglet.</p>
       </header>
 
       <div className={styles.toolbar}>
@@ -185,12 +187,27 @@ export default function LegalAdminClient() {
         </div>
       </div>
 
-      {SECTIONS.map((section) => (
+      <div className={styles.tabs} role="tablist">
+        {TABS.map((item) => (
+          <button
+            aria-selected={tab === item.id}
+            className={tab === item.id ? styles.tabActive : ""}
+            key={item.id}
+            onClick={() => setTab(item.id)}
+            role="tab"
+            type="button"
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "identity" ? IDENTITY_SECTIONS.map((section) => (
         <section className={styles.section} key={section.id}>
           <h2>{section.title}</h2>
           <p>{section.text}</p>
           <div className={styles.grid}>
-            {LEGAL_FIELDS.filter((field) => field.section === section.id).map((field) => (
+            {LEGAL_FIELDS.filter((field) => field.page === "identity" && field.section === section.id).map((field) => (
               <label className={field.multiline ? styles.wide : ""} key={field.key}>
                 <span>
                   {field.label}
@@ -199,7 +216,7 @@ export default function LegalAdminClient() {
                 {field.multiline ? (
                   <textarea
                     onChange={(event) => updateField(field.key, event.target.value)}
-                    rows={field.section === "notes" ? 5 : 3}
+                    rows={3}
                     value={legalDocument[field.key] ?? ""}
                   />
                 ) : (
@@ -214,7 +231,35 @@ export default function LegalAdminClient() {
             ))}
           </div>
         </section>
-      ))}
+      )) : (
+        <section className={styles.section}>
+          <h2>{tab === "mentions" ? "Mentions légales" : "Confidentialité"}</h2>
+          <p>
+            Une ligne vide sépare les paragraphes. Une ligne qui commence par - devient une puce.
+            Un lien s&apos;écrit [texte](https://…). {"{host}"} reprend le nom de l&apos;hébergeur et {"{email}"} l&apos;adresse de contact.
+          </p>
+          <div className={styles.grid}>
+            {LEGAL_FIELDS.filter((field) => field.page === tab).map((field) => (
+              <label className={styles.wide} key={field.key}>
+                <span>{field.label}</span>
+                {field.multiline ? (
+                  <textarea
+                    onChange={(event) => updateField(field.key, event.target.value)}
+                    rows={field.key.endsWith("Body") ? 8 : 3}
+                    value={legalDocument[field.key] ?? ""}
+                  />
+                ) : (
+                  <input
+                    onChange={(event) => updateField(field.key, event.target.value)}
+                    type="text"
+                    value={legalDocument[field.key] ?? ""}
+                  />
+                )}
+              </label>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

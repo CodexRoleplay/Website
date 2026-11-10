@@ -72,6 +72,29 @@
   color: #7dffb0;
 }
 
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tabs button {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  font: inherit;
+  cursor: pointer;
+}
+
+.tabActive {
+  border-color: rgba(36, 182, 189, 0.7);
+  background: rgba(36, 182, 189, 0.16);
+  color: #d9fbff;
+}
+
 .section {
   padding: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);

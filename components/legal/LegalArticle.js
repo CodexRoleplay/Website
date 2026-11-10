@@ -1,10 +1,73 @@
 import Link from "next/link";
-import { privacyContactEmail } from "@/lib/legal/content";
+import { applyLegalTokens, parseLegalCopy, privacyContactEmail } from "@/lib/legal/content";
 import styles from "./legal.module.css";
 
 function text(value) {
-  const cleaned = String(value ?? "").trim();
-  return cleaned || "";
+  return String(value ?? "").trim();
+}
+
+function Inline({ value }) {
+  const source = String(value ?? "");
+  const pattern = /\[([^\]\n]+)\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+)\)/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match = pattern.exec(source);
+
+  while (match) {
+    if (match.index > lastIndex) {
+      parts.push({ type: "text", value: source.slice(lastIndex, match.index) });
+    }
+
+    parts.push({ type: "link", label: match[1], href: match[2] });
+    lastIndex = match.index + match[0].length;
+    match = pattern.exec(source);
+  }
+
+  if (lastIndex < source.length) {
+    parts.push({ type: "text", value: source.slice(lastIndex) });
+  }
+
+  return parts.map((part, index) => {
+    if (part.type === "text") {
+      return <span key={`${index}-${part.value}`}>{part.value}</span>;
+    }
+
+    const external = /^https?:\/\//i.test(part.href);
+
+    return (
+      <a href={part.href} key={`${index}-${part.href}`} rel={external ? "noopener noreferrer" : undefined} target={external ? "_blank" : undefined}>
+        {part.label}
+      </a>
+    );
+  });
+}
+
+function Copy({ value, document }) {
+  const blocks = parseLegalCopy(applyLegalTokens(value, document));
+
+  if (!blocks.length) {
+    return null;
+  }
+
+  return blocks.map((block, index) => {
+    if (block.type === "list") {
+      return (
+        <ul key={`list-${index}`}>
+          {block.items.map((item) => (
+            <li key={`${index}-${item}`}>
+              <Inline value={item} />
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
+    return (
+      <p key={`paragraph-${index}`}>
+        <Inline value={block.text} />
+      </p>
+    );
+  });
 }
 
 function Fact({ label, value, href }) {
@@ -30,14 +93,12 @@ function Fact({ label, value, href }) {
   );
 }
 
-function Note({ value }) {
-  const cleaned = text(value);
-
-  if (!cleaned) {
+function Heading({ value }) {
+  if (!text(value)) {
     return null;
   }
 
-  return cleaned.split("\n").filter(Boolean).map((paragraph, index) => <p key={`${index}-${paragraph}`}>{paragraph}</p>);
+  return <h2>{value}</h2>;
 }
 
 function formatUpdatedAt(value) {
@@ -64,20 +125,16 @@ export default function LegalArticle({ kind, document }) {
   return (
     <article className={styles.article}>
       <header className={styles.hero}>
-        <span className={styles.eyebrow}>Informations légales</span>
-        <h1>{isMentions ? "Mentions légales" : "Politique de confidentialité"}</h1>
-        <p>
-          {isMentions
-            ? "Informations exigées pour l'édition du site Codex RP et pour la boutique."
-            : "Informations sur les données utilisées par le site Codex RP, la boutique et le panel admin."}
-        </p>
+        {text(legal.legalEyebrow) ? <span className={styles.eyebrow}>{legal.legalEyebrow}</span> : null}
+        <h1>{isMentions ? legal.mentionsTitle : legal.privacyTitle}</h1>
+        <Copy document={legal} value={isMentions ? legal.mentionsIntro : legal.privacyIntro} />
         {updated ? <p className={styles.updated}>Mis à jour le {updated}.</p> : null}
       </header>
 
       {isMentions ? (
         <>
           <section>
-            <h2>Éditeur du site</h2>
+            <Heading value={legal.mentionsEditorTitle} />
             {hasIdentity ? (
               <>
                 <Fact label="Éditeur" value={legal.editorName} />
@@ -91,21 +148,21 @@ export default function LegalArticle({ kind, document }) {
                 <Fact label="TVA" value={legal.vatNumber} />
               </>
             ) : (
-              <p>L&apos;identité de l&apos;éditeur sera publiée dès qu&apos;elle aura été renseignée.</p>
+              <Copy document={legal} value={legal.mentionsEditorEmpty} />
             )}
           </section>
 
           <section>
-            <h2>Directeur de la publication</h2>
+            <Heading value={legal.mentionsDirectorTitle} />
             {text(legal.publicationDirector) ? (
               <Fact label="Directeur" value={legal.publicationDirector} />
             ) : (
-              <p>Le directeur de la publication sera nommé dès que cette information aura été renseignée.</p>
+              <Copy document={legal} value={legal.mentionsDirectorEmpty} />
             )}
           </section>
 
           <section>
-            <h2>Hébergement</h2>
+            <Heading value={legal.mentionsHostTitle} />
             <Fact label="Hébergeur" value={legal.hostName} />
             <Fact label="Adresse" value={legal.hostAddress} />
             <Fact label="Téléphone" value={legal.hostPhone} href={text(legal.hostPhone) ? `tel:${text(legal.hostPhone).replace(/\s+/g, "")}` : ""} />
@@ -113,54 +170,35 @@ export default function LegalArticle({ kind, document }) {
           </section>
 
           <section>
-            <h2>Boutique et paiement</h2>
-            <p>
-              Le paiement de la boutique est opéré par Tebex Limited. Tebex assure l&apos;encaissement,
-              la facturation, la délivrance des achats et les demandes de remboursement. Les conditions
-              de Tebex s&apos;appliquent à cette étape.
-            </p>
-            <p>
-              <a href="https://checkout.tebex.io/terms" rel="noopener noreferrer" target="_blank">Conditions Tebex</a>
-              <span aria-hidden="true"> · </span>
-              <a href="https://checkout.tebex.io/privacy" rel="noopener noreferrer" target="_blank">Confidentialité Tebex</a>
-              <span aria-hidden="true"> · </span>
-              <a href="https://checkout.tebex.io/impressum" rel="noopener noreferrer" target="_blank">Impressum Tebex</a>
-            </p>
+            <Heading value={legal.mentionsShopTitle} />
+            <Copy document={legal} value={legal.mentionsShopBody} />
           </section>
 
           <section>
-            <h2>Propriété intellectuelle</h2>
-            <p>
-              Les textes, visuels et éléments propres à Codex RP sont protégés. Toute réutilisation
-              demande une autorisation préalable de l&apos;éditeur, en dehors des courtes citations
-              accompagnées de leur source.
-            </p>
-            <p>
-              Codex RP est un serveur roleplay indépendant. Il n&apos;est ni approuvé, ni sponsorisé,
-              ni affilié à Rockstar Games ou Take-Two Interactive.
-            </p>
+            <Heading value={legal.mentionsIpTitle} />
+            <Copy document={legal} value={legal.mentionsIpBody} />
           </section>
 
           <section>
-            <h2>Contact</h2>
+            <Heading value={legal.mentionsContactTitle} />
             {text(legal.email) ? (
               <Fact label="E-mail" value={legal.email} href={`mailto:${text(legal.email)}`} />
             ) : (
-              <p>L&apos;adresse de contact sera publiée avec l&apos;identité de l&apos;éditeur.</p>
+              <Copy document={legal} value={legal.mentionsContactEmpty} />
             )}
-            <Note value={legal.mentionsNote} />
+            <Copy document={legal} value={legal.mentionsNote} />
           </section>
         </>
       ) : (
         <>
           <section>
-            <h2>Responsable du traitement</h2>
+            <Heading value={legal.privacyControllerTitle} />
             {text(legal.editorName) ? <Fact label="Responsable" value={legal.editorName} /> : null}
             <Fact label="Adresse" value={legal.address} />
             {contactEmail ? (
               <Fact label="Contact" value={contactEmail} href={`mailto:${contactEmail}`} />
             ) : (
-              <p>L&apos;adresse pour exercer tes droits sera publiée avec l&apos;identité de l&apos;éditeur.</p>
+              <Copy document={legal} value={legal.privacyControllerEmpty} />
             )}
             {text(legal.dpoName) || text(legal.dpoEmail) ? (
               <>
@@ -168,91 +206,50 @@ export default function LegalArticle({ kind, document }) {
                 <Fact label="E-mail du délégué" value={legal.dpoEmail} href={text(legal.dpoEmail) ? `mailto:${text(legal.dpoEmail)}` : ""} />
               </>
             ) : (
-              <p>Aucun délégué à la protection des données n&apos;est désigné.</p>
+              <Copy document={legal} value={legal.privacyNoDpo} />
             )}
           </section>
 
           <section>
-            <h2>Données utilisées</h2>
-            <ul>
-              <li>Le pseudo FiveM et l&apos;identifiant Discord, lorsque tu relies ces comptes pour acheter.</li>
-              <li>L&apos;identifiant du panier Tebex, conservé dans le navigateur pour retrouver ta commande.</li>
-              <li>L&apos;e-mail et l&apos;identifiant des comptes autorisés à ouvrir le panel admin.</li>
-              <li>Les messages techniques nécessaires à la sécurité du site et du paiement.</li>
-            </ul>
-            <p>Le site ne demande pas de créer un compte joueur et n&apos;utilise pas de mesure d&apos;audience.</p>
+            <Heading value={legal.privacyDataTitle} />
+            <Copy document={legal} value={legal.privacyDataBody} />
           </section>
 
           <section>
-            <h2>Pourquoi ces données</h2>
-            <ul>
-              <li>Relier un achat au bon compte FiveM et Discord, pour exécuter la commande.</li>
-              <li>Afficher le panier et rouvrir la fenêtre de paiement Tebex.</li>
-              <li>Limiter le panel d&apos;administration aux personnes autorisées.</li>
-              <li>Répondre à une demande envoyée à l&apos;adresse de contact.</li>
-            </ul>
+            <Heading value={legal.privacyWhyTitle} />
+            <Copy document={legal} value={legal.privacyWhyBody} />
           </section>
 
           <section>
-            <h2>Qui les reçoit</h2>
-            <ul>
-              <li>Tebex Limited, pour le paiement, la facturation et la délivrance des achats.</li>
-              <li>Discord, lorsque tu choisis de relier ton compte à la boutique.</li>
-              <li>Google Firebase, pour les comptes autorisés à administrer le site.</li>
-              <li>{text(legal.hostName) || "L'hébergeur du site"}, pour l'affichage des pages.</li>
-            </ul>
-            <p>
-              Tebex, l&apos;hébergeur et Firebase peuvent traiter certaines données hors de l&apos;Union
-              européenne. Le paiement reste soumis à la politique de confidentialité de Tebex.
-            </p>
+            <Heading value={legal.privacyRecipientsTitle} />
+            <Copy document={legal} value={legal.privacyRecipientsBody} />
           </section>
 
           <section>
-            <h2>Durées de conservation</h2>
-            <Fact label="Achats" value={legal.retentionShop} />
-            <Fact label="Navigateur" value={legal.retentionBrowser} />
-            <Fact label="Administration" value={legal.retentionAdmin} />
+            <Heading value={legal.privacyRetentionTitle} />
+            <Fact label={legal.retentionShopLabel || "Achats"} value={legal.retentionShop} />
+            <Fact label={legal.retentionBrowserLabel || "Navigateur"} value={legal.retentionBrowser} />
+            <Fact label={legal.retentionAdminLabel || "Administration"} value={legal.retentionAdmin} />
           </section>
 
           <section>
-            <h2>Stockage dans le navigateur</h2>
-            <p>
-              Le site enregistre dans ton navigateur l&apos;identifiant de panier, le compte Discord
-              relié et la position de lecture de certaines pages. Ces données servent uniquement à
-              faire fonctionner la boutique et la navigation. Aucun cookie publicitaire n&apos;est déposé
-              par Codex RP.
-            </p>
-            <p>
-              La fenêtre de paiement Tebex peut déposer ses propres cookies. Ils sont décrits par Tebex.
-            </p>
+            <Heading value={legal.privacyStorageTitle} />
+            <Copy document={legal} value={legal.privacyStorageBody} />
           </section>
 
           <section>
-            <h2>Tes droits</h2>
-            <p>
-              Tu peux demander l&apos;accès à tes données, leur rectification, leur effacement, la
-              limitation de leur utilisation, ou t&apos;opposer à un traitement fondé sur l&apos;intérêt
-              légitime. Tu peux aussi récupérer les données que tu as fournies, lorsque ce droit
-              s&apos;applique.
-            </p>
-            {contactEmail ? (
-              <p>
-                Écris à <a href={`mailto:${contactEmail}`}>{contactEmail}</a> en précisant ta demande.
-                Une réponse est apportée dans un délai d&apos;un mois.
-              </p>
-            ) : null}
-            <p>
-              Tu peux aussi saisir la CNIL :{" "}
-              <a href="https://www.cnil.fr" rel="noopener noreferrer" target="_blank">www.cnil.fr</a>.
-            </p>
-            <Note value={legal.privacyNote} />
+            <Heading value={legal.privacyRightsTitle} />
+            <Copy document={legal} value={legal.privacyRightsBody} />
+            {contactEmail ? <Copy document={legal} value={legal.privacyRightsContact} /> : null}
+            <Copy document={legal} value={legal.privacyRightsCnil} />
+            <Copy document={legal} value={legal.privacyNote} />
           </section>
         </>
       )}
 
       <p className={styles.switch}>
         <Link href={isMentions ? "/confidentialite" : "/mentions-legales"}>
-          {isMentions ? "Lire la politique de confidentialité" : "Lire les mentions légales"}
+          {isMentions ? legal.mentionsSwitch : legal.privacySwitch}
         </Link>
       </p>
     </article>
