@@ -16,6 +16,9 @@ const TEBEX_LEGAL_LINKS = [
   { label: "Privacy Policy", href: "https://checkout.tebex.io/privacy" },
 ];
 const BASKET_STORAGE_KEY = "codex-rp-tebex-basket";
+const FIVEM_STORAGE_KEY = "codex-rp-fivem-user";
+const FIVEM_REAUTH_KEY = "codex-rp-fivem-reauth";
+const PAYMENT_THANKS_KEY = "codex-rp-payment-thanks";
 const DISCORD_STORAGE_KEY = "codex-rp-tebex-discord";
 const DISCORD_PENDING_KEY = "codex-rp-discord-pending";
 const SCROLL_STORAGE_KEY = "codex-rp-shop-scroll";
@@ -24,6 +27,36 @@ const DISCORD_ID_PATTERN = /^\d{17,20}$/;
 const GIFT_DISCORD_MESSAGE =
   "Connecte d’abord Discord avec le bouton Discord en bas de la boutique. On ne demande pas le Discord du destinataire.";
 let tebexCheckoutBound = false;
+
+function readFiveMUser() {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(FIVEM_STORAGE_KEY) || "");
+    const username = String(parsed?.username ?? "").trim();
+
+    if (!username || username === "null" || username === "undefined") {
+      return null;
+    }
+
+    return { username: username.slice(0, 64) };
+  } catch {
+    return null;
+  }
+}
+
+function rememberFiveMUser(nextBasket) {
+  const username = String(nextBasket?.username ?? "").trim();
+
+  if (!username || username === "null" || username === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(FIVEM_STORAGE_KEY, JSON.stringify({ username: username.slice(0, 64) }));
+}
+
+function forgetFiveMUser() {
+  window.localStorage.removeItem(FIVEM_STORAGE_KEY);
+  window.sessionStorage.removeItem(FIVEM_REAUTH_KEY);
+}
 
 function readDiscordAccount() {
   try {
@@ -454,6 +487,8 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
       window.localStorage.setItem(BASKET_STORAGE_KEY, nextBasket.ident);
     }
 
+    rememberFiveMUser(nextBasket);
+
     return nextBasket;
   }
 
@@ -500,7 +535,8 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
         }
 
         if (params.get("payment") === "success") {
-          setMessage("Paiement terminé. Merci pour votre achat !");
+          window.sessionStorage.setItem(PAYMENT_THANKS_KEY, "1");
+          window.sessionStorage.setItem(FIVEM_REAUTH_KEY, "1");
         } else if (params.get("payment") === "cancelled") {
           setMessage("Paiement annulé. Votre panier reste disponible.");
         } else if (pendingDiscord) {
@@ -527,6 +563,22 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
 
         if (!activeBasket) {
           activeBasket = await createBasket();
+        }
+
+        const shouldReauth = window.sessionStorage.getItem(FIVEM_REAUTH_KEY) === "1";
+        const returnedFromAuth = params.get("auth") === "complete";
+
+        if (shouldReauth && !returnedFromAuth && !activeBasket?.username && readFiveMUser()) {
+          window.sessionStorage.removeItem(FIVEM_REAUTH_KEY);
+          await connectFiveM(null, activeBasket);
+          return;
+        }
+
+        window.sessionStorage.removeItem(FIVEM_REAUTH_KEY);
+
+        if (window.sessionStorage.getItem(PAYMENT_THANKS_KEY) === "1") {
+          window.sessionStorage.removeItem(PAYMENT_THANKS_KEY);
+          setMessage("Paiement terminé. Merci pour votre achat !");
         }
 
         if (pendingPackage?.id && activeBasket?.username) {
@@ -616,13 +668,14 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
     };
   }, [isCartOpen]);
 
-  async function connectFiveM(pendingPackage = null) {
+  async function connectFiveM(pendingPackage = null, existingBasket = null) {
     setIsBusy(true);
     setMessage("");
     let remembered = false;
 
     try {
-      const activeBasket = basket?.ident ? basket : await createBasket();
+      const candidate = existingBasket || basket;
+      const activeBasket = candidate?.ident && !candidate.complete ? candidate : await createBasket();
       const returnPath = boutiqueReturnPath("complete");
       const authLinks = await apiRequest(
         `/api/tebex/baskets/${activeBasket.ident}/auth?returnPath=${encodeURIComponent(returnPath)}`,
@@ -668,6 +721,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
 
     try {
       window.localStorage.removeItem(BASKET_STORAGE_KEY);
+      forgetFiveMUser();
       await createBasket();
       setMessage("Compte FiveM déconnecté et panier réinitialisé.");
     } catch (error) {
@@ -786,14 +840,23 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
   }
 
   onCheckoutPaidRef.current = async () => {
+    rememberFiveMUser(basket);
+    window.sessionStorage.setItem(FIVEM_REAUTH_KEY, "1");
+    window.sessionStorage.setItem(PAYMENT_THANKS_KEY, "1");
     window.localStorage.removeItem(BASKET_STORAGE_KEY);
     setIsCartOpen(false);
     setIsCheckoutOpen(false);
     setMessage("Paiement terminé. Merci pour votre achat !");
 
     try {
-      await createBasket();
+      const nextBasket = await createBasket();
+
+      if (readFiveMUser()) {
+        await connectFiveM(null, nextBasket);
+        return;
+      }
     } catch (error) {
+      window.sessionStorage.removeItem(FIVEM_REAUTH_KEY);
       setBasket(null);
       setMessage(error.message);
     }
