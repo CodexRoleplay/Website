@@ -12,7 +12,7 @@ export default function AdminBoutiqueCardsPage() {
     <>
       <header className={styles.pageHeader}>
         <h1>Cartes de la boutique</h1>
-        <p>Choisis une meilleure vente par catégorie et, si tu le souhaites, le bonus affiché sur chaque carte.</p>
+        <p>Écris le bandeau, le badge et le texte sous le prix. Un champ vide n’affiche rien. Les avantages du tableau d’abonnements se règlent plus bas.</p>
       </header>
       <BoutiqueCardsClient />
     </>

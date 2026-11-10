@@ -4,9 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Script from "next/script";
 import { useSearchParams } from "next/navigation";
-import { asPackageId, FEATURED_BADGE_LABEL, formatBonusLabel, resolveCardHighlights } from "@/lib/boutique/card-display";
+import { asPackageId, resolveCardHighlights } from "@/lib/boutique/card-display";
+import { buildSubscriptionBoard, isMonthlySubscriptionPackage, isSubscriptionCategory, subscriptionGradeFromName } from "@/lib/boutique/subscriptions";
 import { normalizeShopSlug as normalizeSlug } from "@/lib/boutique/shop-links";
 import styles from "./shop.module.css";
+import SubscriptionBoard from "./SubscriptionBoard";
 
 const TEBEX_LEGAL_LINKS = [
   { label: "Impressum", href: "https://checkout.tebex.io/impressum" },
@@ -98,6 +100,8 @@ function rememberShopReturn(pendingPackage) {
       JSON.stringify({
         id: pendingPackage.id,
         ident: pendingPackage.ident ?? "",
+        targetUsername: pendingPackage.targetUsername ?? "",
+        applyMonthlyCoupon: pendingPackage.applyMonthlyCoupon === true,
       }),
     );
     return;
@@ -127,6 +131,8 @@ function consumePendingPackage() {
       return {
         id: parsed.id,
         ident: typeof parsed.ident === "string" ? parsed.ident : "",
+        targetUsername: typeof parsed.targetUsername === "string" ? parsed.targetUsername : "",
+        applyMonthlyCoupon: parsed.applyMonthlyCoupon === true,
       };
     }
   } catch {
@@ -168,8 +174,21 @@ async function addPackageRequest(ident, product) {
       packageId: product.id,
       packageIdent: product.ident ?? "",
       discordId: readDiscordAccount()?.id ?? "",
+      targetUsername: product.targetUsername ?? "",
+      applyMonthlyCoupon: product.applyMonthlyCoupon === true,
     }),
   });
+}
+
+function purchasePayload(product, targetUsername = "") {
+  return {
+    id: product.id,
+    ident: product.ident ?? "",
+    name: product.name ?? "",
+    type: product.type ?? "",
+    targetUsername,
+    applyMonthlyCoupon: isMonthlySubscriptionPackage(product),
+  };
 }
 
 function formatPrice(value, currency = "EUR") {
@@ -379,6 +398,11 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
   const [isBusy, setIsBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [portalTarget, setPortalTarget] = useState(null);
+  const [subscriptionTerm, setSubscriptionTerm] = useState("monthly");
+  const [giftProduct, setGiftProduct] = useState(null);
+  const [giftName, setGiftName] = useState("");
+  const [giftError, setGiftError] = useState("");
+  const [detailProduct, setDetailProduct] = useState(null);
   const initializedRef = useRef(false);
   const cartCloseRef = useRef(null);
   const checkoutFrameRef = useRef(null);
@@ -388,6 +412,14 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
 
   const selectedCategory =
     categories.find((category) => category.id === selectedCategoryId) ?? categories[0] ?? null;
+  const subscriptionView = useMemo(() => {
+    if (!isSubscriptionCategory(selectedCategory)) {
+      return null;
+    }
+
+    const board = buildSubscriptionBoard(selectedCategory?.packages ?? []);
+    return board.matched > 0 ? board : null;
+  }, [selectedCategory]);
   const basketItems = Array.isArray(basket?.packages) ? basket.packages : [];
   const basketCount = basketItems.reduce(
     (total, item) => total + basketPackageDetails(item).quantity,
@@ -624,10 +656,12 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
     }
   }
 
-  async function addProduct(product) {
+  async function addProduct(product, targetUsername = "") {
+    const payload = purchasePayload(product, targetUsername);
+
     if (!basket?.username) {
       setMessage("Connectez votre compte FiveM avant d'ajouter un produit.");
-      await connectFiveM(product);
+      await connectFiveM(payload);
       return;
     }
 
@@ -635,20 +669,43 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
     setMessage("");
 
     try {
-      const updatedBasket = await addPackageRequest(basket.ident, product);
+      const updatedBasket = await addPackageRequest(basket.ident, payload);
       storeBasket(updatedBasket);
       setIsCartOpen(true);
-      setMessage("Produit ajouté au panier.");
+      setGiftProduct(null);
+      setMessage(updatedBasket.notice || "Produit ajouté au panier.");
     } catch (error) {
       if (error.code === "discord_required") {
-        connectDiscord(product);
+        connectDiscord(payload);
         return;
+      }
+
+      if (giftProduct) {
+        setGiftError(error.message);
       }
 
       setMessage(error.message);
     } finally {
       setIsBusy(false);
     }
+  }
+
+  function openGift(product) {
+    setGiftProduct(product);
+    setGiftName("");
+    setGiftError("");
+  }
+
+  function submitGift(event) {
+    event.preventDefault();
+    const name = giftName.trim();
+
+    if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{1,31}$/.test(name)) {
+      setGiftError("Indique le pseudo FiveM du joueur, comme REX-STUDIO. Le pseudo Discord ne fonctionne pas.");
+      return;
+    }
+
+    addProduct(giftProduct, name);
   }
 
   async function removeProduct(packageId) {
@@ -833,16 +890,31 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
       </div>
 
       <div className={styles.products}>
-        {selectedCategory?.packages?.map((product) => {
+        {subscriptionView ? (
+          <SubscriptionBoard
+            highlights={cardHighlights}
+            isBusy={isBusy}
+            onDetail={setDetailProduct}
+            onGift={openGift}
+            onSubscribe={(product) => addProduct(product)}
+            onTerm={setSubscriptionTerm}
+            perks={cardHighlights.subscriptionPerks}
+            signedIn={Boolean(basket?.username)}
+            slots={subscriptionView.slots}
+            term={subscriptionTerm}
+          />
+        ) : null}
+        {(subscriptionView ? subscriptionView.leftovers : selectedCategory?.packages ?? []).map((product) => {
           const description = hideCalculatedBonusNote(cleanDescription(product.description));
           const productId = asPackageId(product.id);
-          const isFeatured = productId !== "" && cardHighlights.featuredIds.has(productId);
-          const bonusPercent = productId ? cardHighlights.bonusById.get(productId) ?? null : null;
+          const banner = productId ? cardHighlights.bannerById.get(productId) ?? "" : "";
+          const badge = productId ? cardHighlights.badgeById.get(productId) ?? "" : "";
+          const priceNote = productId ? cardHighlights.priceNoteById.get(productId) ?? "" : "";
 
           return (
-            <article className={isFeatured ? `${styles.productCard} ${styles.productCardFeatured}` : styles.productCard} key={product.id}>
+            <article className={banner ? `${styles.productCard} ${styles.productCardFeatured}` : styles.productCard} key={product.id}>
               <div className={styles.productMedia}>
-                {isFeatured ? <span className={styles.valueBadge}>{FEATURED_BADGE_LABEL}</span> : null}
+                {banner ? <span className={styles.valueBadge}>{banner}</span> : null}
                 {product.image ? <img alt="" loading="lazy" src={product.image} /> : <Icon name="catalog" />}
               </div>
               <div className={styles.productBody}>
@@ -850,22 +922,21 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
                 <h3>{product.name}</h3>
                 <p>{description || "Produit disponible via la boutique sécurisée Tebex."}</p>
                 <div className={styles.productFooter}>
-                  {bonusPercent ? (
+                  {badge ? (
                     <div className={styles.bonusRow}>
-                      <span className={styles.bonusPill}>
-                        <svg className={styles.bonusSign} viewBox="0 0 12 12" aria-hidden="true">
-                          <path d="M5 0h2v12H5zM0 5h12v2H0z" />
-                        </svg>
-                        {formatBonusLabel(bonusPercent).replace(/^\+/, "")}
-                      </span>
+                      <span className={styles.bonusPill}>{badge}</span>
                     </div>
                   ) : null}
                   <div className={styles.productPrice}>
                     <strong>{formatPrice(product.base_price ?? product.total_price, product.currency)}</strong>
+                    {priceNote ? <small className={styles.priceNote}>{priceNote}</small> : null}
                   </div>
                   <div className={styles.productActions}>
                     <button disabled={isBusy} onClick={() => addProduct(product)} type="button">
                       {basket?.username ? "Ajouter" : "Connexion requise"}
+                    </button>
+                    <button className={styles.giftLink} disabled={isBusy} onClick={() => openGift(product)} type="button">
+                      Offrir
                     </button>
                   </div>
                 </div>
@@ -909,11 +980,21 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
               const details = basketPackageDetails(item, catalogPrices.get(String(productId)) ?? 0);
               const catalogProduct = catalogProducts.get(String(details.id));
               const quantityDisabled = catalogProduct?.disable_quantity === true;
+              const giftedTo = item.in_basket?.gift_username || item.gift_username || "";
+              const giftedSubscription =
+                Boolean(giftedTo) &&
+                ((catalogProduct?.type ?? item.type) === "subscription" || Boolean(subscriptionGradeFromName(details.name)));
 
               return (
                 <div className={styles.cartItem} key={`${details.id ?? details.name}-${index}`}>
                   <div>
                     <strong>{details.name}</strong>
+                    {giftedTo ? <small>Offert à {giftedTo}</small> : null}
+                    {giftedSubscription ? (
+                      <small className={styles.renewalNote}>
+                        Cet abonnement se renouvelle comme un abonnement normal : le moyen de paiement de cette commande est débité aux échéances suivantes, jusqu’à annulation.
+                      </small>
+                    ) : null}
                     {quantityDisabled ? (
                       <small>Quantité unique</small>
                     ) : (
@@ -978,6 +1059,64 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
                   ×
                 </button>
                 <div ref={checkoutFrameRef} className={styles.checkoutFrame} />
+              </div>
+            </div>,
+            portalTarget,
+          )
+        : null}
+
+      {portalTarget && giftProduct
+        ? createPortal(
+            <div className={styles.giftModal}>
+              <button aria-label="Fermer" className={styles.giftBackdrop} onClick={() => setGiftProduct(null)} type="button" />
+              <form className={styles.giftPanel} onSubmit={submitGift}>
+                <span>Cadeau</span>
+                <h2>Offrir {giftProduct.name}</h2>
+                <p>Indique le pseudo FiveM du joueur, comme REX-STUDIO. Le pseudo Discord ne fonctionne pas.</p>
+                {giftProduct.type === "subscription" || subscriptionGradeFromName(giftProduct.name) ? (
+                  <p className={styles.renewalWarning}>
+                    Cet abonnement offert se renouvelle comme un abonnement normal. C’est le moyen de paiement de cette commande qui sera débité aux échéances suivantes, jusqu’à annulation. Le joueur qui reçoit le grade n’est pas débité à ta place.
+                  </p>
+                ) : (
+                  <p>Le produit est livré sur ce compte FiveM, pas sur le tien.</p>
+                )}
+                <label>
+                  Pseudo FiveM
+                  <input
+                    autoComplete="off"
+                    maxLength={32}
+                    onChange={(event) => {
+                      setGiftName(event.target.value);
+                      setGiftError("");
+                    }}
+                    placeholder="REX-STUDIO"
+                    value={giftName}
+                  />
+                </label>
+                {giftError ? <p className={styles.giftError}>{giftError}</p> : null}
+                <div className={styles.giftActions}>
+                  <button onClick={() => setGiftProduct(null)} type="button">Annuler</button>
+                  <button className={styles.checkoutButton} disabled={isBusy} type="submit">
+                    {isBusy ? "Ajout…" : "Ajouter au panier"}
+                  </button>
+                </div>
+              </form>
+            </div>,
+            portalTarget,
+          )
+        : null}
+
+      {portalTarget && detailProduct
+        ? createPortal(
+            <div className={styles.giftModal}>
+              <button aria-label="Fermer" className={styles.giftBackdrop} onClick={() => setDetailProduct(null)} type="button" />
+              <div aria-modal="true" className={`${styles.giftPanel} ${styles.detailPanel}`} role="dialog">
+                <span>Détail Tebex</span>
+                <h2>{detailProduct.name}</h2>
+                <div className={styles.detailBody}>{cleanDescription(detailProduct.description) || "Tebex n’a pas renvoyé de description."}</div>
+                <div className={styles.giftActions}>
+                  <button onClick={() => setDetailProduct(null)} type="button">Fermer</button>
+                </div>
               </div>
             </div>,
             portalTarget,

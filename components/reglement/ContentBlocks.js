@@ -92,13 +92,15 @@ function RuleBlock({ block, ruleStyles, prose = false }) {
   );
 }
 
-export default function ContentBlocks({ blocks = [], ruleStyles = null, prose = false }) {
+export default function ContentBlocks({ blocks = [], ruleStyles = null, prose = false, variant = "" }) {
   if (!blocks.length) {
     return null;
   }
 
+  const rootClass = variant === "legal" ? `${styles.blocks} ${styles.blocksLegal}` : styles.blocks;
+
   return (
-    <div className={styles.blocks}>
+    <div className={rootClass}>
       {blocks.map((block) => {
         switch (block.type) {
           case "heading":

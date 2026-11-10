@@ -92,7 +92,8 @@ export default function Footer() {
             <span>Tous droits réservés.</span>
             <nav className="footer_legal__nEw18" aria-label="Informations légales">
               <a href="/mentions-legales">Mentions légales</a>
-              <a href="/confidentialite">Confidentialité</a>
+              <a href="/conditions-de-vente">Conditions de vente</a>
+              <a href="/confidentialite">Politique de confidentialité</a>
             </nav>
           </div>
           <p className="footer_disclaimer__nEw17">

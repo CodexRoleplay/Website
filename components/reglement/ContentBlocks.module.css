@@ -253,6 +253,47 @@
   margin-bottom: 0;
 }
 
+.blocksLegal {
+  font-family: var(--font-secondary), sans-serif;
+  font-size: 20px;
+  line-height: 1.75;
+}
+
+.blocksLegal .heading h2 {
+  color: #fff;
+  font-family: var(--font-primary), sans-serif;
+  font-size: clamp(30px, 4vw, 36px);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.blocksLegal .textBox .formatted,
+.blocksLegal .textBox .richHtml,
+.blocksLegal .textBox p,
+.blocksLegal .listItem,
+.blocksLegal .alert .formatted,
+.blocksLegal .alert .richHtml,
+.blocksLegal .quote,
+.blocksLegal .card li {
+  color: rgba(232, 236, 255, 0.9);
+  font-family: var(--font-secondary), sans-serif;
+  font-size: 20px;
+  line-height: 1.75;
+}
+
+@media (max-width: 700px) {
+  .blocksLegal,
+  .blocksLegal .textBox .formatted,
+  .blocksLegal .textBox p,
+  .blocksLegal .listItem,
+  .blocksLegal .alert .formatted,
+  .blocksLegal .quote,
+  .blocksLegal .card li {
+    font-size: 18px;
+  }
+}
+
 @media (max-width: 820px) {
   .cardsGrid {
     grid-template-columns: 1fr;

@@ -1,7 +1,7 @@
 .page {
   position: relative;
   min-height: 100vh;
-  overflow: clip;
+  overflow: visible;
   background: var(--body);
 }
 
@@ -310,7 +310,7 @@
   display: flex;
   min-height: 520px;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid rgba(178, 190, 255, 0.13);
   background: linear-gradient(145deg, rgba(15, 26, 62, 0.95), rgba(3, 10, 30, 0.94));
   box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
@@ -447,6 +447,44 @@
   line-height: 1.55;
 }
 
+.giftPanel label {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  color: #fff;
+  font-family: var(--font-secondary);
+}
+
+.giftPanel label input {
+  margin: 0;
+}
+
+.renewalWarning,
+.giftPanel .renewalWarning,
+.giftError {
+  padding: 12px 14px;
+  border: 1px solid rgba(254, 20, 190, 0.55);
+  background: rgba(254, 20, 190, 0.12);
+  color: #fff;
+}
+
+.detailPanel {
+  width: min(720px, 100%);
+}
+
+.detailBody {
+  max-height: min(60vh, 520px);
+  overflow: auto;
+  color: rgba(232, 236, 255, 0.92);
+  font-family: var(--font-secondary);
+  font-size: 16px;
+  line-height: 1.65;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  line-clamp: unset;
+  -webkit-line-clamp: unset;
+}
+
 .giftPanel input {
   display: block;
   box-sizing: border-box;
@@ -549,7 +587,8 @@
   text-align: center;
 }
 
-.productFooter button.giftLink {
+.productFooter button.giftLink,
+.gradeColumn .giftLink {
   width: auto;
   min-width: 0;
   min-height: 0;
@@ -573,7 +612,8 @@
   cursor: pointer;
 }
 
-.productFooter button.giftLink:hover:not(:disabled) {
+.productFooter button.giftLink:hover:not(:disabled),
+.gradeColumn .giftLink:hover:not(:disabled) {
   background: none;
   color: #ff5ad4;
   text-decoration: underline;
@@ -1094,10 +1134,11 @@
   font-size: 20px;
   font-weight: 400;
   letter-spacing: 0.02em;
-  line-height: 0.95;
+  line-height: 1.05;
   text-align: center;
   text-transform: uppercase;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  overflow-wrap: anywhere;
 }
 
 .productPrice {
@@ -1127,12 +1168,204 @@
   border: 1px solid #fe14be;
   color: #fe14be;
   font-family: var(--font-secondary);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   line-height: 1.35;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.priceNote {
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+  color: rgba(232, 236, 255, 0.92);
+  font-family: var(--font-secondary);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.4;
+  text-transform: none;
+  white-space: normal;
+}
+
+.gradeBoard {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 16px;
+}
+
+.cancelNote {
+  position: sticky;
+  top: 156px;
+  z-index: 6;
+  justify-self: end;
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-secondary);
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  text-align: right;
+}
+
+.termSwitch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.termSwitch button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid rgba(36, 182, 189, 0.5);
+  background: rgba(3, 10, 30, 0.8);
+  color: #fff;
+  font-family: var(--font-secondary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.termActive {
+  border-color: #fe14be;
+  background: rgba(254, 20, 190, 0.16);
+}
+
+.gradeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.gradeColumn {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px 18px 18px;
+  overflow: visible;
+  border: 1px solid rgba(36, 182, 189, 0.28);
+  background: linear-gradient(160deg, rgba(15, 26, 62, 0.96), rgba(3, 10, 30, 0.94));
+}
+
+.gradeBanner {
+  align-self: flex-start;
+  max-width: 100%;
+  padding: 8px 12px;
+  background: #fe14be;
+  color: #fff;
+  font-family: var(--font-primary);
+  font-size: 20px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.gradeColumn h3 {
+  margin: 0;
+  font-family: var(--font-primary);
+  font-size: clamp(32px, 3vw, 44px);
+  font-weight: 400;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.gradePrice {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.gradePrice strong {
+  color: #fe14be;
+  font-family: var(--font-primary);
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.gradePrice > span,
+.gradeMissing {
+  color: rgba(232, 236, 255, 0.9);
+  font-family: var(--font-secondary);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.perkList {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.perkList li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  color: rgba(232, 236, 255, 0.9);
+  font-family: var(--font-secondary);
+  line-height: 1.4;
+}
+
+.perkMark {
+  color: #24b6bd;
+  font-weight: 700;
+}
+
+.perkCross {
+  color: #fe14be;
+}
+
+.detailLink {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #24b6bd;
+  font-family: var(--font-secondary);
+  font-size: 14px;
+  text-align: left;
+  text-decoration: underline;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.gradeColumn .productActions > button:not(.giftLink):not(.detailLink) {
+  padding: 13px 16px;
+  border: 1px solid #24b6bd;
+  background: rgba(36, 182, 189, 0.08);
+  color: #24b6bd;
+  font-family: var(--font-secondary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.gradeColumn .productActions > button:disabled {
+  opacity: 0.45;
+  cursor: wait;
+}
+
+.cartItem small.renewalNote {
+  display: block;
+  max-width: 320px;
+  color: #fff;
+  letter-spacing: 0;
+  line-height: 1.45;
+  text-transform: none;
+}
+
+@media (max-width: 900px) {
+  .gradeGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cancelNote {
+    top: 96px;
+  }
 }
 
 .bonusSign {

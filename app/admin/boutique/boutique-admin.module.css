@@ -105,9 +105,9 @@
 
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(180px, 0.7fr) minmax(240px, 0.9fr);
+  grid-template-columns: minmax(200px, 0.7fr) minmax(0, 1.4fr);
   gap: 16px 20px;
-  align-items: center;
+  align-items: start;
   padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
@@ -224,6 +224,130 @@
   cursor: pointer;
 }
 
+.couponField,
+.copyFields label {
+  display: grid;
+  gap: 6px;
+}
+
+.couponField {
+  padding: 16px;
+  border: 1px solid rgba(36, 182, 189, 0.35);
+  border-radius: 8px;
+  background: rgba(36, 182, 189, 0.06);
+}
+
+.couponField span,
+.copyFields label span {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.82rem;
+}
+
+.couponField input,
+.copyFields input,
+.perkColumn select,
+.perkColumn input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.28);
+  color: #fff;
+  font: inherit;
+}
+
+.couponField small,
+.legacyHint {
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.45;
+}
+
+.legacyHint {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  margin: 0;
+}
+
+.legacyHint button,
+.perkActions button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.copyFields {
+  display: grid;
+  gap: 10px;
+}
+
+.perks {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid rgba(254, 20, 190, 0.28);
+  border-radius: 8px;
+  background: rgba(254, 20, 190, 0.05);
+}
+
+.perks h2 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.perks p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.68);
+  line-height: 1.5;
+}
+
+.perkColumns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.perkColumn {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.perkColumn h3 {
+  margin: 0;
+  font-family: var(--font-primary);
+  font-size: 1.4rem;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.perkColumn ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.perkColumn li {
+  display: grid;
+  gap: 6px;
+}
+
+.perkActions {
+  display: flex;
+  gap: 6px;
+}
+
 .empty {
   margin: 0;
   padding: 28px 8px;
@@ -235,7 +359,8 @@
     flex-direction: column;
   }
 
-  .row {
+  .row,
+  .perkColumns {
     grid-template-columns: 1fr;
   }
 }

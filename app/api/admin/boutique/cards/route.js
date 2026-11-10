@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { verifyAdminRequest } from "@/lib/firebase/admin";
 import { loadAdminBoutiqueCatalog } from "@/lib/boutique/admin-catalog";
 import { getBoutiqueSettings, setBoutiqueCardDisplay } from "@/lib/boutique/admin-persistence";
-import { buildAdminProductRows, validateCardDisplayInput } from "@/lib/boutique/card-display";
+import { buildAdminProductRows, sanitizeCouponCode, validateCardDisplayInput } from "@/lib/boutique/card-display";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,6 +14,7 @@ async function cardsResponse(settings) {
     enabled: settings.enabled === true,
     updatedAt: settings.updatedAt ?? null,
     cardDisplay: settings.cardDisplay,
+    firstMonthCoupon: settings.firstMonthCoupon ?? "",
     catalogError: catalog.catalogError,
     products: buildAdminProductRows(catalog.packages, settings.cardDisplay),
   };
@@ -57,7 +58,13 @@ export async function POST(request) {
       return NextResponse.json({ error: validated.error }, { status: 400 });
     }
 
-    const settings = await setBoutiqueCardDisplay(validated.value);
+    const coupon = sanitizeCouponCode(payload?.firstMonthCoupon ?? "");
+
+    if (coupon.error) {
+      return NextResponse.json({ error: coupon.error }, { status: 400 });
+    }
+
+    const settings = await setBoutiqueCardDisplay(validated.value, coupon.value);
     return NextResponse.json(await cardsResponse(settings));
   } catch (error) {
     console.error("[admin/boutique/cards POST]", error);

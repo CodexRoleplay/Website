@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifyAdminRequest } from "@/lib/firebase/admin";
-import { getLegalDocument, saveLegalDocument } from "@/lib/legal/admin-persistence";
+import { getLegalPages, saveLegalPage } from "@/lib/legal/pages-persistence";
+import { LEGAL_PAGE_KEYS } from "@/lib/legal/pages";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,8 +14,8 @@ export async function GET(request) {
       return NextResponse.json({ error: admin.error }, { status: admin.status });
     }
 
-    const stored = await getLegalDocument();
-    return NextResponse.json({ ...stored, source: "firestore" });
+    const pages = await getLegalPages();
+    return NextResponse.json({ pages, source: "firestore" });
   } catch (error) {
     console.error("[admin/legal GET]", error);
     return NextResponse.json({ error: error?.message ?? "Erreur serveur admin." }, { status: 500 });
@@ -37,15 +38,22 @@ export async function POST(request) {
       return NextResponse.json({ error: "Corps de requête invalide." }, { status: 400 });
     }
 
-    if (!payload?.document || typeof payload.document !== "object" || Array.isArray(payload.document)) {
+    if (!LEGAL_PAGE_KEYS.includes(payload?.page) || !Array.isArray(payload.blocks)) {
       return NextResponse.json({ error: "Format des pages légales invalide." }, { status: 400 });
     }
 
-    const result = await saveLegalDocument({
-      document: payload.document,
+    if (payload.title != null && typeof payload.title !== "string") {
+      return NextResponse.json({ error: "Le titre est invalide." }, { status: 400 });
+    }
+
+    const stored = await saveLegalPage({
+      page: payload.page,
+      title: payload.title,
+      blocks: payload.blocks,
       actor: { uid: admin.uid, email: admin.email },
     });
-    return NextResponse.json(result);
+
+    return NextResponse.json({ page: payload.page, ...stored });
   } catch (error) {
     console.error("[admin/legal POST]", error);
     return NextResponse.json({ error: error?.message ?? "Erreur serveur admin." }, { status: 500 });
