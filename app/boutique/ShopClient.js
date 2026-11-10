@@ -15,7 +15,7 @@ const TEBEX_LEGAL_LINKS = [
   { label: "Terms & Conditions", href: "https://checkout.tebex.io/terms" },
   { label: "Privacy Policy", href: "https://checkout.tebex.io/privacy" },
 ];
-const BASKET_STORAGE_KEY = "codex-rp-tebex-basket";
+const BASKET_STORAGE_KEY = "codex-rp-tebex-basket-v2";
 const FIVEM_STORAGE_KEY = "codex-rp-fivem-user";
 const FIVEM_REAUTH_KEY = "codex-rp-fivem-reauth";
 const PAYMENT_THANKS_KEY = "codex-rp-payment-thanks";
@@ -124,6 +124,36 @@ async function apiRequest(path, options) {
   }
 
   return payload;
+}
+
+async function createBasketFromBrowser(token) {
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const origin = window.location.origin;
+    const response = await fetch(`https://headless.tebex.io/api/accounts/${encodeURIComponent(token)}/baskets`, {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({
+        complete_url: `${origin}/boutique?payment=success`,
+        cancel_url: `${origin}/boutique?payment=cancelled`,
+        complete_auto_redirect: true,
+      }),
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const payload = await response.json().catch(() => null);
+    const nextBasket = payload?.data ?? payload;
+
+    return nextBasket?.ident ? nextBasket : null;
+  } catch {
+    return null;
+  }
 }
 
 function rememberShopReturn(pendingPackage) {
@@ -403,7 +433,7 @@ function Icon({ name }) {
   );
 }
 
-export default function ShopClient({ initialCategories, catalogError, cardDisplay = null }) {
+export default function ShopClient({ initialCategories, catalogError, cardDisplay = null, tebexToken = "" }) {
   const searchParams = useSearchParams();
   const targetedCategory = searchParams.get("categorie") ?? searchParams.get("category") ?? "";
   const categories = useMemo(
@@ -503,7 +533,8 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
   }
 
   async function createBasket() {
-    const nextBasket = await apiRequest("/api/tebex/baskets", { method: "POST" });
+    const directBasket = await createBasketFromBrowser(tebexToken);
+    const nextBasket = directBasket ?? (await apiRequest("/api/tebex/baskets", { method: "POST" }));
     return storeBasket(nextBasket);
   }
 

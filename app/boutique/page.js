@@ -75,7 +75,12 @@ export default async function ShopPage() {
               dans la fenêtre de paiement Tebex. Tu peux aussi offrir un pack à un ami.
             </p>
           </section>
-          <ShopClient cardDisplay={cardDisplay} catalogError={catalogError} initialCategories={categories} />
+          <ShopClient
+            cardDisplay={cardDisplay}
+            catalogError={catalogError}
+            initialCategories={categories}
+            tebexToken={process.env.TEBEX_PUBLIC_TOKEN ?? ""}
+          />
         </main>
         <Footer />
       </div>
