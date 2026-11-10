@@ -17,6 +17,8 @@ Le serveur met l'accent sur l'immersion, la cohérence roleplay, l'économie, le
 - [Code pénal](${absoluteUrl("/code-penal")}): infractions, sanctions et procédures judiciaires en jeu.
 - [FAQ](${absoluteUrl("/faq")}): réponses aux questions fréquentes sur le serveur.
 - [Lore actuel](${absoluteUrl("/lore")}): récit synthétisé de ce qui se passe en ce moment à Los Angeles.
+- [Mentions légales](${absoluteUrl("/mentions-legales")}): éditeur, hébergeur et paiement de la boutique.
+- [Confidentialité](${absoluteUrl("/confidentialite")}): données utilisées, durées de conservation et droits.
 
 ## Ressources d'exploration
 

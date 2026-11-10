@@ -9,6 +9,7 @@ import {
   ScrollText,
   CircleHelp,
   ExternalLink,
+  FileText,
   History,
   LayoutDashboard,
   LogOut,
@@ -181,6 +182,15 @@ export default function AdminShell({ children }) {
             <p className={styles.sidebarEmail}>{user.email}</p>
 
             <div className={styles.footerNav}>
+              <Link
+                className={pathname.startsWith("/admin/pages-legales") ? styles.footerNavActive : ""}
+                href="/admin/pages-legales"
+                title="Pages légales"
+              >
+                <span className={styles.navShort}><FileText aria-hidden="true" size={17} /></span>
+                <span className={styles.navLabel}>Pages légales</span>
+              </Link>
+
               <Link
                 className={pathname.startsWith("/admin/users") ? styles.footerNavActive : ""}
                 href="/admin/users"

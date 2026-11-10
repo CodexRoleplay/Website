@@ -297,6 +297,23 @@
     text-align: right
 }
 
+.footer_legal__nEw18 {
+    display: flex;
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+    gap: 8px 22px
+}
+
+.footer_legal__nEw18 a {
+    color: var(--text-secondary);
+    font-size: clamp(10px, .8vw, 12px);
+    text-decoration: none
+}
+
+.footer_legal__nEw18 a:hover {
+    color: var(--text-primary)
+}
+
 .footer_footer__pTLpy .footer_logo__mzArI {
     width: clamp(132px, 12vw, 190px);
     height: auto;

@@ -7,6 +7,8 @@ const routes = [
   { path: "/code-penal", priority: 0.7, changeFrequency: "monthly" },
   { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
   { path: "/lore", priority: 0.7, changeFrequency: "weekly" },
+  { path: "/mentions-legales", priority: 0.3, changeFrequency: "yearly" },
+  { path: "/confidentialite", priority: 0.3, changeFrequency: "yearly" },
 ];
 
 export default function sitemap() {

@@ -1,0 +1,137 @@
+.editor {
+  display: grid;
+  gap: 18px;
+  max-width: 980px;
+}
+
+.status,
+.meta,
+.section p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.68);
+  line-height: 1.6;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.toolbarActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.toolbarActions a,
+.toolbarActions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid rgba(36, 182, 189, 0.4);
+  border-radius: 12px;
+  background: rgba(36, 182, 189, 0.12);
+  color: #d9fbff;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.toolbarActions button {
+  border-color: rgba(254, 20, 190, 0.45);
+  background: rgba(254, 20, 190, 0.16);
+}
+
+.toolbarActions button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.missing,
+.ready,
+.success {
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+.missing {
+  color: #ffc857;
+}
+
+.ready,
+.success {
+  color: #7dffb0;
+}
+
+.section {
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.section h2 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.grid label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.grid span {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.92rem;
+}
+
+.grid small {
+  color: rgba(255, 255, 255, 0.48);
+  line-height: 1.4;
+}
+
+.grid input,
+.grid textarea {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+  font: inherit;
+}
+
+.grid textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+@media (max-width: 760px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

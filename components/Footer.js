@@ -94,6 +94,10 @@ export default function Footer() {
           <p className="footer_disclaimer__nEw17">
             Codex RP n&apos;est ni approuvé ni sponsorisé par Rockstar Games.
           </p>
+          <nav className="footer_legal__nEw18" aria-label="Informations légales">
+            <a href="/mentions-legales">Mentions légales</a>
+            <a href="/confidentialite">Confidentialité</a>
+          </nav>
         </div>
       </div>
     </footer>
