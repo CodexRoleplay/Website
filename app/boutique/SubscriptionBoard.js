@@ -127,6 +127,41 @@ function GradeMedia({ src, banner, termLabel, title }) {
   );
 }
 
+export function SubscriptionPerkTable({ perks }) {
+  const perkRows = visiblePerkRows(perks);
+
+  if (!perkRows.length) {
+    return null;
+  }
+
+  return (
+    <table className={styles.perkCompare}>
+      <caption>Avantages selon le grade</caption>
+      <thead>
+        <tr>
+          <th scope="col">Avantage</th>
+          {SUBSCRIPTION_GRADES.map((grade) => (
+            <th key={grade.key} scope="col">{grade.label}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {perkRows.map((row) => (
+          <tr key={row.id}>
+            <th scope="row">{row.label}</th>
+            {SUBSCRIPTION_GRADES.map((grade) => (
+              <td key={grade.key}>
+                <span className={styles.perkCellLabel}>{grade.label}</span>
+                <PerkValue cell={row[grade.key]} />
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
 function PerkValue({ cell }) {
   if (cell?.kind === "check") {
     return (
@@ -160,8 +195,6 @@ export default function SubscriptionBoard({
   onGift,
   onDetail,
 }) {
-  const perkRows = visiblePerkRows(perks);
-
   return (
     <div className={styles.gradeBoard}>
       <p className={styles.cancelNote}>*Annulable à tout moment</p>
@@ -237,32 +270,7 @@ export default function SubscriptionBoard({
           );
         })}
       </div>
-      {perkRows.length ? (
-        <table className={styles.perkCompare}>
-          <caption>Avantages selon le grade</caption>
-          <thead>
-            <tr>
-              <th scope="col">Avantage</th>
-              {SUBSCRIPTION_GRADES.map((grade) => (
-                <th key={grade.key} scope="col">{grade.label}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {perkRows.map((row) => (
-              <tr key={row.id}>
-                <th scope="row">{row.label}</th>
-                {SUBSCRIPTION_GRADES.map((grade) => (
-                  <td key={grade.key}>
-                    <span className={styles.perkCellLabel}>{grade.label}</span>
-                    <PerkValue cell={row[grade.key]} />
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : null}
+      <SubscriptionPerkTable perks={perks} />
     </div>
   );
 }

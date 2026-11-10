@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { readApiJson } from "@/lib/admin/read-api-json";
 import { MAX_PERKS } from "@/lib/boutique/card-display";
 import { SUBSCRIPTION_GRADES } from "@/lib/boutique/subscriptions";
+import { SubscriptionPerkTable } from "@/app/boutique/SubscriptionBoard";
 import styles from "../boutique-admin.module.css";
 
 function formatDate(value) {
@@ -292,6 +293,18 @@ export default function BoutiqueSubscriptionsClient() {
         <button className={`${styles.removeButton} ${styles.addPerk}`} disabled={loading || !loaded || perks.length >= MAX_PERKS} onClick={addPerk} type="button">
           Ajouter une ligne
         </button>
+      </section>
+
+      <section aria-label="Aperçu sur la boutique" className={styles.preview}>
+        <div>
+          <h2>Aperçu sur la boutique</h2>
+          <p>Le tableau se met à jour pendant la saisie. Une ligne sans libellé reste masquée, comme sur le site.</p>
+        </div>
+        {perks.some((row) => String(row.label ?? "").trim()) ? (
+          <SubscriptionPerkTable perks={perks} />
+        ) : (
+          <p>Aucune ligne visible pour le moment.</p>
+        )}
       </section>
     </div>
   );

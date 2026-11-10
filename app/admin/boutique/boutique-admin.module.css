@@ -237,6 +237,8 @@
 }
 
 .couponField {
+  min-width: 0;
+  max-width: 100%;
   padding: 16px;
   border: 1px solid rgba(36, 182, 189, 0.35);
   border-radius: 8px;
@@ -253,7 +255,10 @@
 .copyFields input,
 .perkLabel input,
 .perkGrade input {
+  box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 42px;
   padding: 0 12px;
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -264,7 +269,10 @@
 }
 
 .perkGrade select {
+  box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 42px;
   padding: 0 12px;
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -318,13 +326,34 @@
   gap: 10px;
 }
 
-.perks {
+.perks,
+.preview {
   display: grid;
   gap: 16px;
+  min-width: 0;
+  max-width: 100%;
   padding: 18px;
   border: 1px solid rgba(254, 20, 190, 0.28);
   border-radius: 8px;
   background: rgba(254, 20, 190, 0.05);
+}
+
+.preview {
+  border-color: rgba(36, 182, 189, 0.35);
+  background: rgba(3, 10, 30, 0.72);
+  overflow-x: auto;
+}
+
+.preview h2 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.preview p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.68);
+  line-height: 1.5;
 }
 
 .perks h2 {
@@ -342,6 +371,8 @@
 .perkRows {
   display: grid;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -350,7 +381,10 @@
 .perkRow {
   display: grid;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
   padding: 14px;
+  overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.22);
@@ -374,10 +408,14 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .perkGrade {
+  min-width: 0;
   padding: 10px;
+  overflow: hidden;
   border: 1px solid rgba(36, 182, 189, 0.35);
   border-radius: 8px;
   background: rgba(36, 182, 189, 0.06);
