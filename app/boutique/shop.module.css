@@ -445,7 +445,7 @@
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
 }
 
-.giftPanel > span {
+.giftKicker {
   color: #24b6bd;
   font-family: var(--font-secondary);
   font-size: 12px;
@@ -456,16 +456,22 @@
 }
 
 .giftPanel h2 {
-  margin: 10px 0 0;
+  margin: 8px 0 12px;
   max-width: 100%;
   min-width: 0;
+  font-size: clamp(28px, 8vw, 36px);
+  line-height: 0.95;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.giftPanel h2.giftTitle {
+  margin: 10px 0 0;
   font-family: var(--font-primary);
   font-size: clamp(24px, 5vw, 32px);
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: 0.02em;
-  overflow-wrap: anywhere;
-  text-transform: uppercase;
 }
 
 .giftPanel p {
@@ -521,7 +527,6 @@
 }
 
 .detailBody {
-  margin-top: 16px;
   max-height: min(60vh, 520px);
   overflow: auto;
   color: rgba(232, 236, 255, 0.92);
@@ -564,6 +569,9 @@
   gap: 12px 16px;
   max-width: 100%;
   min-width: 0;
+}
+
+form.giftPanel .giftActions {
   margin-top: 22px;
 }
 
@@ -1163,6 +1171,10 @@
   }
 
   .giftPanel h2 {
+    font-size: clamp(26px, 8vw, 36px);
+  }
+
+  .giftPanel h2.giftTitle {
     font-size: clamp(22px, 7vw, 28px);
   }
 
@@ -1174,6 +1186,20 @@
   .giftActions .checkoutButton {
     flex: 1 1 140px;
     width: auto;
+  }
+
+  form.giftPanel .giftActions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  form.giftPanel .giftActions button,
+  form.giftPanel .giftActions .checkoutButton {
+    flex: 0 0 auto;
+    width: 100%;
+    white-space: normal;
+    text-align: center;
   }
 
   .shopDock {
@@ -1446,25 +1472,67 @@
   line-height: 1.45;
 }
 
-.perkList {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.perkCompare {
+  position: relative;
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid rgba(36, 182, 189, 0.28);
+  background: linear-gradient(160deg, rgba(15, 26, 62, 0.96), rgba(3, 10, 30, 0.94));
 }
 
-.perkList li {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  color: rgba(232, 236, 255, 0.9);
+.perkCompare caption {
+  margin: 0 0 10px;
+  caption-side: top;
+  color: #fff;
+  font-family: var(--font-primary);
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.perkCompare th,
+.perkCompare td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(232, 236, 255, 0.94);
   font-family: var(--font-secondary);
-  line-height: 1.4;
+  font-size: 15px;
+  line-height: 1.45;
+  text-align: center;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.perkCompare thead th {
+  color: #fff;
+  font-family: var(--font-primary);
+  font-size: 1.05rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.perkCompare tbody th {
+  width: 34%;
+  color: #fff;
+  font-weight: 600;
+  text-align: left;
+}
+
+.perkCompare tbody tr:last-child th,
+.perkCompare tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.perkCellLabel {
+  display: none;
 }
 
 .perkMark {
   color: #24b6bd;
+  font-size: 1.2rem;
   font-weight: 700;
 }
 
@@ -1513,6 +1581,52 @@
 
   .cancelNote {
     top: 96px;
+  }
+
+  .perkCompare thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .perkCompare,
+  .perkCompare caption,
+  .perkCompare tbody,
+  .perkCompare tr,
+  .perkCompare td,
+  .perkCompare tbody th {
+    display: block;
+    width: auto;
+  }
+
+  .perkCompare tr {
+    padding: 14px 16px 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .perkCompare tbody th,
+  .perkCompare td {
+    padding: 6px 0;
+    border: 0;
+    text-align: left;
+  }
+
+  .perkCompare td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .perkCellLabel {
+    display: inline;
+    color: rgba(232, 236, 255, 0.66);
   }
 }
 

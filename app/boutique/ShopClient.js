@@ -1118,8 +1118,8 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
             <div className={styles.giftModal}>
               <button aria-label="Fermer" className={styles.giftBackdrop} onClick={() => setGiftProduct(null)} type="button" />
               <form className={styles.giftPanel} onSubmit={submitGift}>
-                <span>Cadeau</span>
-                <h2>Offrir {giftProduct.name}</h2>
+                <span className={styles.giftKicker}>Cadeau</span>
+                <h2 className={styles.giftTitle}>Offrir {giftProduct.name}</h2>
                 <p>Pseudo du joueur à qui offrir.</p>
                 {discordAccount ? null : (
                   <p className={styles.giftNote}>

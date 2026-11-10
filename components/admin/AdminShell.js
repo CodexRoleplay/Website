@@ -18,6 +18,7 @@ import {
   PanelLeftOpen,
   Scale,
   Store,
+  Ticket,
   Users,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,7 +29,13 @@ const NAV_GROUPS = [
     { href: "/admin", label: "Tableau de bord", icon: LayoutDashboard, match: (path) => path === "/admin" },
   ],
   [
-    { href: "/admin/boutique", label: "Cartes boutique", icon: Store, match: (path) => path.startsWith("/admin/boutique") },
+    { href: "/admin/boutique", label: "Cartes", icon: Store, match: (path) => path === "/admin/boutique" },
+    {
+      href: "/admin/boutique/abonnements",
+      label: "Abonnements",
+      icon: Ticket,
+      match: (path) => path.startsWith("/admin/boutique/abonnements"),
+    },
   ],
   [
     { href: "/admin/reglement", label: "Règlement", icon: BookOpen, match: (path) => path === "/admin/reglement" },

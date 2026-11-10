@@ -3,8 +3,7 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { readApiJson } from "@/lib/admin/read-api-json";
-import { cardCategoryKey, emptySubscriptionPerks, formatBonusLabel } from "@/lib/boutique/card-display";
-import { SUBSCRIPTION_GRADES } from "@/lib/boutique/subscriptions";
+import { cardCategoryKey, formatBonusLabel } from "@/lib/boutique/card-display";
 import styles from "./boutique-admin.module.css";
 
 function formatDate(value) {
@@ -33,7 +32,7 @@ function formatPrice(value, currency) {
   }
 }
 
-function cardsPayload(rows, perks) {
+function cardsPayload(rows) {
   return {
     featuredProducts: rows
       .filter((row) => row.bannerText.trim())
@@ -63,21 +62,12 @@ function cardsPayload(rows, perks) {
         packageIdent: row.packageIdent,
         text: row.priceNote.trim(),
       })),
-    subscriptionPerks: perks,
   };
-}
-
-function newPerk() {
-  const id = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID().slice(0, 8) : String(Date.now());
-
-  return { id: `ligne-${id}`, kind: "check", text: "" };
 }
 
 export default function BoutiqueCardsClient() {
   const { user, getIdToken, loading: authLoading } = useAuth();
   const [rows, setRows] = useState([]);
-  const [perks, setPerks] = useState(emptySubscriptionPerks);
-  const [coupon, setCoupon] = useState("");
   const [catalogError, setCatalogError] = useState("");
   const [updatedAt, setUpdatedAt] = useState(null);
   const [loaded, setLoaded] = useState(false);
@@ -88,11 +78,6 @@ export default function BoutiqueCardsClient() {
 
   const applyPayload = useCallback((payload) => {
     setRows(Array.isArray(payload.products) ? payload.products : []);
-    setPerks({
-      ...emptySubscriptionPerks(),
-      ...(payload.cardDisplay?.subscriptionPerks ?? {}),
-    });
-    setCoupon(typeof payload.firstMonthCoupon === "string" ? payload.firstMonthCoupon : "");
     setCatalogError(typeof payload.catalogError === "string" ? payload.catalogError : "");
     setUpdatedAt(payload.updatedAt ?? null);
   }, []);
@@ -145,55 +130,7 @@ export default function BoutiqueCardsClient() {
     setMessage("");
   }
 
-  function updatePerk(grade, index, partial) {
-    setPerks((current) => ({
-      ...current,
-      [grade]: current[grade].map((row, rowIndex) => (rowIndex === index ? { ...row, ...partial } : row)),
-    }));
-    setMessage("");
-  }
-
-  function movePerk(grade, index, direction) {
-    setPerks((current) => {
-      const nextIndex = index + direction;
-      const rowsForGrade = [...(current[grade] ?? [])];
-
-      if (nextIndex < 0 || nextIndex >= rowsForGrade.length) {
-        return current;
-      }
-
-      const [item] = rowsForGrade.splice(index, 1);
-      rowsForGrade.splice(nextIndex, 0, item);
-      return { ...current, [grade]: rowsForGrade };
-    });
-    setMessage("");
-  }
-
-  function addPerk(grade) {
-    setPerks((current) => ({
-      ...current,
-      [grade]: [...(current[grade] ?? []), newPerk()],
-    }));
-    setMessage("");
-  }
-
-  function removePerk(grade, index) {
-    setPerks((current) => ({
-      ...current,
-      [grade]: current[grade].filter((_, rowIndex) => rowIndex !== index),
-    }));
-    setMessage("");
-  }
-
   async function saveCards() {
-    const emptyPerk = SUBSCRIPTION_GRADES.map((grade) => perks[grade.key] ?? []).flat().find((row) => !row.text.trim());
-
-    if (emptyPerk) {
-      setError("Chaque ligne d’avantage doit avoir un texte.");
-      setMessage("");
-      return;
-    }
-
     setSaving(true);
     setError("");
     setMessage("");
@@ -212,8 +149,8 @@ export default function BoutiqueCardsClient() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          cards: cardsPayload(rows, perks),
-          firstMonthCoupon: coupon.trim(),
+          scope: "cards",
+          cards: cardsPayload(rows),
         }),
       });
       const payload = await readApiJson(response);
@@ -238,7 +175,6 @@ export default function BoutiqueCardsClient() {
           <h2>Produits Tebex</h2>
           <div className={styles.help}>
             <p>Bandeau, badge et texte sous le prix sont libres. Tu peux les poser sur autant de produits que tu veux. Un champ vide n’affiche rien.</p>
-            <p>Le code promo du premier mois reste sur le serveur. Il n’est pas calculé dans le petit texte : écris « 7,49 € le 1er mois » toi-même si tu veux l’afficher.</p>
             {updatedAt ? <p>Dernier enregistrement : {formatDate(updatedAt)}.</p> : null}
           </div>
         </div>
@@ -246,21 +182,6 @@ export default function BoutiqueCardsClient() {
           {saving ? "Enregistrement…" : "Enregistrer"}
         </button>
       </div>
-
-      <label className={styles.couponField}>
-        <span>Code promo 1er mois</span>
-        <input
-          autoComplete="off"
-          maxLength={64}
-          onChange={(event) => {
-            setCoupon(event.target.value);
-            setMessage("");
-          }}
-          spellCheck={false}
-          value={coupon}
-        />
-        <small>Laisser vide pour n’appliquer aucun code. Utilisé seulement quand un abonnement mensuel est ajouté au panier.</small>
-      </label>
 
       {catalogError ? <p className={styles.notice}>{catalogError}</p> : null}
       {error ? <p className={styles.error}>{error}</p> : null}
@@ -346,56 +267,6 @@ export default function BoutiqueCardsClient() {
           })}
         </ul>
       ) : null}
-
-      <section className={styles.perks}>
-        <div>
-          <h2>Avantages du tableau</h2>
-          <p>Une liste par grade, la même pour Mensuel, 3 mois et 12 mois. Coche, croix, ou texte libre comme « 35 props » ou « Bientôt ».</p>
-        </div>
-        <div className={styles.perkColumns}>
-          {SUBSCRIPTION_GRADES.map((grade) => (
-            <div className={styles.perkColumn} key={grade.key}>
-              <h3>{grade.label}</h3>
-              <ul>
-                {(perks[grade.key] ?? []).map((perk, index) => (
-                  <li key={perk.id}>
-                    <select
-                      aria-label={`Type de ligne ${index + 1} pour ${grade.label}`}
-                      onChange={(event) => updatePerk(grade.key, index, { kind: event.target.value })}
-                      value={perk.kind}
-                    >
-                      <option value="check">Coche</option>
-                      <option value="cross">Croix</option>
-                      <option value="text">Texte</option>
-                    </select>
-                    <input
-                      aria-label={`Texte de la ligne ${index + 1} pour ${grade.label}`}
-                      maxLength={160}
-                      onChange={(event) => updatePerk(grade.key, index, { text: event.target.value })}
-                      value={perk.text}
-                    />
-                    <div className={styles.perkActions}>
-                      <button aria-label="Monter" disabled={index === 0} onClick={() => movePerk(grade.key, index, -1)} type="button">↑</button>
-                      <button
-                        aria-label="Descendre"
-                        disabled={index === perks[grade.key].length - 1}
-                        onClick={() => movePerk(grade.key, index, 1)}
-                        type="button"
-                      >
-                        ↓
-                      </button>
-                      <button aria-label="Supprimer" onClick={() => removePerk(grade.key, index)} type="button">×</button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <button className={styles.removeButton} onClick={() => addPerk(grade.key)} type="button">
-                Ajouter une ligne
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }

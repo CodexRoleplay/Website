@@ -76,30 +76,33 @@ export function GiftMark() {
   );
 }
 
-function PerkLine({ perk }) {
-  if (perk.kind === "check") {
+function visiblePerkRows(perks) {
+  if (!Array.isArray(perks)) {
+    return [];
+  }
+
+  return perks.filter((row) => String(row?.label ?? "").trim());
+}
+
+function PerkValue({ cell }) {
+  if (cell?.kind === "check") {
     return (
-      <li>
-        <span aria-hidden="true" className={styles.perkMark}>✓</span>
-        <span>{perk.text}</span>
-      </li>
+      <span aria-label="Inclus" className={styles.perkMark} role="img">
+        ✓
+      </span>
     );
   }
 
-  if (perk.kind === "cross") {
+  if (cell?.kind === "cross") {
     return (
-      <li>
-        <span aria-hidden="true" className={`${styles.perkMark} ${styles.perkCross}`}>✗</span>
-        <span>{perk.text}</span>
-      </li>
+      <span aria-label="Non inclus" className={`${styles.perkMark} ${styles.perkCross}`} role="img">
+        ✗
+      </span>
     );
   }
 
-  return (
-    <li>
-      <span>{perk.text}</span>
-    </li>
-  );
+  const text = String(cell?.text ?? "").trim();
+  return text ? <span>{text}</span> : null;
 }
 
 export default function SubscriptionBoard({
@@ -114,6 +117,8 @@ export default function SubscriptionBoard({
   onGift,
   onDetail,
 }) {
+  const perkRows = visiblePerkRows(perks);
+
   return (
     <div className={styles.gradeBoard}>
       <p className={styles.cancelNote}>*Annulable à tout moment</p>
@@ -142,8 +147,6 @@ export default function SubscriptionBoard({
           const total = product ? Number(product.base_price ?? product.total_price ?? 0) : 0;
           const currency = product?.currency || "EUR";
           const caption = subscriptionTotalCaption(offer.months);
-          const lines = Array.isArray(perks?.[grade.key]) ? perks[grade.key] : [];
-
           const termLabel = SUBSCRIPTION_TERMS.find((item) => item.key === term)?.label ?? "";
 
           return (
@@ -163,13 +166,6 @@ export default function SubscriptionBoard({
               ) : (
                 <p className={styles.gradeMissing}>Cette durée n’est pas en ligne.</p>
               )}
-              {lines.length ? (
-                <ul className={styles.perkList}>
-                  {lines.map((perk) => (
-                    <PerkLine key={perk.id} perk={perk} />
-                  ))}
-                </ul>
-              ) : null}
               {product ? (
                 <div className={styles.productActions}>
                   <button className={styles.addButton} disabled={isBusy} onClick={() => onSubscribe(product)} type="button">
@@ -188,6 +184,32 @@ export default function SubscriptionBoard({
           );
         })}
       </div>
+      {perkRows.length ? (
+        <table className={styles.perkCompare}>
+          <caption>Avantages selon le grade</caption>
+          <thead>
+            <tr>
+              <th scope="col">Avantage</th>
+              {SUBSCRIPTION_GRADES.map((grade) => (
+                <th key={grade.key} scope="col">{grade.label}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {perkRows.map((row) => (
+              <tr key={row.id}>
+                <th scope="row">{row.label}</th>
+                {SUBSCRIPTION_GRADES.map((grade) => (
+                  <td key={grade.key}>
+                    <span className={styles.perkCellLabel}>{grade.label}</span>
+                    <PerkValue cell={row[grade.key]} />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : null}
     </div>
   );
 }

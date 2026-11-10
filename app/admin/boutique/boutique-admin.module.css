@@ -57,7 +57,13 @@
 .saveButton:focus-visible,
 .check input:focus-visible,
 .percent input:focus-visible,
-.removeButton:focus-visible {
+.removeButton:focus-visible,
+.couponField input:focus-visible,
+.perkLabel input:focus-visible,
+.perkGrade select:focus-visible,
+.perkGrade input:focus-visible,
+.perkActions button:focus-visible,
+.addPerk:focus-visible {
   outline: 2px solid #24b6bd;
   outline-offset: 2px;
 }
@@ -245,8 +251,9 @@
 
 .couponField input,
 .copyFields input,
-.perkColumn select,
-.perkColumn input {
+.perkLabel input,
+.perkGrade select,
+.perkGrade input {
   width: 100%;
   min-height: 42px;
   padding: 0 12px;
@@ -309,43 +316,82 @@
   line-height: 1.5;
 }
 
-.perkColumns {
+.perkRows {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.perkColumn {
-  display: grid;
-  align-content: start;
-  gap: 10px;
-  min-width: 0;
-}
-
-.perkColumn h3 {
-  margin: 0;
-  font-family: var(--font-primary);
-  font-size: 1.4rem;
-  font-weight: 400;
-  text-transform: uppercase;
-}
-
-.perkColumn ul {
-  display: grid;
-  gap: 8px;
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.perkColumn li {
+.perkRow {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.perkRowHead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.perkLabel,
+.perkGrade {
   display: grid;
   gap: 6px;
+  min-width: 0;
+}
+
+.perkGrades {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.perkGrade {
+  padding: 10px;
+  border: 1px solid rgba(36, 182, 189, 0.35);
+  border-radius: 8px;
+  background: rgba(36, 182, 189, 0.06);
+}
+
+.perkLabel span,
+.perkGrade > span {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.perkKindHint {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .perkActions {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
+}
+
+.perkActions button {
+  min-height: 42px;
+}
+
+.perkActions button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.addPerk {
+  justify-self: start;
 }
 
 .empty {
@@ -359,8 +405,14 @@
     flex-direction: column;
   }
 
-  .row,
-  .perkColumns {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .perkRowHead,
+  .perkGrades {
     grid-template-columns: 1fr;
   }
 }

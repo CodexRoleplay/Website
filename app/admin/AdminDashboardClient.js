@@ -259,9 +259,14 @@ export default function AdminDashboardClient({ initialReglement, initialCodePena
               ? "Les joueurs accèdent au catalogue."
               : "Un clic sur Boutique affiche seulement l’annonce « bientôt disponible »."}
           </p>
-          <Link className={styles.shopCardsLink} href="/admin/boutique">
-            Gérer les cartes produits
-          </Link>
+          <div className={styles.shopCardLinks}>
+            <Link className={styles.shopCardsLink} href="/admin/boutique">
+              Gérer les cartes produits
+            </Link>
+            <Link className={styles.shopCardsLink} href="/admin/boutique/abonnements">
+              Avantages des abonnements
+            </Link>
+          </div>
         </div>
         <div className={styles.shopSwitchControl} role="group" aria-label="Activer la boutique">
           <button

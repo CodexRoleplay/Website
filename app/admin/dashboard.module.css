@@ -91,11 +91,17 @@
   color: rgba(255, 255, 255, 0.62);
 }
 
+.shopCardLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin-top: 4px;
+}
+
 .shopCardsLink {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  margin-top: 4px;
   color: #fe14be;
   font-weight: 700;
   text-decoration: none;
