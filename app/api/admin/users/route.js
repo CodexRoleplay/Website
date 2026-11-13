@@ -17,7 +17,7 @@ function mapAuthError(error) {
   }
 
   if (code === "auth/weak-password") {
-    return "Mot de passe trop faible (minimum 6 caractères Firebase).";
+    return "Le mot de passe doit contenir au moins 8 caractères.";
   }
 
   return error?.message ?? "Impossible de créer l'utilisateur.";
@@ -80,12 +80,16 @@ export async function POST(request) {
 
     return NextResponse.json({ user });
   } catch (error) {
-    console.error("[admin/users POST]", error);
+    console.error("[admin/users POST]", error?.code ?? "erreur");
+
+    if (error?.expose) {
+      return NextResponse.json({ error: error.message }, { status: error.status ?? 500 });
+    }
 
     if (error?.code?.startsWith?.("auth/")) {
       return NextResponse.json({ error: mapAuthError(error) }, { status: 400 });
     }
 
-    return jsonError(error?.message ?? "Erreur serveur admin.");
+    return jsonError("Erreur serveur admin.");
   }
 }
