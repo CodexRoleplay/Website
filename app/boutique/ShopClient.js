@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import Script from "next/script";
 import { useSearchParams } from "next/navigation";
 import { asPackageId, resolveCardHighlights } from "@/lib/boutique/card-display";
-import { SUBSCRIPTION_TERMS, buildSubscriptionBoard, isMonthlySubscriptionPackage, isSubscriptionCategory, subscriptionGradeFromName, subscriptionTermFromName } from "@/lib/boutique/subscriptions";
+import { SUBSCRIPTION_TERMS, buildSubscriptionBoard, isMonthlySubscriptionPackage, isSubscriptionCategory, orderedSubscriptionGrades, subscriptionGradeFromName, subscriptionTermFromName } from "@/lib/boutique/subscriptions";
 import { normalizeShopSlug as normalizeSlug } from "@/lib/boutique/shop-links";
 import styles from "./shop.module.css";
 import SubscriptionBoard, { BonusPill, GiftMark } from "./SubscriptionBoard";
@@ -1072,6 +1072,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
             onGift={openGift}
             onSubscribe={(product) => addProduct(product)}
             onTerm={setSubscriptionTerm}
+            grades={orderedSubscriptionGrades(cardHighlights.subscriptionGradeOrder)}
             perks={cardHighlights.subscriptionPerks}
             signedIn={Boolean(basket?.username)}
             slots={subscriptionView.slots}

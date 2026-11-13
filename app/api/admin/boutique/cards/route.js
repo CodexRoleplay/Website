@@ -74,6 +74,7 @@ export async function POST(request) {
           {
             ...existing.cardDisplay,
             subscriptionPerks: perkResult.subscriptionPerks,
+            subscriptionGradeOrder: perkResult.subscriptionGradeOrder,
           },
           coupon.value,
         );
@@ -83,6 +84,7 @@ export async function POST(request) {
       const validatedCards = validateCardDisplayInput({
         ...(payload?.cards ?? {}),
         subscriptionPerks: existing.cardDisplay.subscriptionPerks,
+        subscriptionGradeOrder: existing.cardDisplay.subscriptionGradeOrder,
       });
 
       if (validatedCards.error) {

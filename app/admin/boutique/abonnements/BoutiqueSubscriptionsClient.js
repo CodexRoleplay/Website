@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { readApiJson } from "@/lib/admin/read-api-json";
 import { MAX_PERKS } from "@/lib/boutique/card-display";
-import { SUBSCRIPTION_GRADES } from "@/lib/boutique/subscriptions";
+import { orderedSubscriptionGrades } from "@/lib/boutique/subscriptions";
 import { SubscriptionPerkTable } from "@/app/boutique/SubscriptionBoard";
 import styles from "../boutique-admin.module.css";
 
@@ -50,6 +50,7 @@ function perkCell(row, grade) {
 export default function BoutiqueSubscriptionsClient() {
   const { user, getIdToken, loading: authLoading } = useAuth();
   const [perks, setPerks] = useState([]);
+  const [gradeOrder, setGradeOrder] = useState(() => orderedSubscriptionGrades().map((grade) => grade.key));
   const [coupon, setCoupon] = useState("");
   const [updatedAt, setUpdatedAt] = useState(null);
   const [loaded, setLoaded] = useState(false);
@@ -59,10 +60,14 @@ export default function BoutiqueSubscriptionsClient() {
   const [error, setError] = useState("");
   const [dragIndex, setDragIndex] = useState(null);
   const [overIndex, setOverIndex] = useState(null);
+  const [gradeDragIndex, setGradeDragIndex] = useState(null);
+  const [gradeOverIndex, setGradeOverIndex] = useState(null);
+  const grades = orderedSubscriptionGrades(gradeOrder);
 
   const applyPayload = useCallback((payload) => {
     const nextPerks = payload.cardDisplay?.subscriptionPerks;
     setPerks(Array.isArray(nextPerks) ? nextPerks : []);
+    setGradeOrder(orderedSubscriptionGrades(payload.cardDisplay?.subscriptionGradeOrder).map((grade) => grade.key));
     setCoupon(typeof payload.firstMonthCoupon === "string" ? payload.firstMonthCoupon : "");
     setUpdatedAt(payload.updatedAt ?? null);
   }, []);
@@ -124,6 +129,22 @@ export default function BoutiqueSubscriptionsClient() {
     setMessage("");
   }
 
+  function moveGrade(fromIndex, toIndex) {
+    setGradeOrder((current) => {
+      const keys = orderedSubscriptionGrades(current).map((grade) => grade.key);
+
+      if (fromIndex === toIndex || fromIndex == null || toIndex == null || fromIndex < 0 || toIndex < 0 || fromIndex >= keys.length || toIndex >= keys.length) {
+        return keys;
+      }
+
+      const next = [...keys];
+      const [item] = next.splice(fromIndex, 1);
+      next.splice(toIndex, 0, item);
+      return next;
+    });
+    setMessage("");
+  }
+
   function movePerk(fromIndex, toIndex) {
     setPerks((current) => {
       if (fromIndex === toIndex || fromIndex == null || toIndex == null || fromIndex < 0 || toIndex < 0 || fromIndex >= current.length || toIndex >= current.length) {
@@ -168,7 +189,10 @@ export default function BoutiqueSubscriptionsClient() {
         },
         body: JSON.stringify({
           scope: "subscriptions",
-          cards: { subscriptionPerks: perks },
+          cards: {
+            subscriptionPerks: perks,
+            subscriptionGradeOrder: grades.map((grade) => grade.key),
+          },
           firstMonthCoupon: coupon.trim(),
         }),
       });
@@ -219,6 +243,58 @@ export default function BoutiqueSubscriptionsClient() {
       {error ? <p className={styles.error}>{error}</p> : null}
       {message ? <p className={styles.success} role="status">{message}</p> : null}
       {loading ? <p className={styles.empty}>Chargement des avantages…</p> : null}
+
+      <section aria-label="Ordre des abonnements" className={styles.gradeOrder}>
+        <h2>Ordre des abonnements</h2>
+        <ul className={styles.gradeOrderList}>
+          {grades.map((grade, index) => (
+            <li
+              className={`${styles.gradeOrderItem} ${gradeDragIndex === index ? styles.perkRowDragging : ""} ${gradeOverIndex === index && gradeDragIndex !== index ? styles.perkRowOver : ""}`}
+              key={grade.key}
+              onDragOver={(event) => {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+                setGradeOverIndex(index);
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                moveGrade(gradeDragIndex, index);
+                setGradeDragIndex(null);
+                setGradeOverIndex(null);
+              }}
+            >
+              <button
+                aria-label={`Déplacer ${grade.label}. Flèches haut et bas pour changer la position.`}
+                className={styles.perkDrag}
+                draggable
+                onDragEnd={() => {
+                  setGradeDragIndex(null);
+                  setGradeOverIndex(null);
+                }}
+                onDragStart={(event) => {
+                  setGradeDragIndex(index);
+                  event.dataTransfer.effectAllowed = "move";
+                  event.dataTransfer.setData("text/plain", grade.key);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
+                    event.preventDefault();
+                    moveGrade(index, index - 1);
+                  }
+                  if (event.key === "ArrowDown" || event.key === "ArrowRight") {
+                    event.preventDefault();
+                    moveGrade(index, index + 1);
+                  }
+                }}
+                type="button"
+              >
+                ⋮⋮
+              </button>
+              <strong>{grade.label}</strong>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section aria-label="Lignes d’avantages" className={styles.perks}>
         {!loading && !perks.length ? <p>Aucune ligne pour le moment. Ajoute le premier avantage.</p> : null}
@@ -287,7 +363,7 @@ export default function BoutiqueSubscriptionsClient() {
                   </div>
                 </div>
                 <div className={styles.perkGrades}>
-                  {SUBSCRIPTION_GRADES.map((grade) => {
+                  {grades.map((grade) => {
                     const cell = perkCell(perk, grade.key);
 
                     return (
@@ -332,7 +408,7 @@ export default function BoutiqueSubscriptionsClient() {
           <p>Le tableau se met à jour pendant la saisie. Une ligne sans libellé reste masquée, comme sur le site.</p>
         </div>
         {perks.some((row) => String(row.label ?? "").trim()) ? (
-          <SubscriptionPerkTable perks={perks} />
+          <SubscriptionPerkTable grades={grades} perks={perks} />
         ) : (
           <p>Aucune ligne visible pour le moment.</p>
         )}

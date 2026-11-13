@@ -369,6 +369,47 @@
   line-height: 1.5;
 }
 
+.gradeOrder {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 18px;
+  border: 1px solid rgba(36, 182, 189, 0.35);
+  border-radius: 8px;
+  background: rgba(36, 182, 189, 0.06);
+}
+
+.gradeOrder h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.gradeOrderList {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gradeOrderItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.gradeOrderItem strong {
+  font-weight: 600;
+}
+
 .perkRows {
   display: grid;
   gap: 12px;
@@ -502,7 +543,8 @@
 
 @media (max-width: 760px) {
   .perkRowHead,
-  .perkGrades {
+  .perkGrades,
+  .gradeOrderList {
     grid-template-columns: 1fr;
   }
 }

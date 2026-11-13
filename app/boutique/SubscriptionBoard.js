@@ -127,7 +127,7 @@ function GradeMedia({ src, banner, termLabel, title }) {
   );
 }
 
-export function SubscriptionPerkTable({ perks }) {
+export function SubscriptionPerkTable({ perks, grades = SUBSCRIPTION_GRADES }) {
   const perkRows = visiblePerkRows(perks);
 
   if (!perkRows.length) {
@@ -140,7 +140,7 @@ export function SubscriptionPerkTable({ perks }) {
       <thead>
         <tr>
           <th scope="col">Avantage</th>
-          {SUBSCRIPTION_GRADES.map((grade) => (
+          {grades.map((grade) => (
             <th key={grade.key} scope="col">{grade.label}</th>
           ))}
         </tr>
@@ -149,7 +149,7 @@ export function SubscriptionPerkTable({ perks }) {
         {perkRows.map((row) => (
           <tr key={row.id}>
             <th scope="row">{row.label}</th>
-            {SUBSCRIPTION_GRADES.map((grade) => (
+            {grades.map((grade) => (
               <td key={grade.key}>
                 <span className={styles.perkCellLabel}>{grade.label}</span>
                 <PerkValue cell={row[grade.key]} />
@@ -187,6 +187,7 @@ export default function SubscriptionBoard({
   slots,
   highlights,
   perks,
+  grades = SUBSCRIPTION_GRADES,
   term,
   onTerm,
   isBusy,
@@ -213,7 +214,7 @@ export default function SubscriptionBoard({
         ))}
       </div>
       <div className={styles.gradeGrid}>
-        {SUBSCRIPTION_GRADES.map((grade) => {
+        {grades.map((grade) => {
           const offer = columnOffer(slots, term, grade.key);
           const product = offer.product;
           const productId = product ? asPackageId(product.id) : "";
@@ -272,7 +273,7 @@ export default function SubscriptionBoard({
           );
         })}
       </div>
-      <SubscriptionPerkTable perks={perks} />
+      <SubscriptionPerkTable grades={grades} perks={perks} />
     </div>
   );
 }
