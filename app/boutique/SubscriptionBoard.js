@@ -223,7 +223,9 @@ export default function SubscriptionBoard({
           const total = product ? Number(product.base_price ?? product.total_price ?? 0) : 0;
           const currency = product?.currency || "EUR";
           const caption = subscriptionTotalCaption(offer.months);
-          const termLabel = SUBSCRIPTION_TERMS.find((item) => item.key === term)?.label ?? "";
+          const termLabel = grade.key === "belair" && term === "year"
+            ? "6 mois"
+            : SUBSCRIPTION_TERMS.find((item) => item.key === term)?.label ?? "";
           const imageSrc = packageImageSrc(product);
 
           return (

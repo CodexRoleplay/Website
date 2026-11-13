@@ -57,6 +57,8 @@ export default function BoutiqueSubscriptionsClient() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [dragIndex, setDragIndex] = useState(null);
+  const [overIndex, setOverIndex] = useState(null);
 
   const applyPayload = useCallback((payload) => {
     const nextPerks = payload.cardDisplay?.subscriptionPerks;
@@ -122,16 +124,15 @@ export default function BoutiqueSubscriptionsClient() {
     setMessage("");
   }
 
-  function movePerk(index, direction) {
+  function movePerk(fromIndex, toIndex) {
     setPerks((current) => {
-      const nextIndex = index + direction;
-      if (nextIndex < 0 || nextIndex >= current.length) {
+      if (fromIndex === toIndex || fromIndex == null || toIndex == null || fromIndex < 0 || toIndex < 0 || fromIndex >= current.length || toIndex >= current.length) {
         return current;
       }
 
       const rows = [...current];
-      const [item] = rows.splice(index, 1);
-      rows.splice(nextIndex, 0, item);
+      const [item] = rows.splice(fromIndex, 1);
+      rows.splice(toIndex, 0, item);
       return rows;
     });
     setMessage("");
@@ -226,8 +227,49 @@ export default function BoutiqueSubscriptionsClient() {
             const lineName = perk.label.trim() || `la ligne ${index + 1}`;
 
             return (
-              <li className={styles.perkRow} key={perk.id}>
+              <li
+                className={`${styles.perkRow} ${dragIndex === index ? styles.perkRowDragging : ""} ${overIndex === index && dragIndex !== index ? styles.perkRowOver : ""}`}
+                key={perk.id}
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  event.dataTransfer.dropEffect = "move";
+                  setOverIndex(index);
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  movePerk(dragIndex, index);
+                  setDragIndex(null);
+                  setOverIndex(null);
+                }}
+              >
                 <div className={styles.perkRowHead}>
+                  <button
+                    aria-label={`Déplacer ${lineName}. Flèches haut et bas pour changer la position.`}
+                    className={styles.perkDrag}
+                    draggable
+                    onDragEnd={() => {
+                      setDragIndex(null);
+                      setOverIndex(null);
+                    }}
+                    onDragStart={(event) => {
+                      setDragIndex(index);
+                      event.dataTransfer.effectAllowed = "move";
+                      event.dataTransfer.setData("text/plain", perk.id);
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "ArrowUp") {
+                        event.preventDefault();
+                        movePerk(index, index - 1);
+                      }
+                      if (event.key === "ArrowDown") {
+                        event.preventDefault();
+                        movePerk(index, index + 1);
+                      }
+                    }}
+                    type="button"
+                  >
+                    ⋮⋮
+                  </button>
                   <label className={styles.perkLabel}>
                     <span>Libellé</span>
                     <input
@@ -239,17 +281,6 @@ export default function BoutiqueSubscriptionsClient() {
                     />
                   </label>
                   <div className={styles.perkActions}>
-                    <button aria-label={`Monter ${lineName}`} disabled={index === 0} onClick={() => movePerk(index, -1)} type="button">
-                      Monter
-                    </button>
-                    <button
-                      aria-label={`Descendre ${lineName}`}
-                      disabled={index === perks.length - 1}
-                      onClick={() => movePerk(index, 1)}
-                      type="button"
-                    >
-                      Descendre
-                    </button>
                     <button aria-label={`Supprimer ${lineName}`} onClick={() => removePerk(index)} type="button">
                       Supprimer
                     </button>

@@ -63,6 +63,7 @@
 .perkGrade select:focus-visible,
 .perkGrade input:focus-visible,
 .perkActions button:focus-visible,
+.perkDrag:focus-visible,
 .addPerk:focus-visible {
   outline: 2px solid #24b6bd;
   outline-offset: 2px;
@@ -390,9 +391,37 @@
   background: rgba(0, 0, 0, 0.22);
 }
 
+.perkRowDragging {
+  opacity: 0.45;
+}
+
+.perkRowOver {
+  outline: 2px solid #24b6bd;
+  outline-offset: 2px;
+}
+
+.perkDrag {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  min-height: 42px;
+  margin-bottom: 0;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  letter-spacing: -0.12em;
+  cursor: grab;
+}
+
+.perkDrag:active {
+  cursor: grabbing;
+}
+
 .perkRowHead {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 12px;
   align-items: end;
 }
