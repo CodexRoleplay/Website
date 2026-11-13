@@ -52,6 +52,7 @@ export default function BoutiqueSubscriptionsClient() {
   const [perks, setPerks] = useState([]);
   const [gradeOrder, setGradeOrder] = useState(() => orderedSubscriptionGrades().map((grade) => grade.key));
   const [coupon, setCoupon] = useState("");
+  const [percent, setPercent] = useState(25);
   const [updatedAt, setUpdatedAt] = useState(null);
   const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -69,6 +70,7 @@ export default function BoutiqueSubscriptionsClient() {
     setPerks(Array.isArray(nextPerks) ? nextPerks : []);
     setGradeOrder(orderedSubscriptionGrades(payload.cardDisplay?.subscriptionGradeOrder).map((grade) => grade.key));
     setCoupon(typeof payload.firstMonthCoupon === "string" ? payload.firstMonthCoupon : "");
+    setPercent(Number.isInteger(payload.firstMonthPercent) ? payload.firstMonthPercent : 25);
     setUpdatedAt(payload.updatedAt ?? null);
   }, []);
 
@@ -194,6 +196,7 @@ export default function BoutiqueSubscriptionsClient() {
             subscriptionGradeOrder: grades.map((grade) => grade.key),
           },
           firstMonthCoupon: coupon.trim(),
+          firstMonthPercent: percent,
         }),
       });
       const payload = await readApiJson(response);
@@ -225,20 +228,49 @@ export default function BoutiqueSubscriptionsClient() {
         </button>
       </div>
 
-      <label className={styles.couponField}>
-        <span>Code promo 1er mois</span>
-        <input
-          autoComplete="off"
-          maxLength={64}
-          onChange={(event) => {
-            setCoupon(event.target.value);
-            setMessage("");
-          }}
-          spellCheck={false}
-          value={coupon}
-        />
-        <small>Laisser vide pour n’appliquer aucun code. Il part avec le panier d’un abonnement mensuel. Pour écrire « 7,49 € le 1er mois » sous le prix, fais-le dans Cartes.</small>
-      </label>
+      <div className={styles.couponField}>
+        <p>Offre du 1er mois</p>
+        <div className={styles.couponRow}>
+          <label>
+            <span>Pourcentage</span>
+            <input
+              inputMode="numeric"
+              max={100}
+              min={0}
+              onChange={(event) => {
+                const raw = event.target.value;
+                if (raw === "") {
+                  setPercent("");
+                  setMessage("");
+                  return;
+                }
+                const numeric = Number(raw);
+                if (Number.isInteger(numeric) && numeric >= 0 && numeric <= 100) {
+                  setPercent(numeric);
+                  setMessage("");
+                }
+              }}
+              step={1}
+              type="number"
+              value={percent}
+            />
+          </label>
+          <label>
+            <span>Code promo</span>
+            <input
+              autoComplete="off"
+              maxLength={64}
+              onChange={(event) => {
+                setCoupon(event.target.value);
+                setMessage("");
+              }}
+              spellCheck={false}
+              value={coupon}
+            />
+          </label>
+        </div>
+        <small>Laisser le code vide pour n’afficher aucune offre et n’appliquer aucun code. Le code part avec le panier d’un abonnement mensuel. Pour écrire « 7,49 € le 1er mois » sous le prix, fais-le dans Cartes.</small>
+      </div>
 
       {error ? <p className={styles.error}>{error}</p> : null}
       {message ? <p className={styles.success} role="status">{message}</p> : null}

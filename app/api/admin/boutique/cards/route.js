@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { verifyAdminRequest } from "@/lib/firebase/admin";
 import { loadAdminBoutiqueCatalog } from "@/lib/boutique/admin-catalog";
 import { getBoutiqueSettings, setBoutiqueCardDisplay } from "@/lib/boutique/admin-persistence";
-import { buildAdminProductRows, sanitizeCouponCode, validateCardDisplayInput, validateSubscriptionPerksInput } from "@/lib/boutique/card-display";
+import { buildAdminProductRows, sanitizeCouponCode, sanitizeFirstMonthPercent, validateCardDisplayInput, validateSubscriptionPerksInput } from "@/lib/boutique/card-display";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,6 +15,7 @@ async function cardsResponse(settings) {
     updatedAt: settings.updatedAt ?? null,
     cardDisplay: settings.cardDisplay,
     firstMonthCoupon: settings.firstMonthCoupon ?? "",
+    firstMonthPercent: settings.firstMonthPercent ?? 25,
     catalogError: catalog.catalogError,
     products: buildAdminProductRows(catalog.packages, settings.cardDisplay),
   };
@@ -65,9 +66,14 @@ export async function POST(request) {
         }
 
         const coupon = sanitizeCouponCode(payload?.firstMonthCoupon ?? "");
+        const percent = sanitizeFirstMonthPercent(payload?.firstMonthPercent);
 
         if (coupon.error) {
           return NextResponse.json({ error: coupon.error }, { status: 400 });
+        }
+
+        if (percent.error) {
+          return NextResponse.json({ error: percent.error }, { status: 400 });
         }
 
         const settings = await setBoutiqueCardDisplay(
@@ -77,6 +83,7 @@ export async function POST(request) {
             subscriptionGradeOrder: perkResult.subscriptionGradeOrder,
           },
           coupon.value,
+          percent.value,
         );
         return NextResponse.json(await cardsResponse(settings));
       }
@@ -91,7 +98,11 @@ export async function POST(request) {
         return NextResponse.json({ error: validatedCards.error }, { status: 400 });
       }
 
-      const settings = await setBoutiqueCardDisplay(validatedCards.value, existing.firstMonthCoupon ?? "");
+      const settings = await setBoutiqueCardDisplay(
+        validatedCards.value,
+        existing.firstMonthCoupon ?? "",
+        existing.firstMonthPercent ?? 25,
+      );
       return NextResponse.json(await cardsResponse(settings));
     }
 
@@ -102,12 +113,17 @@ export async function POST(request) {
     }
 
     const coupon = sanitizeCouponCode(payload?.firstMonthCoupon ?? "");
+    const percent = sanitizeFirstMonthPercent(payload?.firstMonthPercent);
 
     if (coupon.error) {
       return NextResponse.json({ error: coupon.error }, { status: 400 });
     }
 
-    const settings = await setBoutiqueCardDisplay(validated.value, coupon.value);
+    if (percent.error) {
+      return NextResponse.json({ error: percent.error }, { status: 400 });
+    }
+
+    const settings = await setBoutiqueCardDisplay(validated.value, coupon.value, percent.value);
     return NextResponse.json(await cardsResponse(settings));
   } catch (error) {
     console.error("[admin/boutique/cards POST]", error);

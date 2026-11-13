@@ -433,7 +433,7 @@ function Icon({ name }) {
   );
 }
 
-export default function ShopClient({ initialCategories, catalogError, cardDisplay = null, tebexToken = "" }) {
+export default function ShopClient({ initialCategories, catalogError, cardDisplay = null, tebexToken = "", firstMonthOffer = null }) {
   const searchParams = useSearchParams();
   const targetedCategory = searchParams.get("categorie") ?? searchParams.get("category") ?? "";
   const categories = useMemo(
@@ -1072,6 +1072,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
             onGift={openGift}
             onSubscribe={(product) => addProduct(product)}
             onTerm={setSubscriptionTerm}
+            firstMonthOffer={firstMonthOffer}
             grades={orderedSubscriptionGrades(cardHighlights.subscriptionGradeOrder)}
             perks={cardHighlights.subscriptionPerks}
             signedIn={Boolean(basket?.username)}

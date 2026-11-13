@@ -22,11 +22,18 @@ export const metadata = pageMetadata({
 export default async function ShopPage() {
   let boutiqueEnabled = false;
   let cardDisplay = emptyCardDisplay();
+  let firstMonthOffer = null;
 
   try {
     const settings = await getBoutiqueSettings();
     boutiqueEnabled = settings.enabled;
     cardDisplay = settings.cardDisplay ?? cardDisplay;
+    if (settings.firstMonthCoupon) {
+      firstMonthOffer = {
+        code: settings.firstMonthCoupon,
+        percent: settings.firstMonthPercent ?? 25,
+      };
+    }
   } catch (error) {
     console.error("[boutique] Impossible de lire le statut.", error);
   }
@@ -79,6 +86,7 @@ export default async function ShopPage() {
             cardDisplay={cardDisplay}
             catalogError={catalogError}
             initialCategories={categories}
+            firstMonthOffer={firstMonthOffer}
             tebexToken={process.env.TEBEX_PUBLIC_TOKEN ?? ""}
           />
         </main>

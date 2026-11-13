@@ -195,10 +195,23 @@ export default function SubscriptionBoard({
   onSubscribe,
   onGift,
   onDetail,
+  firstMonthOffer = null,
 }) {
+  const promoCode = String(firstMonthOffer?.code ?? "").trim();
+  const promoPercent = Number.isInteger(firstMonthOffer?.percent) ? firstMonthOffer.percent : 25;
+
   return (
     <div className={styles.gradeBoard}>
-      <p className={styles.cancelNote}>*Annulable à tout moment</p>
+      <div className={styles.gradeHeader}>
+        {promoCode ? (
+          <p className={styles.promoNote}>
+            <strong>-{promoPercent} %</strong>
+            {" "}le 1er mois
+            <span>{promoCode}</span>
+          </p>
+        ) : null}
+        <p className={styles.cancelNote}>*Annulable à tout moment</p>
+      </div>
       <div aria-label="Durée de l’abonnement" className={styles.termSwitch} role="tablist">
         {SUBSCRIPTION_TERMS.map((item) => (
           <button

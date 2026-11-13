@@ -237,6 +237,26 @@
   gap: 6px;
 }
 
+.couponField p {
+  margin: 0;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.couponRow {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.couponRow label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
 .couponField {
   min-width: 0;
   max-width: 100%;
@@ -542,6 +562,7 @@
 }
 
 @media (max-width: 760px) {
+  .couponRow,
   .perkRowHead,
   .perkGrades,
   .gradeOrderList {

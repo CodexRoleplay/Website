@@ -1379,10 +1379,43 @@ form.giftPanel .giftActions {
   gap: 16px;
 }
 
-.cancelNote {
+.gradeHeader {
   position: sticky;
   top: 156px;
   z-index: 6;
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+.promoNote {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-primary), sans-serif;
+  font-size: clamp(18px, 2vw, 26px);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  text-align: right;
+}
+
+.promoNote strong {
+  color: #fe14be;
+}
+
+.promoNote span {
+  color: #24b6bd;
+  font-family: var(--font-secondary), sans-serif;
+  font-size: 0.72em;
+  letter-spacing: 0.08em;
+}
+
+.cancelNote {
   justify-self: end;
   margin: 0;
   color: #fff;
@@ -1738,7 +1771,7 @@ form.giftPanel .giftActions {
     grid-template-columns: 1fr;
   }
 
-  .cancelNote {
+  .gradeHeader {
     top: 96px;
   }
 
