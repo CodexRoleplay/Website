@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { asPackageId } from "@/lib/boutique/card-display";
 import {
   SUBSCRIPTION_GRADES,
@@ -9,6 +9,41 @@ import {
   subscriptionTotalCaption,
 } from "@/lib/boutique/subscriptions";
 import styles from "./shop.module.css";
+
+function PromoCopy({ code }) {
+  const [copied, setCopied] = useState(false);
+  const timerRef = useRef(0);
+
+  useEffect(() => () => window.clearTimeout(timerRef.current), []);
+
+  async function copyCode() {
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      return;
+    }
+
+    setCopied(true);
+    window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => setCopied(false), 1600);
+  }
+
+  return (
+    <button aria-label="Copier le code promo" className={styles.promoCopy} onClick={copyCode} type="button">
+      <span>Avec le code :</span>
+      <strong className={styles.promoCode}>{code}</strong>
+      {copied ? (
+        <span className={styles.promoCopied}>Copié</span>
+      ) : (
+        <svg aria-hidden="true" className={styles.promoCopyIcon} viewBox="0 0 24 24">
+          <rect height="13" rx="1.5" width="13" x="8" y="8" />
+          <path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8" />
+        </svg>
+      )}
+      <span aria-live="polite" className={styles.promoLive}>{copied ? "Copié" : ""}</span>
+    </button>
+  );
+}
 
 function formatPrice(value, currency = "EUR") {
   return new Intl.NumberFormat("fr-FR", {
@@ -208,7 +243,7 @@ export default function SubscriptionBoard({
             <span className={styles.promoLead}>
               <strong>-{promoPercent} %</strong> le 1er mois
             </span>
-            <strong className={styles.promoCode}>{promoCode}</strong>
+            <PromoCopy code={promoCode} />
           </p>
         ) : null}
         <p className={styles.cancelNote}>*Annulable à tout moment</p>
