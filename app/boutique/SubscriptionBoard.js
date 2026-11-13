@@ -205,9 +205,10 @@ export default function SubscriptionBoard({
       <div className={styles.gradeHeader}>
         {promoCode ? (
           <p className={styles.promoNote}>
-            <strong>-{promoPercent} %</strong>
-            {" "}le 1er mois
-            <span>{promoCode}</span>
+            <span className={styles.promoLead}>
+              <strong>-{promoPercent} %</strong> le 1er mois
+            </span>
+            <strong className={styles.promoCode}>{promoCode}</strong>
           </p>
         ) : null}
         <p className={styles.cancelNote}>*Annulable à tout moment</p>
