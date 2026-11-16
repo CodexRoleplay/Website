@@ -356,11 +356,14 @@ export default function Header() {
             </li>
             <li style={{ "--i": 3 }}>
               <ShopLink
-                className={`cxnav__drawer-group${pathname.startsWith("/boutique") ? " is-active" : ""}`}
+                className={`cxnav__drawer-group cxnav__drawer-group--featured${pathname.startsWith("/boutique") ? " is-active" : ""}`}
                 href="/boutique"
                 onClick={() => setIsOpen(false)}
               >
-                <em>04</em>Boutique
+                <em>04</em>
+                <span className="cxnav__drawer-featured" data-text="Boutique">
+                  Boutique
+                </span>
               </ShopLink>
               <ul>
                 {shopLinks.map((link) => (

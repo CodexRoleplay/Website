@@ -718,6 +718,48 @@
   .cxnav__drawer-list a.is-active,
   .cxnav__drawer-group.is-active { color: var(--cx-cyan); }
 
+  .cxnav__drawer-featured {
+    position: relative;
+    animation: cxnav-featured-color 2.8s ease-in-out infinite;
+  }
+
+  .cxnav__drawer-featured::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow:
+      -39px -9px 0 rgba(255, 53, 189, 0.85),
+      41px -6px 0 rgba(53, 227, 236, 0.72),
+      35px 10px 0 rgba(255, 255, 255, 0.58),
+      -31px 11px 0 rgba(255, 53, 189, 0.52),
+      7px -14px 0 rgba(255, 255, 255, 0.48);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
+    animation: cxnav-featured-particles 2.8s ease-in-out infinite;
+  }
+
+  .cxnav__drawer-group--featured:hover .cxnav__drawer-featured,
+  .cxnav__drawer-group--featured:focus-visible .cxnav__drawer-featured,
+  .cxnav__drawer-group--featured:active .cxnav__drawer-featured {
+    color: #fff;
+  }
+
+  .cxnav__drawer-group--featured:hover .cxnav__drawer-featured::before,
+  .cxnav__drawer-group--featured:focus-visible .cxnav__drawer-featured::before {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    color: #ff35bd;
+    clip-path: inset(0 0 55% 0);
+    animation: cxnav-glitch 340ms steps(2) 1;
+    pointer-events: none;
+  }
+
   .cxnav__drawer-list em {
     font-size: 10px;
     font-style: normal;
