@@ -36,17 +36,50 @@ export default function UsersAdminClient() {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    fetch("/api/admin/status")
-      .then((response) => readApiJson(response))
-      .then((status) => {
-        setAdminStatus(status);
+    if (authLoading || !user) {
+      return undefined;
+    }
 
-        if (!status.configured || !status.initOk) {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const token = await getIdToken();
+
+        if (!token || cancelled) {
+          return;
+        }
+
+        const response = await fetch("/api/admin/status", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const status = await readApiJson(response);
+
+        if (cancelled || response.status === 401 || response.status === 403) {
+          return;
+        }
+
+        const normalized = {
+          ...status,
+          configured: status.configured ?? false,
+          initOk: status.initOk ?? false,
+          initError: status.initError ?? status.error ?? null,
+        };
+
+        setAdminStatus(normalized);
+
+        if (!normalized.configured || !normalized.initOk) {
           setSetupRequired(true);
         }
-      })
-      .catch(() => {});
-  }, []);
+      } catch {
+        // Le diagnostic reste optionnel : la liste des accès a son propre message.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, user, getIdToken]);
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -261,11 +294,11 @@ export default function UsersAdminClient() {
           <ul className={styles.setupList}>
             <li>
               <code>FIREBASE_ADMIN_CLIENT_EMAIL</code>
-              {adminStatus?.hasClientEmail ? " ✓" : " ✗ manquant"}
+              {adminStatus?.hasClientEmail === true ? " ✓" : adminStatus?.hasClientEmail === false ? " ✗ manquant" : ""}
             </li>
             <li>
               <code>FIREBASE_ADMIN_PRIVATE_KEY</code>
-              {adminStatus?.hasPrivateKey ? " ✓" : " ✗ manquant"}
+              {adminStatus?.hasPrivateKey === true ? " ✓" : adminStatus?.hasPrivateKey === false ? " ✗ manquant" : ""}
             </li>
           </ul>
           {adminStatus?.initError ? <p className={styles.setupHint}>{adminStatus.initError}</p> : null}
@@ -289,8 +322,7 @@ export default function UsersAdminClient() {
             <li>Redeploy sur Vercel, puis Actualiser ici.</li>
           </ol>
           <p className={styles.setupHint}>
-            Test direct : ouvre <code>/api/admin/status</code> sur ton site — tu dois voir du JSON, pas une
-            page HTML.
+            Sans session admin, <code>/api/admin/status</code> répond une erreur JSON, pas la configuration.
           </p>
         </section>
       ) : null}

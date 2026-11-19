@@ -13,7 +13,7 @@ export async function GET(request) {
       return NextResponse.json({ error: admin.error }, { status: admin.status });
     }
 
-    const stored = await getCodePenalDocument();
+    const stored = await getCodePenalDocument(undefined, { includeEditorEmail: true });
     return NextResponse.json({ ...stored, source: "firestore" });
   } catch (error) {
     console.error("[admin/code-penal GET]", error);

@@ -1,21 +1,21 @@
 import { NextResponse } from "next/server";
-import { getAdminInitStatus } from "@/lib/firebase/admin";
+import { getAdminInitStatus, verifyAdminRequest } from "@/lib/firebase/admin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request) {
   try {
+    const admin = await verifyAdminRequest(request);
+
+    if (admin.error) {
+      return NextResponse.json({ error: admin.error }, { status: admin.status });
+    }
+
     const status = await getAdminInitStatus();
     return NextResponse.json(status);
   } catch (error) {
-    return NextResponse.json(
-      {
-        configured: false,
-        initOk: false,
-        initError: error?.message ?? "Erreur status admin.",
-      },
-      { status: 200 },
-    );
+    console.error("[admin/status GET]", error);
+    return NextResponse.json({ error: "Erreur status admin." }, { status: 500 });
   }
 }
