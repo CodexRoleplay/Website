@@ -636,6 +636,10 @@
     border-bottom: 1px solid rgba(174, 190, 255, 0.12);
   }
 
+  .sidebar.sidebarIndex {
+    display: none;
+  }
+
   .sideNav {
     gap: 2px;
   }

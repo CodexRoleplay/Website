@@ -50,7 +50,7 @@ export const footerGroups = [
     links: [
       { label: "Accueil", href: "/" },
       { label: "Rejoindre", href: "https://discord.gg/HwUqfteUHz", external: true },
-      { label: "Notre histoire", href: "#about" },
+      { label: "Notre histoire", href: "/#about" },
       {
         label: "Discord",
         href: "https://discord.gg/HwUqfteUHz",

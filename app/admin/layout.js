@@ -6,7 +6,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = {
   ...pageMetadata({
     path: "/admin",
-    title: "Admin — Codex RP",
+    title: "Admin - Codex RP",
     description: "Espace d'administration Codex RP.",
   }),
   robots: {

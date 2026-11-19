@@ -1999,7 +1999,23 @@ body.cx-modal-open {
 
 @media screen and (min-width: 851px) {
   .module_video__content {
+    margin-left: clamp(280px, calc(22vw + 120px), 460px);
+  }
+}
+
+@media screen and (min-width: 1440px) {
+  .module_video__content {
     margin-left: clamp(400px, calc(30vw + 180px), 560px);
+  }
+}
+
+@media screen and (max-width: 1400px) and (min-width: 851px) {
+  .module_video .services_heading__MRcrx {
+    --size: clamp(72px, 8vw, 120px);
+  }
+
+  .module_video__heading {
+    min-width: 0;
   }
 }
 
@@ -2143,11 +2159,15 @@ body.cx-modal-open {
 }
 
 .module_video__play-caption {
+  max-width: 12.5rem;
   margin: 0;
   font-family: var(--font-secondary);
-  font-size: calc(14px + 4 * (100vw - 320px) / 1080);
-  letter-spacing: 0.25em;
+  font-size: calc(13px + 2 * (100vw - 320px) / 1080);
+  letter-spacing: 0.14em;
+  line-height: 1.35;
+  text-align: center;
   text-transform: uppercase;
+  text-wrap: balance;
   color: var(--secondary);
 }
 

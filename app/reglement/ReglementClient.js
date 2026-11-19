@@ -321,7 +321,7 @@ export default function ReglementClient({ initialCategories = [] }) {
 
       <div className={styles.layout}>
         <aside
-          className={styles.sidebar}
+          className={`${styles.sidebar} ${!activeCategory && !isSearching ? styles.sidebarIndex : ""}`}
           aria-label="Catégories du règlement"
           data-lenis-prevent="true"
           ref={sidebarRef}

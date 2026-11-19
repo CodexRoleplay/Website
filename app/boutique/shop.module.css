@@ -808,12 +808,12 @@ form.giftPanel .giftActions {
 }
 
 .shopDock > a {
-  padding-left: 8%;
+  padding-left: 16%;
   clip-path: polygon(12% 0, 100% 0, 100% 100%, 12% 100%, 0 50%);
 }
 
 .shopDock > button:last-child {
-  padding-right: 8%;
+  padding-right: 16%;
   border-right: 0;
   clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%);
 }
@@ -845,19 +845,17 @@ form.giftPanel .giftActions {
   display: block;
   max-width: 100%;
   margin-top: 4px;
-  overflow: hidden;
   color: rgba(232, 236, 255, 0.42);
   font-size: 8px;
-  letter-spacing: 0.08em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  white-space: normal;
 }
 
 .dockName {
   display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .cartModal {
@@ -1289,7 +1287,7 @@ form.giftPanel .giftActions {
   overflow: visible;
   border: 0;
   border-radius: 4px;
-  background: #fe14be;
+  background: #c61094;
   color: #fff;
   font-family: var(--font-primary);
   font-size: 18px;
@@ -1689,7 +1687,7 @@ form.giftPanel .giftActions {
 }
 
 .gradeFeatured .gradeSubscribe {
-  background: #fe14be;
+  background: #c61094;
   color: #fff;
 }
 

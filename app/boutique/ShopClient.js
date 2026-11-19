@@ -11,9 +11,9 @@ import styles from "./shop.module.css";
 import SubscriptionBoard, { BonusPill, GiftMark } from "./SubscriptionBoard";
 
 const TEBEX_LEGAL_LINKS = [
-  { label: "Impressum", href: "https://checkout.tebex.io/impressum" },
-  { label: "Terms & Conditions", href: "https://checkout.tebex.io/terms" },
-  { label: "Privacy Policy", href: "https://checkout.tebex.io/privacy" },
+  { label: "Mentions légales", href: "https://checkout.tebex.io/impressum" },
+  { label: "Conditions", href: "https://checkout.tebex.io/terms" },
+  { label: "Confidentialité", href: "https://checkout.tebex.io/privacy" },
 ];
 const BASKET_STORAGE_KEY = "codex-rp-tebex-basket-v2";
 const FIVEM_STORAGE_KEY = "codex-rp-fivem-user";
@@ -58,6 +58,16 @@ function forgetFiveMUser() {
   window.sessionStorage.removeItem(FIVEM_REAUTH_KEY);
 }
 
+function discordDisplayName(value) {
+  const name = String(value ?? "")
+    .trim()
+    .replace(/#0+$/u, "")
+    .replace(/\s+/g, " ")
+    .slice(0, 64);
+
+  return name;
+}
+
 function readDiscordAccount() {
   try {
     const parsed = JSON.parse(window.localStorage.getItem(DISCORD_STORAGE_KEY) || "");
@@ -67,7 +77,7 @@ function readDiscordAccount() {
       return null;
     }
 
-    const name = String(parsed?.name ?? "").trim().slice(0, 64);
+    const name = discordDisplayName(parsed?.name);
 
     return { id, name: name || "Discord" };
   } catch {
@@ -78,7 +88,7 @@ function readDiscordAccount() {
 function storeDiscordAccount(account) {
   window.localStorage.setItem(
     DISCORD_STORAGE_KEY,
-    JSON.stringify({ id: account.id, name: account.name || "Discord" }),
+    JSON.stringify({ id: account.id, name: discordDisplayName(account.name) || "Discord" }),
   );
 }
 
@@ -96,11 +106,11 @@ function discordAccountFromSearch(params, pending) {
     return null;
   }
 
-  const name = ["username", "ign", "discord_tag", "discord_username"]
-    .map((key) => String(params.get(key) ?? "").trim())
+  const name = ["discord_username", "username", "ign", "discord_tag"]
+    .map((key) => discordDisplayName(params.get(key)))
     .find(Boolean);
 
-  return { id: returnedId, name: (name || "Discord").slice(0, 64) };
+  return { id: returnedId, name: name || "Discord" };
 }
 
 function boutiqueReturnPath(authValue) {
@@ -1288,7 +1298,7 @@ export default function ShopClient({ initialCategories, catalogError, cardDispla
             <div className={styles.giftModal}>
               <button aria-label="Fermer" className={styles.giftBackdrop} onClick={() => setDetailProduct(null)} type="button" />
               <div aria-modal="true" className={`${styles.giftPanel} ${styles.detailPanel}`} role="dialog">
-                <span>Détail Tebex</span>
+                <span>Détail</span>
                 <h2>{detailProduct.name}</h2>
                 <div className={styles.detailBody}>{cleanDescription(detailProduct.description) || "Tebex n’a pas renvoyé de description."}</div>
                 <div className={styles.giftActions}>

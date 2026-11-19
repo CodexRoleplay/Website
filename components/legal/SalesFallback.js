@@ -23,7 +23,7 @@ export default function SalesFallback() {
           {" · "}
           <a href="https://checkout.tebex.io/privacy" rel="noopener noreferrer" target="_blank">Confidentialité Tebex</a>
           {" · "}
-          <a href="https://checkout.tebex.io/impressum" rel="noopener noreferrer" target="_blank">Impressum Tebex</a>
+          <a href="https://checkout.tebex.io/impressum" rel="noopener noreferrer" target="_blank">Mentions Tebex</a>
         </p>
       </section>
 

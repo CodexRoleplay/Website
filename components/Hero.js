@@ -87,7 +87,7 @@ export default function Hero() {
                   </span>
                 </h1>
                 <p className="cxhero__desc">
-                  Tout ce qui est possible dans la vraie vie, est possible sur Codex RP.
+                  Tout ce qui est possible dans la vraie vie est possible sur Codex RP.
                 </p>
               </div>
             </div>
